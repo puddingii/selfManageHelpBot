@@ -1,6 +1,7 @@
-const { Client, Intents } = require('discord.js');
+const { Client, Collection, Intents } = require('discord.js');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
@@ -12,27 +13,26 @@ const client = new Client({
 		Intents.FLAGS.GUILD_PRESENCES,
 	],
 });
+/** commands때문에 index.d.ts수정. */
+client.commands = new Collection();
 
-client.once('ready', () => {
-	console.log('Ready!');
+const commandFiles = fs
+	.readdirSync(path.resolve(__dirname, './commands'))
+	.filter(file => file.endsWith('.js'));
+commandFiles.forEach(file => {
+	const command = require(`./commands/${file}`);
+	client.commands.set(command.data.name, command);
 });
 
-client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) {
-		return;
-	}
-
-	const { commandName } = interaction;
-
-	if (commandName === 'ping') {
-		await interaction.reply({
-			content: 'pong',
-			ephemeral: true,
-		});
-	} else if (commandName === 'server') {
-		await interaction.reply('Server info.');
-	} else if (commandName === 'user') {
-		await interaction.reply('User info.');
+const eventFiles = fs
+	.readdirSync(path.resolve(__dirname, './events'))
+	.filter(file => file.endsWith('.js'));
+eventFiles.forEach(file => {
+	const event = require(`./events/${file}`);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
 	}
 });
 

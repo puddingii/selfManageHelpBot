@@ -69,6 +69,7 @@
 		/**********************/
 		/* Global Code Rules */
 		/**********************/
+		"global-require": "warn",
 		"no-restricted-globals": ["error", "event"],
 		"no-empty-function": "off",
 		"linebreak-style": "off",
