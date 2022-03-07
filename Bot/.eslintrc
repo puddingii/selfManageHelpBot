@@ -1,0 +1,174 @@
+{
+	"root": true,
+	"env": {
+		"browser": true,
+		"node": true
+	},
+	"extends": ["airbnb-base", "plugin:prettier/recommended"],
+	"parserOptions": {
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	},
+	"plugins": ["sort-class-members"],
+	"ignorePatterns": "_",
+	"globals": {
+		"globalThis": false,
+		"*": false,
+		"$": false,
+		"_": false,
+		"Vue": false,
+		"VueAwesomeSwiper": false,
+		"vueBus": false,
+		"dayjs": false,
+		"lottie": false,
+		"cookie": false,
+		"bridge": false,
+		"bridgeRouter": false,
+		"app": false,
+		"device": false,
+		"history": false,
+		"location": false,
+		"document": false,
+		"window": false
+	},
+	// add your custom rules here
+	"rules": {
+		"no-underscore-dangle": "off",
+		"no-undef": "off",
+		"prefer-destructuring": "off",
+		"key-spacing": "off",
+		"prettier/prettier": "off",
+
+		"sort-class-members/sort-class-members": [
+			2,
+			{
+				"order": [
+					"[static-properties]",
+					"[static-methods]",
+					"[customProperties]",
+					"constructor",
+					// ["getters"],
+					// ["setters"],
+					// "[methods]",
+					"[event-handlers]", // reference the custom group defined in the "groups" property
+					"[everything-else]" // a few groups are provided by default (see list below)
+				],
+				"groups": {
+					"customProperties": [{ "type": "property", "sort": "alphabetical" }],
+					"event-handlers": [
+						{ "name": "/init|init.+/", "type": "method" },
+						{ "type": "method", "kind": "get", "sort": "alphabetical" },
+						{ "type": "method", "sort": "alphabetical" },
+						{ "type": "method", "async": true, "sort": "alphabetical" }
+					]
+				},
+				"accessorPairPositioning": "getThenSet"
+			}
+		],
+
+		/**********************/
+		/* Global Code Rules */
+		/**********************/
+		"no-restricted-globals": ["error", "event"],
+		"no-empty-function": "off",
+		"linebreak-style": "off",
+		// "quotes": "error",
+		"no-console": "off",
+		"max-len": "off",
+		"vars-on-top": "off",
+		"no-unused-expressions": "off",
+		"no-unused-vars": [
+			"warn",
+			{
+				// "varsIgnorePattern": "^_",
+				"args": "none",
+				"ignoreRestSiblings": true,
+				"caughtErrors": "none",
+				"caughtErrorsIgnorePattern": "^ignore"
+			}
+		],
+		"no-param-reassign": "off",
+		"class-methods-use-this": "off",
+		"consistent-return": "off",
+		"prefer-arrow-callback": "off",
+		"func-names": "off",
+		"no-bitwise": ["error", { "allow": ["^"] }],
+
+		/**********************/
+		/* General Code Rules */
+		/**********************/
+		// Enforce import order
+		"import/order": "error",
+
+		// ?룞?쟻 濡쒕뵫 ?뿀?슜
+		"import/no-dynamic-require": "off",
+
+		// .vue ~ syntax 泥섎━
+		"import/extensions": "off",
+		// "import/extensions": [
+		//   "error",
+		//   { "js": "always", "vue": "always", "jsx": "always"
+		// }],
+
+		// nuxt.js ?옄泥댁뿉?꽌 ?룷?븿?븯?뒗 vuex 紐⑤뱢 ?븣臾몄뿉 ?깮湲곕뒗 臾몄젣 泥섎━
+		"import/no-extraneous-dependencies": "off",
+
+		// Imports should come first
+		"import/first": "error",
+
+		// Other import rules
+		"import/no-mutable-exports": "error",
+
+		// Allow unresolved imports
+		"import/no-unresolved": "off",
+
+		"no-plusplus": "off",
+
+		// Allow async-await
+		"generator-star-spacing": "off",
+
+		// Prefer const over let
+		"prefer-const": [
+			"error",
+			{
+				"destructuring": "any",
+				"ignoreReadBeforeAssign": false
+			}
+		],
+
+		// No single if in an "else" block
+		"no-lonely-if": "error",
+
+		"no-irregular-whitespace": "off",
+
+		// Force curly braces for control flow,
+		// including if blocks with a single statement
+		"curly": ["error", "all"],
+
+		// No async function without await
+		"require-await": "error",
+
+		// Force dot notation when possible
+		"dot-notation": "error",
+
+		"no-var": "off",
+
+		// Force object shorthand where possible
+		"object-shorthand": "off",
+
+		// No useless destructuring/importing/exporting renames
+		"no-useless-rename": "error",
+
+		/**********************/
+		/*     Vue Rules      */
+		/**********************/
+		// "vue/no-multi-spaces": [
+		//   "error",
+		//   {
+		//     ignoreProperties: false,
+		//   },
+		// ],
+
+		"no-shadow": "off"
+	}
+}
