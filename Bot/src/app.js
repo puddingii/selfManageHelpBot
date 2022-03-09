@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
+require('./config/db');
 
 const client = new Client({
 	intents: [
