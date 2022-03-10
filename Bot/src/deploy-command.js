@@ -3,7 +3,9 @@ const { Routes } = require('discord-api-types/v9');
 const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
-const logger = require('./config/winston.js');
+const {
+	cradle: { logger },
+} = require('./config/dependencyInjection');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
@@ -21,7 +23,9 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 	commandFiles.forEach(file => {
 		// eslint-disable-next-line global-require
 		const command = require(`./commands/${file}`);
-		commands.push(command.data.toJSON());
+		if (command.data) {
+			commands.push(command.data.toJSON());
+		}
 	});
 
 	/** Apply commands */

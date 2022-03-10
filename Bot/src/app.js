@@ -22,7 +22,9 @@ const commandFiles = fs
 	.filter(file => file.endsWith('.js'));
 commandFiles.forEach(file => {
 	const command = require(`./commands/${file}`);
-	client.commands.set(command.data.name, command);
+	if (command.data) {
+		client.commands.set(command.data.name, command);
+	}
 });
 
 const eventFiles = fs

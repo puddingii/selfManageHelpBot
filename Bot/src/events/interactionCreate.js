@@ -1,4 +1,6 @@
-const logger = require('../config/winston');
+const {
+	cradle: { logger },
+} = require('../config/dependencyInjection');
 
 module.exports = {
 	name: 'interactionCreate',

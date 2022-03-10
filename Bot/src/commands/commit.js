@@ -9,7 +9,7 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction} interaction */
 	async execute(interaction) {
 		await interaction.reply({
-			content: 'pong',
+			content: 'Commit 완료',
 			ephemeral: true,
 		});
 	},
