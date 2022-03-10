@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const User = new mongoose.Schema({
-	id: {
+	userId: {
 		type: String,
 		required: true,
 		unique: true,
@@ -10,24 +10,28 @@ const User = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	channel: [
+	channelList: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Channel',
 		},
 	],
-	study: [
+	studyList: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Study',
 		},
 	],
-	memo: [
+	todoList: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Memo',
+			ref: 'Todo',
 		},
 	],
+	accessKey: {
+		type: String,
+		default: '',
+	},
 });
 
 module.exports = mongoose.model('User', User);

@@ -8,21 +8,23 @@ const logger = require('./config/winston.js');
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 (function () {
+	if (!process.env.BOT_TOKEN || !process.env.CLIENT_ID || !process.env.GUILD_ID) {
+		logger.error('Required Env variables is not defined.');
+		return;
+	}
+
+	/** Commands defined */
 	const commands = [];
 	const commandFiles = fs
 		.readdirSync(path.resolve(__dirname, './commands'))
 		.filter(file => file.endsWith('.js'));
-
 	commandFiles.forEach(file => {
 		// eslint-disable-next-line global-require
 		const command = require(`./commands/${file}`);
 		commands.push(command.data.toJSON());
 	});
-	if (!process.env.BOT_TOKEN || !process.env.CLIENT_ID || !process.env.GUILD_ID) {
-		logger.error('Token is not valid');
-		return;
-	}
 
+	/** Apply commands */
 	const rest = new REST({ version: '9' }).setToken(process.env.BOT_TOKEN);
 	if (process.env.NODE_ENV !== 'production') {
 		rest
