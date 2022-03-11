@@ -1,5 +1,4 @@
-const { createContainer, asClass, asValue } = require('awilix');
-const path = require('path');
+const { createContainer, asValue } = require('awilix');
 const logger = require('./logger');
 const User = require('../model/User');
 const Study = require('../model/Study');
@@ -11,11 +10,11 @@ const container = createContainer();
 
 container.register({
 	logger: asValue(logger),
-	User: asValue(User),
-	Study: asValue(Study),
-	Channel: asValue(Channel),
-	Todo: asValue(Todo),
-	ChannelUserGoal: asValue(ChannelUserGoal),
+	UserModel: asValue(User),
+	StudyModel: asValue(Study),
+	ChannelModel: asValue(Channel),
+	TodoModel: asValue(Todo),
+	ChannelUserGoalModel: asValue(ChannelUserGoal),
 });
 
 module.exports = container;
