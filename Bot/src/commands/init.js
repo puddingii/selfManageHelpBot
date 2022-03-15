@@ -24,6 +24,7 @@ module.exports = {
 			await interaction.reply({ content });
 		} catch (err) {
 			logger.error(err);
+			await interaction.reply({ content: `${err}` });
 		}
 	},
 };

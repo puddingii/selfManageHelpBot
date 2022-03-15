@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const User = new mongoose.Schema({
 	userId: {
-		type: String,
+		type: Number,
 		required: true,
 		unique: true,
 	},
@@ -33,5 +34,16 @@ const User = new mongoose.Schema({
 		default: '',
 	},
 });
+
+User.pre('save', async function () {
+	if (this.accessKey !== '' && this.isModified('accessKey')) {
+		this.accessKey = await bcrypt.hash(this.accessKey, process.env.HASH_ROUND);
+	}
+});
+
+User.statics.findByUserId = async function (userId) {
+	const userInfo = await this.findOne({ userId });
+	return userInfo;
+};
 
 module.exports = mongoose.model('User', User);

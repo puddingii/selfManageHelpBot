@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
-	cradle: { ChannelModel, logger },
+	cradle: { ChannelModel, UserModel, logger },
 } = require('../config/dependencyInjection');
 
 module.exports = {
@@ -10,18 +10,19 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction} interaction */
 	async execute(interaction) {
 		try {
-			const isExist = await ChannelModel.findOne({ channelId: interaction.guild?.id });
-			let content = 'It is an ID that has already been registered.';
-			if (!isExist) {
-				await ChannelModel.create({
-					channelId: interaction.guild?.id,
-					name: interaction.guild?.name,
-				});
-				content = 'Registered the server.';
+			const isExist = await UserModel.findByUserId(interaction.user.id);
+			if (isExist) {
+				throw new Error('User is already existed.');
 			}
-			await interaction.reply({ content });
+			const newUser = await UserModel.create({
+				userId: interaction.user.id,
+				nickname: interaction.user.username,
+			});
+			await ChannelModel.addUser(interaction.guild?.id, newUser);
+			await interaction.reply({ content: 'Registered User!' });
 		} catch (err) {
 			logger.error(err);
+			await interaction.reply({ content: `${err}` });
 		}
 	},
 };
