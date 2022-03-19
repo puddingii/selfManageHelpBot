@@ -6,9 +6,10 @@ module.exports = class Study {
 	/**
 	 * @param {import('../interface/Study').Study.studyUserInfo} studyUserInfo
 	 */
-	static startStudy(studyUserInfo) {
+	static startStudy(studyUserInfo, serverId) {
 		// FIXME 아이디 검증 필요.
-		this.studyInfo[studyUserInfo.userId] = {
+		this.studyInfo[serverId] = {
+			userId: studyUserInfo.userId,
 			sTime: `${dayjs()}`,
 			commentList: [],
 			isStudying: true,

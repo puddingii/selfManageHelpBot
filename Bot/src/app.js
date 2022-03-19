@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 
+const { isEnrolledUser } = require('./config/middleware');
+
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 require('./config/db');
 
@@ -35,7 +37,15 @@ eventFiles.forEach(file => {
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));
 	} else {
-		client.on(event.name, (...args) => event.execute(...args));
+		client.on(event.name, (...args) => {
+			if (event.name !== 'init' && event.name !== 'enrollUser') {
+				const isExist = isEnrolledUser(...args);
+				if (!isExist) {
+					return;
+				}
+			}
+			event.execute(...args);
+		});
 	}
 });
 

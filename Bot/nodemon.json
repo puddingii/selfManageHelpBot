@@ -1,3 +1,6 @@
 {
-  "ignore": ["db/*"]
+	"ignore": [
+		"types/*",
+		"interface/*"
+	]
 }
