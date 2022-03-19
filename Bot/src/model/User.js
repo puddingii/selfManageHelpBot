@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 const User = new mongoose.Schema({
 	userId: {
-		type: Number,
+		type: String,
 		required: true,
 		unique: true,
 	},
@@ -37,7 +37,10 @@ const User = new mongoose.Schema({
 
 User.pre('save', async function () {
 	if (this.accessKey !== '' && this.isModified('accessKey')) {
-		this.accessKey = await bcrypt.hash(this.accessKey, process.env.HASH_ROUND);
+		this.accessKey = await bcrypt.hash(
+			this.accessKey,
+			parseInt(process.env.HASH_ROUND, 10),
+		);
 	}
 });
 

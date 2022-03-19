@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Channel = new mongoose.Schema({
 	channelId: {
-		type: Number,
+		type: String,
 		unique: true,
 		required: true,
 	},
@@ -19,7 +19,7 @@ const Channel = new mongoose.Schema({
 	],
 });
 
-/** 채널아이디로 검색 */
+/** 아이디로 채널 검색 */
 Channel.statics.findByChannelId = async function (channelId) {
 	const channelInfo = await this.findOne({ channelId });
 	return channelInfo;

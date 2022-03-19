@@ -10,15 +10,15 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction} interaction */
 	async execute(interaction) {
 		try {
-			const isExist = await UserModel.findByUserId(interaction.user.id);
+			const userId = interaction.user.id.toString();
+			const nickname = interaction.user.username;
+			const channelId = interaction.guild.id.toString();
+			const isExist = await UserModel.findByUserId(userId);
 			if (isExist) {
 				throw new Error('User is already existed.');
 			}
-			const newUser = await UserModel.create({
-				userId: interaction.user.id,
-				nickname: interaction.user.username,
-			});
-			await ChannelModel.addUser(interaction.guild?.id, newUser);
+			const newUser = await UserModel.create({ userId, nickname });
+			await ChannelModel.addUser(channelId, newUser);
 			await interaction.reply({ content: 'Registered User!' });
 		} catch (err) {
 			logger.error(err);

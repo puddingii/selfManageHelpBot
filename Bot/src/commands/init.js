@@ -11,13 +11,13 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			const isExist = await ChannelModel.findOne({
-				channelId: interaction.guild?.id,
+				channelId: interaction.guild?.id.toString(),
 			});
 			let content = 'It is an ID that has already been registered.';
 			if (!isExist) {
 				await ChannelModel.create({
-					channelId: interaction.guild?.id,
-					name: interaction.guild?.name,
+					channelId: interaction.guild.id.toString(),
+					name: interaction.guild.name,
 				});
 				content = 'Registered the server.';
 			}
