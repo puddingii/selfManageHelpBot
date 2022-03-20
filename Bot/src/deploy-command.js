@@ -37,6 +37,15 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 			})
 			.then(() => logger.info('Successfully registered application commands.'))
 			.catch(err => logger.error(err));
+		rest
+			.put(
+				Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID2),
+				{
+					body: commands,
+				},
+			)
+			.then(() => logger.info('Successfully registered application commands.'))
+			.catch(err => logger.error(err));
 	} else {
 		rest
 			.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands })

@@ -4,12 +4,12 @@ module.exports = class Study {
 	static studyInfo = {};
 
 	/**
-	 * @param {import('../interface/Study').Study.studyUserInfo} studyUserInfo
+	 * @param {import('../interface/Study').Study.userInfo} userInfo
+	 * @param {String} serverId
 	 */
-	static startStudy(studyUserInfo, serverId) {
-		// FIXME 아이디 검증 필요.
+	static startStudy(userInfo, serverId) {
 		this.studyInfo[serverId] = {
-			userId: studyUserInfo.userId,
+			userId: userInfo.userId,
 			sTime: `${dayjs()}`,
 			commentList: [],
 			isStudying: true,
@@ -17,13 +17,13 @@ module.exports = class Study {
 	}
 
 	/**
-	 * @param {import('../interface/Study').Study.studyUserInfo} studyUserInfo
+	 * @param {import('../interface/Study').Study.userInfo} userInfo
 	 */
-	static endStudy(studyUserInfo) {
-		const { isStudying, sTime, commentList } = this.studyInfo[studyUserInfo.userId];
+	static endStudy(userInfo) {
+		const { isStudying, sTime, commentList } = this.studyInfo[userInfo.userId];
 		if (isStudying) {
 			console.log({
-				userId: studyUserInfo.userId,
+				userId: userInfo.userId,
 				sTime,
 				eTime: `${dayjs()}`,
 				commentList,
@@ -31,7 +31,7 @@ module.exports = class Study {
 		}
 	}
 
-	constructor() {
-		console.log();
+	static init() {
+		this.studyInfo = { asdf: 123123 };
 	}
 };

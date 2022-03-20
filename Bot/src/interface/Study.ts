@@ -1,5 +1,5 @@
 export namespace Study {
-	export type studyUserInfo = {
+	export type userInfo = {
 		userId: string;
 		channelId: string;
 	};

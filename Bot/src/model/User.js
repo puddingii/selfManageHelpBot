@@ -44,9 +44,23 @@ User.pre('save', async function () {
 	}
 });
 
+/** 아이디로 유저정보 탐색 */
 User.statics.findByUserId = async function (userId) {
 	const userInfo = await this.findOne({ userId });
 	return userInfo;
+};
+
+/** 유저정보에 채널 추가 */
+User.statics.addChannel = async function (userId, channel) {
+	const user = await this.findOne({ userId }).populate('channelList');
+	if (!user) {
+		throw new Error('User is not found.');
+	}
+	if (user.channelList.find(dbChannel => dbChannel.channelId === channel.channelId)) {
+		return;
+	}
+	user.channelList.push(channel._id);
+	await user.save();
 };
 
 module.exports = mongoose.model('User', User);
