@@ -13,7 +13,7 @@ module.exports = {
 			const isExist = await ChannelModel.findOne({
 				channelId: interaction.guild?.id.toString(),
 			});
-			let content = 'It is an ID that has already been registered.';
+			let content = '[Fail]It is an ID that has already been registered.';
 			if (!isExist) {
 				await ChannelModel.create({
 					channelId: interaction.guild.id.toString(),
