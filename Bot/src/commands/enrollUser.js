@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
-	cradle: { ChannelModel, UserModel, logger },
+	cradle: { ChannelModel, UserModel, ChannelUserGoalModel, logger },
 } = require('../config/dependencyInjection');
 
 module.exports = {
@@ -22,6 +22,14 @@ module.exports = {
 			/** 유저정보가 없을 때 */
 			if (!userInfo) {
 				userInfo = await UserModel.create({ userId, nickname });
+			}
+
+			const isExistCUGInfo = await ChannelUserGoalModel.isChannelUserUnique({
+				user: userInfo,
+				channel: channelInfo,
+			});
+			if (!isExistCUGInfo) {
+				await ChannelUserGoalModel.create({ user: userInfo, channel: channelInfo });
 			}
 			await ChannelModel.addUser(channelId, userInfo);
 			await UserModel.addChannel(userId, channelInfo);

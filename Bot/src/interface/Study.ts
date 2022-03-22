@@ -11,4 +11,13 @@ export namespace Study {
 		userId: string;
 		channelId: string;
 	};
+	export type endStudyReturns =
+		| {
+				channelId: String;
+				startDate: String;
+				endDate: String;
+				commentList: Array<String>;
+				isStudying: Boolean;
+		  }
+		| Number;
 }

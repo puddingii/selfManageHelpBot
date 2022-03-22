@@ -51,15 +51,26 @@ User.statics.findByUserId = async function (userId) {
 };
 
 /** 유저정보에 채널 추가 */
-User.statics.addChannel = async function (userId, channel) {
+User.statics.addChannel = async function (userId, channelInfo) {
 	const user = await this.findOne({ userId }).populate('channelList');
 	if (!user) {
 		throw new Error('User is not found.');
 	}
-	if (user.channelList.find(dbChannel => dbChannel.channelId === channel.channelId)) {
+	if (user.channelList.find(dbChannel => dbChannel.channelId === channelInfo.channelId)) {
 		return;
 	}
-	user.channelList.push(channel._id);
+	user.channelList.push(channelInfo);
+	await user.save();
+};
+
+/** 유저정보에 공부정보 추가 */
+User.statics.addStudy = async function (userId, studyInfo) {
+	const user = await this.findOne({ userId }).populate('studyList');
+	if (!user) {
+		throw new Error('User is not found.');
+	}
+
+	user.studyList.push(studyInfo);
 	await user.save();
 };
 

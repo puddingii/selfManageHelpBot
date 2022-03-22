@@ -16,9 +16,10 @@ module.exports = class Study {
 	}
 
 	/**
+	 * Add comment when you are studying. Comment is about study information.
 	 * @param {import('../interface/Study').Study.userInfo} userInfo
 	 * @param {{ title: String, content: String, isSecret: Boolean }} comment
-	 * @returns {number} 1 - success,  2 - channel is different,  3 - study status is false
+	 * @returns {Number} 1 - success,  2 - channel is different,  3 - study status is false
 	 */
 	addComment(userInfo, comment) {
 		const { userId, channelId } = userInfo;
@@ -37,26 +38,27 @@ module.exports = class Study {
 	}
 
 	/**
+	 * Stop studying and return my study information(start time, end time, comment etc...)
 	 * @param {import('../interface/Study').Study.userInfo} userInfo
-	 * @returns {Boolean | {userId: String, sTime: String, eTime:String, commentList: Array<String>, isStudying: Boolean}} if study status is false, this function will return false
+	 * @returns {import('../interface/Study').Study.endStudyReturns} Object - success ,2 - channel is different,  3 - study status is false
 	 */
 	endStudy(userInfo) {
 		const { userId, channelId } = userInfo;
-		if (
-			this.studyInfo[userId]?.isStudying &&
-			this.studyInfo[userId].channelId === channelId
-		) {
-			this.studyInfo[userId].isStudying = false;
-			return { ...this.studyInfo[userId], eTime: `${dayjs()}` };
+		if (this.studyInfo[userId].channelId !== channelId) {
+			return 2;
 		}
-		return false;
+		if (this.studyInfo[userId]?.isStudying) {
+			this.studyInfo[userId].isStudying = false;
+			return { ...this.studyInfo[userId], endDate: `${dayjs()}` };
+		}
+		return 3;
 	}
 
 	/**
 	 * Study start. This command cannot be used simultaneously with other channels.
 	 * EX - (channel1 - startstudy >> channel2 - startstudy) : impossible
 	 * @param {import('../interface/Study').Study.userInfo} userInfo
-	 * @returns {number} 0 - already studying(failed),  1 - success
+	 * @returns {Number} 0 - already studying(failed),  1 - success
 	 */
 	startStudy(userInfo) {
 		const { userId, channelId } = userInfo;
@@ -65,10 +67,27 @@ module.exports = class Study {
 		}
 		this.studyInfo[userId] = {
 			channelId,
-			sTime: `${dayjs()}`,
+			startDate: `${dayjs()}`,
 			commentList: [],
 			isStudying: true,
 		};
 		return 1;
+	}
+
+	/**
+	 * Stop studying.
+	 * @param {import('../interface/Study').Study.userInfo} userInfo
+	 * @returns {Number} 1 - success,  2 - channel is different,  3 - study status is false
+	 */
+	stopStudy(userInfo) {
+		const { userId, channelId } = userInfo;
+		if (this.studyInfo[userId].channelId !== channelId) {
+			return 2;
+		}
+		if (this.studyInfo[userId]?.isStudying) {
+			this.studyInfo[userId].isStudying = false;
+			return 1;
+		}
+		return 3;
 	}
 };

@@ -13,11 +13,17 @@ const ChannelUserGoal = new mongoose.Schema({
 	},
 	goalTime: {
 		type: Number,
-		required: true,
+		default: 30,
 	},
 	content: {
 		type: String,
 	},
 });
+
+ChannelUserGoal.statics.isChannelUserUnique = async function (userInfo) {
+	const { user, channel } = userInfo;
+	const result = await this.findOne({ user, channel });
+	return result ? 1 : 0;
+};
 
 module.exports = mongoose.model('ChannelUserGoal', ChannelUserGoal);

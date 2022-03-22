@@ -25,15 +25,15 @@ Channel.statics.findByChannelId = async function (channelId) {
 };
 
 /** 채널에 유저 추가 */
-Channel.statics.addUser = async function (channelId, user) {
+Channel.statics.addUser = async function (channelId, userInfo) {
 	const channel = await this.findOne({ channelId }).populate('userList');
 	if (!channel) {
 		throw new Error('Channel is not found.');
 	}
-	if (channel.userList.find(dbUser => dbUser.userId === user.userId)) {
+	if (channel.userList.find(dbUser => dbUser.userId === userInfo.userId)) {
 		return;
 	}
-	channel.userList.push(user._id);
+	channel.userList.push(userInfo);
 	await channel.save();
 };
 
