@@ -25,36 +25,38 @@ module.exports = {
 				const studyController = new StudyController();
 				result = studyController.endStudy({ userId, channelId });
 			} else {
-				result = 4;
+				result = 0;
 			}
 
-			let content = 'Stop studying and recording my logs';
-			/** If command is failed */
-			if (typeof result === 'number') {
-				switch (result) {
-					case 2:
-						content = '[Fail]Channel is different';
-						break;
-					case 3:
-						content = '[Fail]You are not the studying status...';
-						break;
-					case 4:
-						content = '[Fail]Title option is essential';
-						break;
-					default:
-						content = '[Fail]Error End';
-				}
-			} else {
+			/** If controller is working normally */
+			if (typeof result === 'object') {
 				const owner = await UserModel.findByUserId(userId);
-				const studyInfo = {
+				const newStudyInfo = await StudyModel.create({
 					title,
 					startDate: result.startDate,
 					endDate: result.endDate,
 					commentList: result.commentList,
 					owner,
-				};
-				const newStudyInfo = await StudyModel.create(studyInfo);
-				await UserModel.addStudy(userId, newStudyInfo);
+				});
+				result = await UserModel.addStudy(userId, newStudyInfo);
+			}
+
+			let content;
+			switch (result) {
+				case 0:
+					content = '[Fail]Title option is essential';
+					break;
+				case 1:
+					content = 'Stop studying and recording my logs';
+					break;
+				case 2:
+					content = '[Fail]Channel is different';
+					break;
+				case 3:
+					content = '[Fail]You are not the studying status...';
+					break;
+				default:
+					content = '[Fail]Error End';
 			}
 			await interaction.reply({ content });
 		} catch (err) {

@@ -61,6 +61,8 @@ User.statics.addChannel = async function (userId, channelInfo) {
 	}
 	user.channelList.push(channelInfo);
 	await user.save();
+
+	return 1;
 };
 
 /** 유저정보에 공부정보 추가 */
@@ -72,6 +74,21 @@ User.statics.addStudy = async function (userId, studyInfo) {
 
 	user.studyList.push(studyInfo);
 	await user.save();
+
+	return 1;
+};
+
+/** 유저정보에 Todo정보 추가 */
+User.statics.addTodo = async function (userId, todoInfo) {
+	const user = await this.findOne({ userId }).populate('todoList');
+	if (!user) {
+		throw new Error('User is not found.');
+	}
+
+	user.todoList.push(todoInfo);
+	await user.save();
+
+	return 1;
 };
 
 module.exports = mongoose.model('User', User);

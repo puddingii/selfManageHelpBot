@@ -33,10 +33,6 @@ module.exports = class Study {
 		return this.studyInfo[userId]?.isStudying ? 2 : 3;
 	}
 
-	checkStudyInfo() {
-		console.log(this.studyInfo);
-	}
-
 	/**
 	 * Stop studying and return my study information(start time, end time, comment etc...)
 	 * @param {import('../interface/Study').Study.userInfo} userInfo
