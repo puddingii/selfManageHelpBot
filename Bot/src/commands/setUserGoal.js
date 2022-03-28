@@ -8,7 +8,10 @@ module.exports = {
 		.setName('setusergoal')
 		.setDescription('내 목표 설정')
 		.addStringOption(option =>
-			option.setName('minute').setDescription('공부 목표 시간(일주일 기준/분 단위)'),
+			option
+				.setName('minute')
+				.setDescription('공부 목표 시간(일주일 기준/분 단위)')
+				.setRequired(true),
 		)
 		.addStringOption(option =>
 			option.setName('content').setDescription('목표내용(optional)'),

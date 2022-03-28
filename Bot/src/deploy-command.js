@@ -47,6 +47,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 			.then(() => logger.info('Successfully registered application commands.'))
 			.catch(err => logger.error(err));
 	} else {
+		/** Global apply => After 1 hour. */
 		rest
 			.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands })
 			.then(() => logger.info('Successfully registered global application commands.'))

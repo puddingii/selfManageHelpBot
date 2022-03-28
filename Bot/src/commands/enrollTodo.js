@@ -7,7 +7,9 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('enrolltodo')
 		.setDescription('할일 등록하기')
-		.addStringOption(option => option.setName('content').setDescription('내용')),
+		.addStringOption(option =>
+			option.setName('content').setDescription('내용').setRequired(true),
+		),
 	/** @param {import('discord.js').CommandInteraction} interaction */
 	async execute(interaction) {
 		try {

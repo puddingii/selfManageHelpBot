@@ -9,7 +9,10 @@ module.exports = {
 		.setName('end')
 		.setDescription('End studying and recording my logs')
 		.addStringOption(option =>
-			option.setName('title').setDescription('공부한 내용의 간략한 총 요약'),
+			option
+				.setName('title')
+				.setDescription('공부한 내용의 간략한 총 요약')
+				.setRequired(true),
 		),
 	/** @param {import('discord.js').CommandInteraction} interaction */
 	async execute(interaction) {
