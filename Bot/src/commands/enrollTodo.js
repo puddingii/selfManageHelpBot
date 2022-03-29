@@ -25,10 +25,7 @@ module.exports = {
 			}
 
 			if (content && result === 0) {
-				const newTodo = await TodoModel.create({
-					content,
-					owner: user,
-				});
+				const newTodo = await TodoModel.createTodo({ content, owner: user });
 				result = await UserModel.addTodo(userId, newTodo);
 			}
 			let replyContent;
