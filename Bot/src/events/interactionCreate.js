@@ -21,8 +21,9 @@ module.exports = {
 			return;
 		}
 		if (commandName !== 'init' && commandName !== 'enrolluser') {
-			const isExist = isEnrolledUser(interaction);
+			const isExist = await isEnrolledUser(interaction);
 			if (!isExist) {
+				await interaction.reply('You are not enrolled this server.');
 				return;
 			}
 		}

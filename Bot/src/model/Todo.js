@@ -25,6 +25,7 @@ const Todo = new mongoose.Schema({
 
 /**
  * Todo 추가
+ * @this import('mongoose').Model
  * @param {{content: String, owner: import('mongoose').Query}}
  * @returns {Number}
  */
@@ -49,6 +50,7 @@ Todo.statics.createTodo = async function ({ content, owner }) {
 
 /**
  * 완료한 Todo 상태값 바꿔주기
+ * @this import('mongoose').Model
  * @param {import('mongoose').Query} userInfo
  * @param {Number} todoId
  * @returns {Number} -1 : Success,  x > -1 : failed Index
@@ -63,6 +65,16 @@ Todo.statics.updateComplete = async function (userInfo, todoId) {
 	await todo.save();
 
 	return -1;
+};
+
+/**
+ * 자기의 Todo list 가져오기
+ * @this import('mongoose').Model
+ * @param {import('mongoose').Query} userInfo
+ */
+Todo.statics.getAllData = async function (userInfo) {
+	const todo = await this.find({ owner: userInfo });
+	return todo;
 };
 
 module.exports = mongoose.model('Todo', Todo);
