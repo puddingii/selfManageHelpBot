@@ -91,4 +91,22 @@ User.statics.addTodo = async function (userId, todoInfo) {
 	return 1;
 };
 
+/**
+ * Random id 생성 후 저장 및 return
+ * @this import('mongoose').Model
+ * @param {String} userId
+ */
+User.statics.getRandomId = async function (userId) {
+	const user = await this.findOne({ userId });
+	if (!user) {
+		throw new Error('User is not found.');
+	}
+
+	const randomString = Math.random().toString(36).slice(2);
+	user.accessKey = randomString;
+	await user.save();
+
+	return randomString;
+};
+
 module.exports = mongoose.model('User', User);
