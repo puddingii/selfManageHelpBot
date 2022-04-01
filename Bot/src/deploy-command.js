@@ -17,15 +17,28 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 	/** Commands defined */
 	const commands = [];
-	const commandFiles = fs
-		.readdirSync(path.resolve(__dirname, './commands'))
-		.filter(file => file.endsWith('.js'));
-	commandFiles.forEach(file => {
+	const commandFolder = fs.readdirSync(path.resolve(__dirname, './commands'));
+	const commonCommandFiles = commandFolder.filter(file => file.endsWith('.js'));
+	commonCommandFiles.forEach(file => {
 		// eslint-disable-next-line global-require
 		const command = require(`./commands/${file}`);
 		if (command.data) {
 			commands.push(command.data.toJSON());
 		}
+	});
+
+	/** Service Folder Init */
+	const detailFolders = commandFolder.filter(file => !file.includes('.'));
+	detailFolders.forEach(folder => {
+		const detailFiles = fs.readdirSync(path.resolve(__dirname, `./commands/${folder}`));
+		const commandFiles = detailFiles.filter(file => file.endsWith('.js'));
+		commandFiles.forEach(file => {
+			// eslint-disable-next-line global-require
+			const command = require(`./commands/${folder}/${file}`);
+			if (command.data) {
+				commands.push(command.data.toJSON());
+			}
+		});
 	});
 
 	/** Apply commands */
