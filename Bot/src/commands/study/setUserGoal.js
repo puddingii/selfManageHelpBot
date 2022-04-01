@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
 	cradle: { UserModel, ChannelModel, ChannelUserGoalModel, logger },
-} = require('../config/dependencyInjection');
+} = require('../../config/dependencyInjection');
 
 module.exports = {
 	data: new SlashCommandBuilder()

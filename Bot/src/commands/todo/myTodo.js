@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const {
 	cradle: { UserModel, TodoModel, logger },
-} = require('../config/dependencyInjection');
+} = require('../../config/dependencyInjection');
 
 module.exports = {
 	data: new SlashCommandBuilder()

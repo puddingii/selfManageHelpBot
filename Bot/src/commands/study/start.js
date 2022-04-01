@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
 	cradle: { logger },
-} = require('../config/dependencyInjection');
-const StudyController = require('../controller/Study');
+} = require('../../config/dependencyInjection');
+const StudyController = require('../../controller/Study');
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('start').setDescription('Start studying'),
