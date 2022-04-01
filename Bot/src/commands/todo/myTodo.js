@@ -7,17 +7,26 @@ const {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('mytodo')
-		.setDescription('Show list that has not yet been completed.'),
+		.setDescription('Show list that has not yet been completed.')
+		.addStringOption(option =>
+			option
+				.setName('iscompleted')
+				.setDescription('Completed or Not Completed List')
+				.setRequired(true)
+				.addChoice('Completed', 'true')
+				.addChoice('Not Completed', 'false'),
+		),
 	/** @param {import('discord.js').CommandInteraction} interaction */
 	async execute(interaction) {
 		try {
 			/** Discord Info */
 			const userId = interaction.user.id.toString();
+			const isCompleted = JSON.parse(interaction.options.getString('iscompleted'));
 			const embedBox = new MessageEmbed();
 			embedBox
 				.setColor('#0099ff')
 				.setTitle('My Todo List')
-				.setDescription('Not completed list')
+				.setDescription(`${isCompleted ? 'C' : 'Not c'}ompleted list`)
 				.addField('\u200B', '\u200B')
 				.setTimestamp();
 			let result = 1;
@@ -30,6 +39,7 @@ module.exports = {
 				result = 2;
 			} else {
 				todoList = await TodoModel.getAllData(userInfo);
+				todoList = todoList.filter(todo => todo.isCompleted === isCompleted);
 				result = todoList.length > 0 ? 1 : 3;
 			}
 
