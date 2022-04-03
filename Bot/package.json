@@ -3,8 +3,9 @@
 	"version": "1.0.0",
 	"main": "app.js",
 	"scripts": {
+		"start": "node src/deploy-command.js && node src/app.js",
 		"dev:app": "nodemon src/app.js",
-		"dev:deploy": "nodemon --watch src/deploy-command.js src/deploy-command.js"
+		"dev:deploy": "node src/deploy-command.js"
 	},
 	"author": "",
 	"license": "ISC",
