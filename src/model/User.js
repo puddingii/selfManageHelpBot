@@ -44,7 +44,11 @@ User.pre('save', async function () {
 	}
 });
 
-/** 아이디로 유저정보 탐색 */
+/**
+ * 아이디로 유저정보 탐색
+ * @this import('mongoose').Model
+ * @param {String} userId
+ */
 User.statics.findByUserId = async function (userId) {
 	const userInfo = await this.findOne({ userId });
 	return userInfo;
