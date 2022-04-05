@@ -1,3 +1,4 @@
+require('regenerator-runtime');
 const { createContainer, asValue } = require('awilix');
 const logger = require('./logger');
 const User = require('../model/User');

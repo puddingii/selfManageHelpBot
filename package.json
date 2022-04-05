@@ -3,7 +3,8 @@
 	"version": "1.0.0",
 	"main": "app.js",
 	"scripts": {
-		"start": "node src/deploy-command.js && node src/app.js",
+		"start": "node build/deploy-command.js && node build/app.js",
+		"build": "babel src -d build",
 		"dev:app": "nodemon src/app.js",
 		"dev:deploy": "node src/deploy-command.js"
 	},
@@ -24,6 +25,9 @@
 		"winston-daily-rotate-file": "^4.6.1"
 	},
 	"devDependencies": {
+		"@babel/cli": "^7.17.6",
+		"@babel/core": "^7.17.8",
+		"@babel/preset-env": "^7.16.11",
 		"eslint": "^8.10.0",
 		"eslint-config-airbnb-base": "^15.0.0",
 		"eslint-config-prettier": "^8.5.0",
