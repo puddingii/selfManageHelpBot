@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"main": "app.js",
 	"scripts": {
-		"start": "node build/deploy-command.js && node build/app.js",
+		"start": "node src/deploy-command.js && node src/app.js",
 		"build": "babel src -d build",
 		"dev:app": "nodemon src/app.js",
 		"dev:deploy": "node src/deploy-command.js"
