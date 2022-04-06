@@ -1,6 +1,7 @@
 require('regenerator-runtime');
 const { createContainer, asValue } = require('awilix');
 const logger = require('./logger');
+const AccountBook = require('../model/AccountBook');
 const User = require('../model/User');
 const Study = require('../model/Study');
 const Channel = require('../model/Channel');
@@ -11,6 +12,7 @@ const container = createContainer();
 
 container.register({
 	logger: asValue(logger),
+	AccountBookModel: asValue(AccountBook),
 	UserModel: asValue(User),
 	StudyModel: asValue(Study),
 	ChannelModel: asValue(Channel),
