@@ -1,6 +1,7 @@
 {
 	"ignore": [
 		"types/*",
-		"interface/*"
+		"interface/*",
+		"build/*"
 	]
 }

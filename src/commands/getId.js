@@ -26,7 +26,7 @@ module.exports = {
 			}
 
 			/** 유저정보가 없을 때 */
-			await interaction.reply({ content: replyContent });
+			await interaction.reply({ content: replyContent, ephemeral: true });
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });

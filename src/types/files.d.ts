@@ -8,9 +8,9 @@ declare namespace DIFB {
 		UserModel: typeof import('../model/User');
 		ChannelModel: typeof import('../model/Channel');
 		StudyModel: typeof import('../model/Study');
-		TodoModel: import('../model/Todo');
-		ChannelUserGoalModel: import('../model/ChannelUserGoal');
-		AccountBookModel: import('../model/AccountBook');
+		TodoModel: typeof import('../model/Todo');
+		ChannelUserGoalModel: typeof import('../model/ChannelUserGoal');
+		AccountBookModel: typeof import('../model/AccountBook');
 	}
 
 	interface Controllers {}
