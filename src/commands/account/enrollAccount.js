@@ -13,10 +13,10 @@ module.exports = {
 		.addStringOption(option =>
 			option
 				.setName('isfixed')
-				.setDescription('고정 지출인지?')
+				.setDescription('고정 금액인지?')
 				.setRequired(true)
-				.addChoice('고정지출', 'true')
-				.addChoice('변동지출', 'false'),
+				.addChoice('고정금액', 'true')
+				.addChoice('변동금액', 'false'),
 		)
 		.addStringOption(option =>
 			option.setName('category').setDescription('카테고리(음식, 교통, 집세 등...)'),
@@ -38,7 +38,7 @@ module.exports = {
 			if (!user) {
 				replyContent = '[Fail]User information is not existed';
 			} else {
-				AccountBookModel.create({
+				await AccountBookModel.createMyAccount({
 					user,
 					isFixed,
 					amount,

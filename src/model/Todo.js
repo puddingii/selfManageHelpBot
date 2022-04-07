@@ -40,7 +40,7 @@ Todo.statics.createTodo = async function ({ content, owner }) {
 		await this.create({
 			content,
 			owner,
-			todoId: counter.seq_value ?? 1,
+			todoId: counter?.seq_value ?? 1,
 		});
 	} else {
 		await this.create({ content, owner });
