@@ -2,6 +2,7 @@
 declare namespace DIFB {
 	interface Config {
 		logger: typeof import('../config/logger');
+		util: typeof import('../config/util');
 	}
 
 	interface Models {
