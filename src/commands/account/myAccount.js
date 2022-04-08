@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const dayjs = require('dayjs');
 const {
-	cradle: { UserModel, AccountBookModel, logger },
+	cradle: { UserModel, AccountBookModel, logger, util },
 } = require('../../config/dependencyInjection');
 
 module.exports = {
@@ -17,7 +17,7 @@ module.exports = {
 			const embedBox = new MessageEmbed();
 			embedBox
 				.setColor('#0099ff')
-				.setTitle('My Account List')
+				.setTitle('My Account List(Recent Count: 15)')
 				.setDescription(`${dayjs().format('MMMM')}'s Account Book`)
 				.addField('\u200B', '\u200B')
 				.setTimestamp();
@@ -43,16 +43,28 @@ module.exports = {
 						}
 						return 0;
 					});
-					let sum = 0;
-					filteredList.forEach(myAccount => {
-						sum += myAccount.amount;
+					let fixedSum = 0;
+					let notFixedSum = 0;
+					filteredList.slice(-15).forEach(myAccount => {
+						if (myAccount.isFixed) {
+							fixedSum += myAccount.amount;
+						} else {
+							notFixedSum += myAccount.amount;
+						}
 						embedBox.addField(
-							`${myAccount.isFixed ? '고정' : '변동'} - [${myAccount.amount}원]`,
+							`${myAccount.isFixed ? '고정' : '변동'} - [${util.numberToCurrency(
+								myAccount.amount,
+							)}원]`,
 							`${myAccount.category}: ${myAccount.content}`,
 						);
 					});
 
-					embedBox.addField('\u200B', '\u200B').addField('이번달 내역 합계', `${sum}원`);
+					embedBox
+						.addField('\u200B', '\u200B')
+						.addField(
+							'이번달 내역 합계',
+							`${util.numberToCurrency(fixedSum + notFixedSum)}원`,
+						);
 				}
 			}
 

@@ -7,7 +7,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('setusergoal')
 		.setDescription('내 목표 설정')
-		.addStringOption(option =>
+		.addIntegerOption(option =>
 			option
 				.setName('minute')
 				.setDescription('공부 목표 시간(일주일 기준/분 단위)')
@@ -22,7 +22,7 @@ module.exports = {
 			/** Discord Info */
 			const userId = interaction.user.id.toString();
 			const channelId = interaction.guild.id.toString();
-			const minute = parseInt(interaction.options.getString('minute'), 10);
+			const minute = interaction.options.getInteger('minute');
 			const content = interaction.options.getString('content');
 			let result = 0;
 

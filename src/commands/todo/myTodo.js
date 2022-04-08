@@ -26,7 +26,7 @@ module.exports = {
 			embedBox
 				.setColor('#0099ff')
 				.setTitle('My Todo List')
-				.setDescription(`${isCompleted ? 'C' : 'Not c'}ompleted list`)
+				.setDescription(`${isCompleted ? 'C' : 'Not c'}ompleted list.(Recent Count: 15)`)
 				.addField('\u200B', '\u200B')
 				.setTimestamp();
 			let result = 1;
@@ -45,7 +45,7 @@ module.exports = {
 
 			switch (result) {
 				case 1:
-					todoList.forEach(todo => {
+					todoList.slice(-15).forEach(todo => {
 						embedBox.addField(`- ${todo.todoId}번 -`, todo.content);
 					});
 					break;
