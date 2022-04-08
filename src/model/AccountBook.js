@@ -35,16 +35,13 @@ const AccountBook = new mongoose.Schema({
  * @param {import('mongoose').Query} userInfo
  */
 AccountBook.statics.createMyAccount = async function (accountBookInfo) {
-	if (process.env.NODE_ENV === 'development') {
-		const counter = await TodoCounter.findOneAndUpdate(
-			{ name: 'AccountBook' },
-			{ $inc: { seq_value: 1 } },
-			{ returnNewDocument: true, upsert: true },
-		);
-		await this.create({ ...accountBookInfo, accountId: counter?.seq_value ?? 1 });
-	} else {
-		await this.create({ ...accountBookInfo });
-	}
+	const counter = await TodoCounter.findOneAndUpdate(
+		{ name: 'AccountBook' },
+		{ $inc: { seq_value: 1 } },
+		{ returnNewDocument: true, upsert: true },
+	);
+	await this.create({ ...accountBookInfo, accountId: counter?.seq_value ?? 1 });
+
 	return 1;
 };
 

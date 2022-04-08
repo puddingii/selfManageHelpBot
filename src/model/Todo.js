@@ -21,6 +21,10 @@ const Todo = new mongoose.Schema({
 	todoId: {
 		type: Number,
 	},
+	proceed: {
+		type: Number,
+		default: 0,
+	},
 });
 
 /**
@@ -31,20 +35,17 @@ const Todo = new mongoose.Schema({
  */
 Todo.statics.createTodo = async function ({ content, owner }) {
 	/** MongoDB Cloud에서는 Auto_Increment가 trigger로 작동하기 때문에 로직 추가 */
-	if (process.env.NODE_ENV === 'development') {
-		const counter = await TodoCounter.findOneAndUpdate(
-			{ name: 'Todo' },
-			{ $inc: { seq_value: 1 } },
-			{ returnNewDocument: true, upsert: true },
-		);
-		await this.create({
-			content,
-			owner,
-			todoId: counter?.seq_value ?? 1,
-		});
-	} else {
-		await this.create({ content, owner });
-	}
+	const counter = await TodoCounter.findOneAndUpdate(
+		{ name: 'Todo' },
+		{ $inc: { seq_value: 1 } },
+		{ returnNewDocument: true, upsert: true },
+	);
+	await this.create({
+		content,
+		owner,
+		todoId: counter?.seq_value ?? 1,
+	});
+
 	return 1;
 };
 
@@ -61,6 +62,7 @@ Todo.statics.updateComplete = async function (userInfo, todoId) {
 		return todoId;
 	}
 	todo.isCompleted = true;
+	todo.proceed = 100;
 
 	await todo.save();
 
