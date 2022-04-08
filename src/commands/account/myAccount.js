@@ -52,9 +52,9 @@ module.exports = {
 							notFixedSum += myAccount.amount;
 						}
 						embedBox.addField(
-							`${myAccount.isFixed ? '고정' : '변동'} - [${util.numberToCurrency(
-								myAccount.amount,
-							)}원]`,
+							`[${myAccount.accountId}]${
+								myAccount.isFixed ? '고정' : '변동'
+							} - [${util.numberToCurrency(myAccount.amount)}원]`,
 							`${myAccount.category}: ${myAccount.content}`,
 						);
 					});
@@ -62,7 +62,7 @@ module.exports = {
 					embedBox
 						.addField('\u200B', '\u200B')
 						.addField(
-							'이번달 내역 합계',
+							'이번달 내역 합계(고정 + 변동)',
 							`${util.numberToCurrency(fixedSum + notFixedSum)}원`,
 						);
 				}
