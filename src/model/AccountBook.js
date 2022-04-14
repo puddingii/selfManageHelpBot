@@ -40,7 +40,7 @@ AccountBook.statics.createMyAccount = async function (accountBookInfo) {
 		{ $inc: { seq_value: 1 } },
 		{ returnNewDocument: true, upsert: true },
 	);
-	await this.create({ ...accountBookInfo, accountId: counter?.seq_value ?? 1 });
+	await this.create({ ...accountBookInfo, accountId: counter?.seq_value ?? 0 });
 
 	return 1;
 };
