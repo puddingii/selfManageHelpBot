@@ -8,6 +8,7 @@
     "gulp": "4.0.2",
     "gulp-append-prepend": "1.0.8",
     "node-sass": "4.14.1",
+    "prop-types": "^15.8.1",
     "react": "17.0.1",
     "react-bootstrap": "1.4.3",
     "react-chartist": "0.14.3",
@@ -31,7 +32,8 @@
     "compile:scss": "node-sass src/assets/scss/light-bootstrap-dashboard-react.scss src/assets/css/light-bootstrap-dashboard-react.css",
     "minify:scss": "node-sass src/assets/scss/light-bootstrap-dashboard-react.scss src/assets/css/light-bootstrap-dashboard-react.min.css --output-style compressed",
     "map:scss": "node-sass src/assets/scss/light-bootstrap-dashboard-react.scss src/assets/css/light-bootstrap-dashboard-react.css --source-map true",
-    "build:scss": "npm run compile:scss && npm run minify:scss && npm run map:scss"
+    "build:scss": "npm run compile:scss && npm run minify:scss && npm run map:scss",
+		"lint": "./node_modules/.bin/eslint --fix ."
   },
   "browserslist": {
     "production": [
@@ -44,5 +46,16 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-react-hooks": "^4.4.0",
+    "react-error-overlay": "6.0.9",
+    "prettier": "^2.6.2"
   }
 }
