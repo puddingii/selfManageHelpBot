@@ -1,18 +1,17 @@
 {
 	"parser": "@babel/eslint-parser",
-    "settings": {
-			"react": {
-				"version": "detect"
-			}
-    },
-    "env": {
-			"browser": true,
-			"es2021": true
-    },
+	"parserOptions": { "requireConfigFile" : "false" },
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	},
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
 	"extends": ["plugin:prettier/recommended", "plugin:react/recommended"],
-  "plugins": [
-
-  ],
+  "plugins": [],
   "rules": {
 		"react/prop-types": "off",
 		"react/no-unescaped-entities": "off"
