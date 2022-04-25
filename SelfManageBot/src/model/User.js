@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 
 const User = new mongoose.Schema({
 	userId: {
@@ -35,14 +35,14 @@ const User = new mongoose.Schema({
 	},
 });
 
-User.pre('save', async function () {
-	if (this.accessKey !== '' && this.isModified('accessKey')) {
-		this.accessKey = await bcrypt.hash(
-			this.accessKey,
-			parseInt(process.env.HASH_ROUND, 10),
-		);
-	}
-});
+// User.pre('save', async function () {
+// 	if (this.accessKey !== '' && this.isModified('accessKey')) {
+// 		this.accessKey = await bcrypt.hash(
+// 			this.accessKey,
+// 			parseInt(process.env.HASH_ROUND, 10),
+// 		);
+// 	}
+// });
 
 /**
  * 아이디로 유저정보 탐색
