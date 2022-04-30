@@ -50,24 +50,6 @@ export const userSlice = createSlice({
 				console.log('DefaultCase')
 			})
 	},
-	// extraReducers: {
-
-	// 	/** 데이터를 가져오기 전 */
-	// 	[fetchUserById.pending]: (state, action) => {
-	// 		console.log('Data pending')
-	// 		state.temp = action.payload
-	// 	},
-	// 	/** Data를 성공적으로 가져왔을 경우 */
-	// 	[fetchUserById.fulfilled]: (state, action) => {
-	// 		console.log('Data fulfilled')
-	// 		state.temp = action.payload
-	// 	},
-	// 	/** 데이터를 가져오는데 실패했을 경우 */
-	// 	[fetchUserById.rejected]: (state, action) => {
-	// 		console.log('Data rejected')
-	// 		state.temp = action.payload
-	// 	},
-	// },
 })
 
 export const { increment } = userSlice.actions
