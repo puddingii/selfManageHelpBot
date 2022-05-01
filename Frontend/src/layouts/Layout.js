@@ -23,7 +23,7 @@ import Footer from 'components/Footer/Footer'
 import Sidebar from 'components/Sidebar/Sidebar'
 import FixedPlugin from 'components/FixedPlugin/FixedPlugin.js'
 
-import routes from 'routes.js'
+import { smbRoutes as routes } from 'routes.js'
 
 import sidebarImage from 'assets/img/sidebar-3.jpg'
 
@@ -35,27 +35,7 @@ function Admin() {
 	const mainPanel = React.useRef(null)
 	const getRoutes = routes => {
 		return routes.map((prop, key) => {
-			// if (prop.layout === '/admin') {
-			// 	return (
-			// 		<Route
-			// 			path={prop.layout + prop.path}
-			// 			render={props => <prop.component {...props} />}
-			// 			key={key}
-			// 		/>
-			// 	)
-			// } else {
-			// 	return null
-			// }
 			switch (prop.layout) {
-				case '/admin': {
-					return (
-						<Route
-							path={prop.layout + prop.path}
-							render={props => <prop.component {...props} />}
-							key={key}
-						/>
-					)
-				}
 				case '/study': {
 					return (
 						<Route

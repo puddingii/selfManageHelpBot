@@ -28,16 +28,19 @@ import './assets/css/demo.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 
 import AdminLayout from 'layouts/Admin.js'
-import configureStore from './configureStore'
+import Layout from 'layouts/Layout'
+import configureAppStore from 'configureStore'
 
-const store = configureStore()
+const store = configureAppStore()
 
 ReactDOM.render(
 	<Provider store={store}>
 		<BrowserRouter>
 			<Switch>
 				<Route path="/admin" render={props => <AdminLayout {...props} />} />
+				<Route path="/study" render={props => <Layout {...props} />} />
 				{/* <Redirect from="/" to="/admin/dashboard" /> */}
+				<Route />
 			</Switch>
 		</BrowserRouter>
 	</Provider>,
