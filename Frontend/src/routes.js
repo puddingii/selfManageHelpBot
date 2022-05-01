@@ -24,6 +24,7 @@ import Maps from 'views/Maps.js'
 import Notifications from 'views/Notifications.js'
 import Upgrade from 'views/Upgrade.js'
 import { Study } from 'views/Study'
+import AccountBook from 'views/AccountBook.js'
 
 const dashboardRoutes = [
 	{
@@ -81,6 +82,13 @@ const dashboardRoutes = [
 		name: 'Notifications',
 		icon: 'nc-icon nc-bell-55',
 		component: Notifications,
+		layout: '/admin',
+	},
+	{
+		path: '/account',
+		name: 'AccountBook',
+		icon: 'nc-icon nc-bell-55',
+		component: AccountBook,
 		layout: '/admin',
 	},
 ]

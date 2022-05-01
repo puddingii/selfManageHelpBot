@@ -4,6 +4,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "5.15.2",
     "@reduxjs/toolkit": "^1.8.1",
+    "axios": "^0.27.2",
     "bootstrap": "4.6.0",
     "chartist": "0.10.1",
     "dotenv": "^16.0.0",
@@ -37,7 +38,7 @@
     "minify:scss": "node-sass src/assets/scss/light-bootstrap-dashboard-react.scss src/assets/css/light-bootstrap-dashboard-react.min.css --output-style compressed",
     "map:scss": "node-sass src/assets/scss/light-bootstrap-dashboard-react.scss src/assets/css/light-bootstrap-dashboard-react.css --source-map true",
     "build:scss": "npm run compile:scss && npm run minify:scss && npm run map:scss",
-		"lint": "./node_modules/.bin/eslint --fix ."
+    "lint": "./node_modules/.bin/eslint --fix ."
   },
   "browserslist": {
     "production": [

@@ -1,28 +1,14 @@
-import { applyMiddleware, compose, createStore } from "redux";
-import thunkMiddleware from "redux-thunk";
-import { composeWithDevTools } from "redux-devtools-extension";
+import { configureStore } from '@reduxjs/toolkit'
+import user from './store/reducer/user'
 
-// import monitorReducersEnhancer from "./enhancers/monitorReducers";
-// import loggerMiddleware from "./middleware/logger";
-import rootReducer from "./store/reducer/_rootReducer";
+export default function configureAppStore(preloadedState = {}) {
+	const store = configureStore({
+		reducer: {
+			user,
+		},
+		devTools: process.env.NODE_ENV !== 'production',
+		preloadedState,
+	})
 
-export default function configureStore(preloadedState) {
-  preloadedState = preloadedState || {};
-  // const middlewares = [loggerMiddleware, thunkMiddleware];
-  const middlewares = [thunkMiddleware];
-  const middlewareEnhancer = applyMiddleware(...middlewares);
-
-  // const enhancers = [middlewareEnhancer, monitorReducersEnhancer];
-  const enhancers = [middlewareEnhancer];
-  const composedEnhancers = composeWithDevTools(...enhancers);
-
-  const store = createStore(rootReducer, preloadedState, composedEnhancers);
-
-  if (process.env.NODE_ENV !== "production" && module.hot) {
-    module.hot.accept("./store/reducer/_rootReducer", () =>
-      store.replaceReducer(rootReducer)
-    );
-  }
-
-  return store;
+	return store
 }
