@@ -1,0 +1,9 @@
+{
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": { "requireConfigFile" : "false" },
+	"env": {
+		"browser": true
+	},
+	"extends": [],
+  "rules": {}
+}
