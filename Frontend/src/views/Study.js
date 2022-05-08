@@ -3,7 +3,8 @@ import React, { Component } from 'react'
 import { Col, Container, Row, Card, Table } from 'react-bootstrap'
 import ChartistGraph from 'react-chartist'
 import Chart from 'react-apexcharts'
-import { LineGraph } from '../components/Graph/LineGraph'
+import { StudyWeekGraph } from '../components/Graph/LineGraph'
+import { fetchStudyWeekTimeByDate } from 'store/reducer/study'
 
 const Study = () => {
 	return (
@@ -20,8 +21,11 @@ const Study = () => {
 			</Row>
 			<Row>
 				<Col md="8">
-					{/* <Graph1 /> */}
-					{<LineGraph dateOptions={{}} action={() => {}} payload={{}} />}
+					<StudyWeekGraph
+						dateOptions={{ unitType: 'minutes', startDate: '2022-05-01' }}
+						action={fetchStudyWeekTimeByDate}
+						title={`Week's Study`}
+					/>
 				</Col>
 				<Col md="4">
 					<Graph2 />

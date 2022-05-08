@@ -6,67 +6,56 @@ import Chart from 'react-apexcharts'
 import { CardView } from 'components/CardView'
 import { Spinner } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import study, { fetchStudyWeekTimeByDate } from '../../store/reducer/study'
 
-const LineGraph = () => {
+const dateOptions = {
+	type: '', // week or month      -> recur parameter unit 1 or 4
+	unitType: '', // won or minutes
+	startDate: '', //YYYY-MM-DD
+}
+
+const LineGraph = ({ data, dateOptions, action, title, subTitle = null }) => {
 	const dispatch = useDispatch()
-	// const LineGraph = ({ data, options }) => {
-	const getDateSet = dateOptions => {
+
+	const getDateSet = () => {
 		const { type, startDate } = dateOptions
-		let dateSet = []
 		let label = []
-		if (type === 'month') {
-			const endDate = moment(startDate).endOf('month').format('YYYY-MM-DD')
-			const labelLength = Number(endDate.split('-')[2])
-			label = Array(labelLength).fill('')
-			dateSet = moment().recur(startDate, endDate).every(4).days().all('L')
-			for (const date of dateSet) {
-				const idx = Number(date.split('-')[2]) - 1
-				label[idx] = date
-			}
-		} else {
-			label = dateSet = moment()
-				.recur(startDate, moment().day(7).format('YYYY-MM-DD'))
-				.every(1)
-				.days()
-				.all('L')
-		}
+		const endDate =
+			type === 'month'
+				? moment(startDate).endOf('month').format('YYYY-MM-DD')
+				: moment().day(7).format('YYYY-MM-DD')
+		label = moment()
+			.recur(startDate, endDate)
+			.every(1)
+			.days()
+			.all('L')
+			.map(e => {
+				const [M, D, Y] = e.split('/')
+				return `${Y}-${M}-${D}`
+			})
 
 		return label
 	}
-	const dateOptions = {
-		type: '', // weeks or months      -> recur parameter unit 1 or 4
-		unitType: '', // won or minuets
-		startDate: '', //YYYY-MM-DD
-	}
 
-	// 액션함수
-	const action = {}
-
-	const payload = {}
-
-	// 타이틀
-	const title = ''
-	const subTitle = ''
-
-	const fetchOptions = {
-		url: '',
-		params: {}, // dateOptions에서 가져옴
+	const getPayload = () => {
+		const { type, startDate } = dateOptions
+		const payload = { startDate }
+		if (type === 'month') {
+			payload.count = parseInt(moment(startDate).endOf('month').format('DD'))
+		} else {
+			payload.count = 7
+		}
+		return payload
 	}
 
 	const [state, setState] = useState(null)
-	const weekData = useSelector(({ study }) => study.week)
 
 	useEffect(async () => {
-		dispatch(fetchStudyWeekTimeByDate({ startDate: '2022-05-01', count: 3 })).unwrap()
+		dispatch(action(getPayload())).unwrap()
 	}, [])
 
 	useEffect(() => {
-		if (Object.keys(weekData).length > 0) {
-			const [date, time] = [
-				weekData.list.map(e => e.date),
-				weekData.list.map(e => e.time),
-			]
+		if (data && Object.keys(data).length > 0) {
+			const [date, time] = [data.list.map(e => e.date), data.list.map(e => e.time)]
 			setState({
 				series: [
 					{
@@ -86,7 +75,7 @@ const LineGraph = () => {
 					annotations: {
 						yaxis: [
 							{
-								y: 30,
+								y: data.average,
 								borderColor: '#00E396',
 								label: {
 									borderColor: '#00E396',
@@ -111,14 +100,23 @@ const LineGraph = () => {
 							left: 20,
 						},
 					},
-					labels: getDateSet(dateOptions),
+					labels: getDateSet(),
 					xaxis: {
 						type: 'string',
+						labels: {
+							rotate: 0,
+							hideOverlappingLabels: true,
+						},
+					},
+					yaxis: {
+						title: {
+							text: dateOptions.unitType,
+						},
 					},
 				},
 			})
 		}
-	}, [weekData])
+	}, [data])
 
 	return (
 		<CardView title={title} subTitle={subTitle}>
@@ -129,9 +127,10 @@ const LineGraph = () => {
 	)
 }
 
-const StudyLineGraph = props => {
+const StudyWeekGraph = props => {
 	const data = useSelector(({ study }) => study.week)
-	return <LineGraph props={{ ...props, data }} />
+	props.dateOptions.type = 'week'
+	return <LineGraph {...props} data={data} />
 }
 
-export { LineGraph }
+export { StudyWeekGraph }
