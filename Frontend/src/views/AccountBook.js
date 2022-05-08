@@ -7,6 +7,7 @@ import {
 	Badge,
 	Button,
 	Card,
+	Dropdown,
 	Navbar,
 	Nav,
 	Table,
@@ -18,115 +19,126 @@ import {
 	Tooltip,
 } from 'react-bootstrap'
 import { increment, fetchUserById } from 'store/reducer/user'
+import SummaryMiniBox from 'components/Box/SummaryMiniBox'
+import TableBox from 'components/Box/TableBox'
 
 function AccountBook({ onBtnClick }) {
+	const columns = [
+		{
+			dataField: 'id',
+			text: 'Product ID',
+			headerClasses: 'border-0',
+		},
+		{
+			dataField: 'name',
+			text: 'Product Name',
+			headerClasses: 'border-0',
+		},
+	]
+	const tableData = [
+		{ id: '1', name: 'Book 1' },
+		{ id: '2', name: 'Book 2' },
+		{ id: '3', name: 'Book 3' },
+		{ id: '4', name: 'Book 4' },
+		{ id: '5', name: 'Book 5' },
+		{ id: '6', name: 'Book 6' },
+	]
+
+	const summaryBoxOptionList = [
+		{
+			title: '수입',
+			value: '3,500',
+			btnName: '고정수입 포함',
+			mainIconOption: {
+				type: 'fas fa-caret-up',
+				color: 'text-success',
+			},
+			subIconOption: {
+				type: 'fas fa-redo',
+			},
+		},
+		{
+			title: '지출',
+			value: '2,500',
+			btnName: '고정지출 포함',
+			mainIconOption: {
+				type: 'fas fa-caret-down',
+				color: 'text-danger',
+			},
+			subIconOption: {
+				type: 'fas fa-redo fa-spin',
+			},
+		},
+		{
+			title: '합계',
+			value: '2,500',
+			btnName: '고정지출 포함',
+			mainIconOption: {
+				type: 'fas fa-chart-pie',
+				color: 'text-warning',
+			},
+			subIconOption: {
+				type: 'fas fa-redo fa-spin',
+			},
+		},
+	]
 	return (
 		<>
 			<Container fluid>
+				<Dropdown as={Nav.Item}>
+					<Dropdown.Toggle
+						as={Nav.Link}
+						data-toggle="dropdown"
+						id="dropdown-67443507"
+						variant="default"
+						className="m-0"
+					>
+						<i className="nc-icon nc-planet"></i>
+						<span className="notification">5</span>
+						<span className="d-lg-none ml-1">Notification</span>
+					</Dropdown.Toggle>
+					<Dropdown.Menu>
+						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
+							Notification 1
+						</Dropdown.Item>
+						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
+							Notification 2
+						</Dropdown.Item>
+						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
+							Notification 3
+						</Dropdown.Item>
+						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
+							Notification 4
+						</Dropdown.Item>
+						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
+							Another notification
+						</Dropdown.Item>
+					</Dropdown.Menu>
+				</Dropdown>
 				<Row>
-					<Col lg="3" sm="6">
-						<Card className="card-stats">
-							<Card.Body>
-								<Row>
-									<Col xs="5">
-										<div className="icon-big text-center icon-warning">
-											<i className="nc-icon nc-chart text-warning"></i>
-										</div>
-									</Col>
-									<Col xs="7">
-										<div className="numbers">
-											<p className="card-category">Number</p>
-											<Card.Title as="h4">150GB</Card.Title>
-										</div>
-									</Col>
-								</Row>
-							</Card.Body>
-							<Card.Footer>
-								<hr></hr>
-								<div className="stats">
-									<i className="fas fa-redo mr-1"></i>
-									<button onClick={onBtnClick}>Update Now</button>
-								</div>
-							</Card.Footer>
-						</Card>
-					</Col>
-					<Col lg="3" sm="6">
-						<Card className="card-stats">
-							<Card.Body>
-								<Row>
-									<Col xs="5">
-										<div className="icon-big text-center icon-warning">
-											<i className="nc-icon nc-light-3 text-success"></i>
-										</div>
-									</Col>
-									<Col xs="7">
-										<div className="numbers">
-											<p className="card-category">Revenue</p>
-											<Card.Title as="h4">$ 1,345</Card.Title>
-										</div>
-									</Col>
-								</Row>
-							</Card.Body>
-							<Card.Footer>
-								<hr></hr>
-								<div className="stats">
-									<i className="far fa-calendar-alt mr-1"></i>
-									Last day
-								</div>
-							</Card.Footer>
-						</Card>
-					</Col>
-					<Col lg="3" sm="6">
-						<Card className="card-stats">
-							<Card.Body>
-								<Row>
-									<Col xs="5">
-										<div className="icon-big text-center icon-warning">
-											<i className="nc-icon nc-vector text-danger"></i>
-										</div>
-									</Col>
-									<Col xs="7">
-										<div className="numbers">
-											<p className="card-category">Errors</p>
-											<Card.Title as="h4">23</Card.Title>
-										</div>
-									</Col>
-								</Row>
-							</Card.Body>
-							<Card.Footer>
-								<hr></hr>
-								<div className="stats">
-									<i className="far fa-clock-o mr-1"></i>
-									In the last hour
-								</div>
-							</Card.Footer>
-						</Card>
-					</Col>
-					<Col lg="3" sm="6">
-						<Card className="card-stats">
-							<Card.Body>
-								<Row>
-									<Col xs="5">
-										<div className="icon-big text-center icon-warning">
-											<i className="nc-icon nc-favourite-28 text-primary"></i>
-										</div>
-									</Col>
-									<Col xs="7">
-										<div className="numbers">
-											<p className="card-category">Followers</p>
-											<Card.Title as="h4">+45K</Card.Title>
-										</div>
-									</Col>
-								</Row>
-							</Card.Body>
-							<Card.Footer>
-								<hr></hr>
-								<div className="stats">
-									<i className="fas fa-redo mr-1"></i>
-									Update now
-								</div>
-							</Card.Footer>
-						</Card>
+					{summaryBoxOptionList.map(option => {
+						return (
+							<Col lg="4" sm="6" key={option.title}>
+								<SummaryMiniBox
+									title={option.title}
+									value={option.value}
+									onBtnClick={option.onBtnClick}
+									btnName={option.btnName}
+									mainIconOption={option.mainIconOption}
+									subIconOption={option.subIconOption}
+								></SummaryMiniBox>
+							</Col>
+						)
+					})}
+				</Row>
+				<Row>
+					<Col>
+						<TableBox
+							title="예?"
+							description="Here is a subtitle for this table"
+							tableData={tableData}
+							columns={columns}
+						/>
 					</Col>
 				</Row>
 				<Row>
