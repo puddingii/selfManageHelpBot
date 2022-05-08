@@ -19,8 +19,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, Row, Col } from 'react-bootstrap'
 
+/** @param {import('../../interface/Component').ComponentOptions.SummaryMiniBox} */
 function SummaryMiniBox({
-	name,
+	title,
 	value,
 	onBtnClick,
 	btnName,
@@ -38,7 +39,7 @@ function SummaryMiniBox({
 					</Col>
 					<Col xs="8">
 						<div className="numbers">
-							<p className="card-category">{name}</p>
+							<p className="card-category">{title}</p>
 							<Card.Title as="h4">{value}</Card.Title>
 						</div>
 					</Col>
@@ -56,7 +57,7 @@ function SummaryMiniBox({
 }
 
 SummaryMiniBox.propTypes = {
-	name: PropTypes.string.isRequired,
+	title: PropTypes.string.isRequired,
 	value: PropTypes.string.isRequired,
 	onBtnClick: PropTypes.func,
 	btnName: PropTypes.string.isRequired,
