@@ -17,6 +17,8 @@
     "react": "17.0.1",
     "react-apexcharts": "^1.4.0",
     "react-bootstrap": "1.4.3",
+    "react-bootstrap-table-next": "^4.0.3",
+    "react-bootstrap-table2-paginator": "^2.1.2",
     "react-chartist": "0.14.3",
     "react-dom": "17.0.1",
     "react-notification-alert": "0.0.13",
@@ -66,6 +68,8 @@
     "eslint-plugin-react-hooks": "^4.4.0",
     "prettier": "^2.6.2",
     "react-error-overlay": "^6.0.9",
+    "@types/react-bootstrap-table-next": "^4.0.18",
+    "@types/react-bootstrap-table2-paginator": "^2.1.2",
     "redux-devtools-extension": "^2.13.9"
   }
 }

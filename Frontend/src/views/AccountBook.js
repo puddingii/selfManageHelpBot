@@ -23,9 +23,30 @@ import SummaryMiniBox from 'components/Box/SummaryMiniBox'
 import TableBox from 'components/Box/TableBox'
 
 function AccountBook({ onBtnClick }) {
+	const columns = [
+		{
+			dataField: 'id',
+			text: 'Product ID',
+			headerClasses: 'border-0',
+		},
+		{
+			dataField: 'name',
+			text: 'Product Name',
+			headerClasses: 'border-0',
+		},
+	]
+	const tableData = [
+		{ id: '1', name: 'Book 1' },
+		{ id: '2', name: 'Book 2' },
+		{ id: '3', name: 'Book 3' },
+		{ id: '4', name: 'Book 4' },
+		{ id: '5', name: 'Book 5' },
+		{ id: '6', name: 'Book 6' },
+	]
+
 	const summaryBoxOptionList = [
 		{
-			name: '수입',
+			title: '수입',
 			value: '3,500',
 			btnName: '고정수입 포함',
 			mainIconOption: {
@@ -37,7 +58,7 @@ function AccountBook({ onBtnClick }) {
 			},
 		},
 		{
-			name: '지출',
+			title: '지출',
 			value: '2,500',
 			btnName: '고정지출 포함',
 			mainIconOption: {
@@ -47,9 +68,9 @@ function AccountBook({ onBtnClick }) {
 			subIconOption: {
 				type: 'fas fa-redo fa-spin',
 			},
-		}, //
+		},
 		{
-			name: '합계',
+			title: '합계',
 			value: '2,500',
 			btnName: '고정지출 포함',
 			mainIconOption: {
@@ -97,9 +118,9 @@ function AccountBook({ onBtnClick }) {
 				<Row>
 					{summaryBoxOptionList.map(option => {
 						return (
-							<Col lg="4" sm="6" key={option.name}>
+							<Col lg="4" sm="6" key={option.title}>
 								<SummaryMiniBox
-									name={option.name}
+									title={option.title}
 									value={option.value}
 									onBtnClick={option.onBtnClick}
 									btnName={option.btnName}
@@ -112,7 +133,12 @@ function AccountBook({ onBtnClick }) {
 				</Row>
 				<Row>
 					<Col>
-						<TableBox></TableBox>
+						<TableBox
+							title="예?"
+							description="Here is a subtitle for this table"
+							tableData={tableData}
+							columns={columns}
+						/>
 					</Col>
 				</Row>
 				<Row>

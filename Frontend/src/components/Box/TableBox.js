@@ -2,84 +2,88 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 // react-bootstrap components
-import {
-	Badge,
-	Button,
-	Card,
-	Navbar,
-	Nav,
-	Table,
-	Container,
-	Row,
-	Col,
-} from 'react-bootstrap'
+import { Card, Dropdown, Nav } from 'react-bootstrap'
+import BSTable from 'react-bootstrap-table-next'
+import paginationFactory from 'react-bootstrap-table2-paginator'
 
-function TableBox() {
+/** @param {import('../../interface/Component').ComponentOptions.TableBox} */
+function TableBox({ title, description, columns, tableData }) {
+	const sizePerPageRenderer = ({ options, currSizePerPage, onSizePerPageChange }) => (
+		<Dropdown>
+			<Dropdown.Toggle
+				aria-expanded={false}
+				aria-haspopup={true}
+				data-toggle="dropdown"
+				id="navbarDropdownMenuLink"
+				variant="default"
+				className="m-0"
+			>
+				<span className="no-icon">{currSizePerPage}</span>
+			</Dropdown.Toggle>
+			<Dropdown.Menu aria-labelledby="navbarDropdownMenuLink">
+				{options.map(option => (
+					<Dropdown.Item
+						href="#pablo"
+						key={option.page}
+						onClick={() => onSizePerPageChange(option.page)}
+					>
+						{option.page}
+					</Dropdown.Item>
+				))}
+				<div className="divider"></div>
+				<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
+					All
+				</Dropdown.Item>
+			</Dropdown.Menu>
+		</Dropdown>
+	)
+	const paginationOption = {
+		firstPageText: 'First',
+		prePageText: 'Back',
+		nextPageText: 'Next',
+		lastPageText: 'Last',
+		hidePageListOnlyOnePage: true,
+		sizePerPageList: [
+			{
+				text: '5',
+				value: 5,
+			},
+			{
+				text: '10',
+				value: 10,
+			},
+			{
+				text: '20',
+				value: 20,
+			},
+		],
+		sizePerPageRenderer,
+	}
 	return (
 		<Card className="strpied-tabled-with-hover">
 			<Card.Header>
-				<Card.Title as="h4">Striped Table with Hover</Card.Title>
-				<p className="card-category">Here is a subtitle for this table</p>
+				<Card.Title as="h4">{title}</Card.Title>
+				<p className="card-category">{description}</p>
 			</Card.Header>
 			<Card.Body className="table-full-width table-responsive px-0">
-				<Table className="table-hover table-striped">
-					<thead>
-						<tr>
-							<th className="border-0">ID</th>
-							<th className="border-0">Name</th>
-							<th className="border-0">Salary</th>
-							<th className="border-0">Country</th>
-							<th className="border-0">City</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>1</td>
-							<td>Dakota Rice</td>
-							<td>$36,738</td>
-							<td>Niger</td>
-							<td>Oud-Turnhout</td>
-						</tr>
-						<tr>
-							<td>2</td>
-							<td>Minerva Hooper</td>
-							<td>$23,789</td>
-							<td>Curaçao</td>
-							<td>Sinaai-Waas</td>
-						</tr>
-						<tr>
-							<td>3</td>
-							<td>Sage Rodriguez</td>
-							<td>$56,142</td>
-							<td>Netherlands</td>
-							<td>Baileux</td>
-						</tr>
-						<tr>
-							<td>4</td>
-							<td>Philip Chaney</td>
-							<td>$38,735</td>
-							<td>Korea, South</td>
-							<td>Overland Park</td>
-						</tr>
-						<tr>
-							<td>5</td>
-							<td>Doris Greene</td>
-							<td>$63,542</td>
-							<td>Malawi</td>
-							<td>Feldkirchen in Kärnten</td>
-						</tr>
-						<tr>
-							<td>6</td>
-							<td>Mason Porter</td>
-							<td>$78,615</td>
-							<td>Chile</td>
-							<td>Gloucester</td>
-						</tr>
-					</tbody>
-				</Table>
+				<BSTable
+					classes="table-hover table-striped"
+					keyField="id"
+					data={tableData}
+					columns={columns}
+					bordered={false}
+					pagination={paginationFactory(paginationOption)}
+				/>
 			</Card.Body>
 		</Card>
 	)
+}
+
+TableBox.propTypes = {
+	title: PropTypes.string.isRequired,
+	description: PropTypes.string,
+	columns: PropTypes.array.isRequired,
+	tableData: PropTypes.array.isRequired,
 }
 
 export default TableBox
