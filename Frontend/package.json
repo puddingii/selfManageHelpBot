@@ -68,9 +68,12 @@
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.4.0",
     "prettier": "^2.6.2",
-    "react-error-overlay": "^6.0.9",
     "@types/react-bootstrap-table-next": "^4.0.18",
     "@types/react-bootstrap-table2-paginator": "^2.1.2",
     "redux-devtools-extension": "^2.13.9"
-  }
+  },
+	"resolutions": {
+		"//": "See https://github.com/facebook/create-react-app/issues/11773",
+		"react-error-overlay": "6.0.9"
+	}
 }
