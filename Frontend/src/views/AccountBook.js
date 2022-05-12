@@ -21,6 +21,7 @@ import {
 import { increment, fetchUserById } from 'store/reducer/user'
 import SummaryMiniBox from 'components/Box/SummaryMiniBox'
 import TableBox from 'components/Box/TableBox'
+import AccountTable from 'components/CustomTable/AccountTable'
 
 function AccountBook({ onBtnClick }) {
 	const columns = [
@@ -42,6 +43,17 @@ function AccountBook({ onBtnClick }) {
 		{ id: '4', name: 'Book 4' },
 		{ id: '5', name: 'Book 5' },
 		{ id: '6', name: 'Book 6' },
+		{ id: '7', name: 'Book 6' },
+		{ id: '8', name: 'Book 6' },
+		{ id: '9', name: 'Book 6' },
+		{ id: '61', name: 'Book 6' },
+		{ id: '62', name: 'Book 6' },
+		{ id: '63', name: 'Book 6' },
+		{ id: '64', name: 'Book 6' },
+		{ id: '65', name: 'Book 6' },
+		{ id: '66', name: 'Book 6' },
+		{ id: '67', name: 'Book 6' },
+		{ id: '68', name: 'Book 6' },
 	]
 
 	const summaryBoxOptionList = [
@@ -133,12 +145,9 @@ function AccountBook({ onBtnClick }) {
 				</Row>
 				<Row>
 					<Col>
-						<TableBox
-							title="예?"
-							description="Here is a subtitle for this table"
-							tableData={tableData}
-							columns={columns}
-						/>
+						<TableBox title="예?" description="Here is a subtitle for this table">
+							<AccountTable tableData={tableData} columns={columns}></AccountTable>
+						</TableBox>
 					</Col>
 				</Row>
 				<Row>
