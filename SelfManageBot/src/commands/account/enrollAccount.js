@@ -38,7 +38,7 @@ module.exports = {
 			const type = ['d', 'w', 'm', 'y']
 			const durationType = fixedDuration.slice(-1)
 			const cnt = parseInt(fixedDuration.slice(0, -1), 10)
-			if (!type.includes(durationType) || typeof cnt !== 'number') {
+			if (isFixed && (!type.includes(durationType) || typeof cnt !== 'number')) {
 				await interaction.reply({ content: 'fixedDuration값이 잘못되었음. option) 12d 2w 1m 1y' });
 				return;
 			}
