@@ -24,6 +24,11 @@ function AccountTable({ columns, tableData }) {
 		},
 	}
 
+	const handleSubmit = e => {
+		e.preventDefault()
+		console.log('df', e)
+	}
+
 	const paginationOption = {
 		prePageText: '<',
 		nextPageText: '>',
@@ -49,14 +54,18 @@ function AccountTable({ columns, tableData }) {
 				<Modal.Header closeButton>
 					<Modal.Title>가계부 수정</Modal.Title>
 				</Modal.Header>
-				<Modal.Body>
-					<Form>
+				<Form noValidate onSubmit={handleSubmit}>
+					<Modal.Body>
 						<Form.Group as={Row} controlId="amount">
 							<Form.Label column sm={3}>
 								금액
 							</Form.Label>
 							<Col sm={9}>
-								<Form.Control type="number" placeholder="Amount" />
+								<Form.Control
+									type="number"
+									placeholder="Amount"
+									defaultValue={currentRow.amount}
+								/>
 							</Col>
 						</Form.Group>
 
@@ -65,7 +74,11 @@ function AccountTable({ columns, tableData }) {
 								내용
 							</Form.Label>
 							<Col sm={9}>
-								<Form.Control type="text" placeholder="출처" />
+								<Form.Control
+									type="text"
+									placeholder="출처"
+									defaultValue={currentRow.content}
+								/>
 							</Col>
 						</Form.Group>
 
@@ -74,7 +87,11 @@ function AccountTable({ columns, tableData }) {
 								카테고리
 							</Form.Label>
 							<Col sm={9}>
-								<Form.Control type="text" placeholder="취미, 식사 등..." />
+								<Form.Control
+									type="text"
+									placeholder="취미, 식사 등..."
+									defaultValue={currentRow.category}
+								/>
 							</Col>
 						</Form.Group>
 
@@ -83,7 +100,7 @@ function AccountTable({ columns, tableData }) {
 								날짜
 							</Form.Label>
 							<Col sm={6}>
-								<Form.Control type="text" readOnly />
+								<Form.Control type="text" defaultValue={currentRow.amount} readOnly />
 							</Col>
 						</Form.Group>
 
@@ -92,19 +109,19 @@ function AccountTable({ columns, tableData }) {
 								고정지출
 							</Form.Label>
 							<Col sm={1}>
-								<Form.Control type="checkbox" />
+								<Form.Control type="checkbox" defaultChecked={currentRow.isFixed} />
 							</Col>
 						</Form.Group>
-					</Form>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="secondary" onClick={handleClose}>
-						닫기
-					</Button>
-					<Button variant="primary" onClick={handleClose}>
-						수정하기
-					</Button>
-				</Modal.Footer>
+					</Modal.Body>
+					<Modal.Footer>
+						<Button variant="secondary" onClick={handleClose}>
+							닫기
+						</Button>
+						<Button variant="primary" type="submit">
+							수정하기
+						</Button>
+					</Modal.Footer>
+				</Form>
 			</Modal>
 		</>
 	)
