@@ -27,6 +27,10 @@ const AccountBook = new mongoose.Schema({
 	accountId: {
 		type: Number,
 	},
+	fixedDuration: {
+		type: String,
+		default: '1m'
+	}
 });
 
 /**
