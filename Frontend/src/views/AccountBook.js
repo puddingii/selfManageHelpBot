@@ -22,38 +22,27 @@ import { increment, fetchUserById } from 'store/reducer/user'
 import SummaryMiniBox from 'components/Box/SummaryMiniBox'
 import TableBox from 'components/Box/TableBox'
 import AccountTable from 'components/CustomTable/AccountTable'
+import { accountBookColumns } from '../code'
 
 function AccountBook({ onBtnClick }) {
-	const columns = [
-		{
-			dataField: 'id',
-			text: 'Product ID',
-			headerClasses: 'border-0',
-		},
-		{
-			dataField: 'name',
-			text: 'Product Name',
-			headerClasses: 'border-0',
-		},
-	]
 	const tableData = [
-		{ id: '1', name: 'Book 1' },
-		{ id: '2', name: 'Book 2' },
-		{ id: '3', name: 'Book 3' },
-		{ id: '4', name: 'Book 4' },
-		{ id: '5', name: 'Book 5' },
-		{ id: '6', name: 'Book 6' },
-		{ id: '7', name: 'Book 6' },
-		{ id: '8', name: 'Book 6' },
-		{ id: '9', name: 'Book 6' },
-		{ id: '61', name: 'Book 6' },
-		{ id: '62', name: 'Book 6' },
-		{ id: '63', name: 'Book 6' },
-		{ id: '64', name: 'Book 6' },
-		{ id: '65', name: 'Book 6' },
-		{ id: '66', name: 'Book 6' },
-		{ id: '67', name: 'Book 6' },
-		{ id: '68', name: 'Book 6' },
+		{ id: '1', content: 'Book 1', amount: 100000, category: '식사', isFixed: false },
+		{ id: '2', content: 'Book 2', amount: 100000, category: '식사', isFixed: true },
+		{ id: '3', content: 'Book 3', amount: 100000, category: '식사', isFixed: false },
+		{ id: '4', content: 'Book 4', amount: 100000, category: '식사', isFixed: true },
+		{ id: '5', content: 'Book 5', amount: 100000, category: '식사', isFixed: false },
+		{ id: '6', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '7', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '8', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '9', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '61', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '62', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '63', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '64', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '65', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '66', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '67', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
+		{ id: '68', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
 	]
 
 	const summaryBoxOptionList = [
@@ -68,6 +57,7 @@ function AccountBook({ onBtnClick }) {
 			subIconOption: {
 				type: 'fas fa-redo',
 			},
+			onBtnClick,
 		},
 		{
 			title: '지출',
@@ -146,7 +136,10 @@ function AccountBook({ onBtnClick }) {
 				<Row>
 					<Col>
 						<TableBox title="예?" description="Here is a subtitle for this table">
-							<AccountTable tableData={tableData} columns={columns}></AccountTable>
+							<AccountTable
+								tableData={tableData}
+								columns={accountBookColumns}
+							></AccountTable>
 						</TableBox>
 					</Col>
 				</Row>
@@ -604,7 +597,7 @@ function AccountBook({ onBtnClick }) {
 
 function mapDispatchToProps(dispatch, ownProps) {
 	return {
-		onBtnClick: () => dispatch(fetchUserById()),
+		onBtnClick: () => dispatch(fetchUserById('hi')),
 	}
 }
 
