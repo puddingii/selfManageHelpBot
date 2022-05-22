@@ -47,15 +47,21 @@ const calcSummary = (accountList, dateInfo) => {
 /** 일정 기간 내의 가계부 정보 가져오기 */
 export const getAccountBookList = createAsyncThunk(
 	'accountBook/getAccountBookList',
-	async (param, thunkAPI) => {
-		let { data } = await axios('https://api.bithumb.com/api/account-book/get-list', {
-			userId: '',
-			...param,
-		})
+	/**
+	 * @param {{userId: string, startDate: string, endDate: string}} params
+	 * @returns {import('../../interface/Store').ifStore.AccountBookAjax.AccountList}
+	 */
+	async params => {
+		let { data } = await axios.get(
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
+			{ params },
+		)
 		if (data.length > 0) {
 			data = data.map(info => {
 				const isFixed = info.isFixed === 'true'
-				return { ...info, isFixed }
+				const amount =
+					typeof info.amount === `string` ? parseInt(info.amount, 10) : info.amount
+				return { ...info, isFixed, amount }
 			})
 		}
 
@@ -63,26 +69,50 @@ export const getAccountBookList = createAsyncThunk(
 	},
 )
 
-/** 가게부 작성 */
+/** 가계부 작성 */
 export const insertAccountBook = createAsyncThunk(
 	'accountBook/insertAccountBook',
-	async (param, thunkAPI) => {
-		const response = await axios('https://api.bithumb.com/api/account-book/insert', {
-			userId: '',
-			...param,
-		})
+	/**
+	 * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} data
+	 * @returns {{ msg: string, code: string }}
+	 */
+	async data => {
+		const response = await axios.post(
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+			{ data },
+		)
 		return response.data
 	},
 )
 
-/** 가게부 삭제 */
+/** 가계부 삭제 */
 export const deleteAccountBook = createAsyncThunk(
 	'accountBook/deleteAccountBook',
-	async (param, thunkAPI) => {
-		const response = await axios('https://api.bithumb.com/api/account-book/delete', {
-			userId: '',
-			...param,
-		})
+	/**
+	 * @param {{ userId: string, accountId: string }} data
+	 * @returns {{ msg: string, code: string }}
+	 */
+	async data => {
+		const response = await axios.delete(
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+			data,
+		)
+		return response.data
+	},
+)
+
+/** 가계부 수정 */
+export const updateAccountBook = createAsyncThunk(
+	'accountBook/updateAccountBook',
+	/**
+	 * @param {{ accountId: string, amount?: number, isFixed?: boolean, date?: string }} data
+	 * @returns {{ msg: string, code: string }}
+	 */
+	async data => {
+		const response = await axios.patch(
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+			data,
+		)
 		return response.data
 	},
 )

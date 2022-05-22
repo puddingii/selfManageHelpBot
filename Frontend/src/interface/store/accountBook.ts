@@ -1,8 +1,12 @@
-export type AccountList = {
+export interface accountBookInfo {
+	userId: string
 	amount: number
-	content: string
-	category: string
 	isFixed: boolean
+	category: string
+	content: string
 	date: string
-	fixedDuration: string
-}[]
+}
+
+export interface AccountList extends accountBookInfo {
+	accountId: string
+}

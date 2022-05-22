@@ -1,7 +1,8 @@
 namespace ifStore {
 	// Table Box Component
-	export namespace AccountBookAjaxResult {
-		export type AccountBook = import('./store/accountBook').AccountList
+	export namespace AccountBookAjax {
+		export type AccountList = import('./store/accountBook').AccountList[]
+		export type AccountInfo = import('./store/accountBook').accountBookInfo
 	}
 }
 

@@ -23,7 +23,9 @@ module.exports = {
 		)
 		.addStringOption(option => option.setName('content').setDescription('내용'))
 		.addStringOption(option =>
-			option.setName('fixedduration').setDescription('고정금액 주기'),
+			option
+				.setName('fixedduration')
+				.setDescription('고정금액 주기(d:일,w:주,m:월,y:년)ex: 2w'),
 		),
 	/** @param {import('discord.js').CommandInteraction} interaction */
 	async execute(interaction) {
