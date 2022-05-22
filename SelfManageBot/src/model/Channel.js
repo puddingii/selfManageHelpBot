@@ -30,7 +30,7 @@ Channel.statics.addUser = async function (channelId, userInfo) {
 	if (!channel) {
 		throw new Error('Channel is not found.');
 	}
-	if (channel.userList.find(dbUser => dbUser.userId === userInfo.userId)) {
+	if (channel.userList.find(dbUser => dbUser.discordId === userInfo.discordId)) {
 		return;
 	}
 	channel.userList.push(userInfo);

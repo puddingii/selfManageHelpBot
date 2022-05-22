@@ -9,7 +9,7 @@ module.exports = {
 		.setName('enrolluser')
 		.setDescription('Enroll User Information')
 		.addStringOption(option =>
-			option.setName('webid').setDescription('웹 아이디').setRequired(true),
+			option.setName('userid').setDescription('웹 아이디').setRequired(true),
 		)
 		.addStringOption(option =>
 			option.setName('passwd').setDescription('비번').setRequired(true),
@@ -18,13 +18,13 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const channelId = interaction.guild.id.toString();
-			const webId = interaction.options.getString('webid');
+			const userId = interaction.options.getString('userid');
 			const passwd = interaction.options.getString('passwd');
 
 			/** DB Info */
-			const userInfo = await UserModel.findByWeb({ webId });
+			const userInfo = await UserModel.findByWeb({ userId });
 			const channelInfo = await ChannelModel.findByChannelId(channelId);
 
 			/** 유저정보가 없을 때 */
@@ -39,12 +39,12 @@ module.exports = {
 				return;
 			}
 
-			if (userInfo.userId) {
+			if (userInfo.discordId) {
 				await interaction.reply({ content: 'Already enroll' });
 				return;
 			}
 
-			userInfo.userId = userId;
+			userInfo.discordId = discordId;
 			await userInfo.save();
 
 			const isExistCUGInfo = await ChannelUserGoalModel.isChannelUserUnique({

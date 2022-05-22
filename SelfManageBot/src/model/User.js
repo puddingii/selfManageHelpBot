@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const User = new mongoose.Schema({
-	userId: {
+	discordId: {
 		type: String,
 		unique: true,
 	},
@@ -28,7 +28,7 @@ const User = new mongoose.Schema({
 			ref: 'Todo',
 		},
 	],
-	webId: {
+	userId: {
 		type: String,
 		required: true,
 		unique: true,
@@ -48,17 +48,17 @@ User.pre('save', async function () {
 /**
  * 아이디로 유저정보 탐색
  * @this import('mongoose').Model
- * @param {String} userId
+ * @param {String} discordId
  */
-User.statics.findByUserId = async function (userId) {
-	const userInfo = await this.findOne({ userId });
+User.statics.findBydiscordId = async function (discordId) {
+	const userInfo = await this.findOne({ discordId });
 	return userInfo;
 };
 
 /**
  * 아이디로 유저정보 탐색
  * @this import('mongoose').Model
- * @param {{webId: String, nickname?: String}}
+ * @param {{userId: String, nickname?: String}}
  */
 User.statics.findByWeb = async function (orOptions) {
 	const orOptionList = [];
@@ -88,8 +88,8 @@ User.statics.addChannel = async function (userInfo, channelInfo) {
 };
 
 /** 유저정보에 공부정보 추가 */
-User.statics.addStudy = async function (userId, studyInfo) {
-	const user = await this.findOne({ userId }).populate('studyList');
+User.statics.addStudy = async function (discordId, studyInfo) {
+	const user = await this.findOne({ discordId }).populate('studyList');
 	if (!user) {
 		throw new Error('User is not found.');
 	}
@@ -101,8 +101,8 @@ User.statics.addStudy = async function (userId, studyInfo) {
 };
 
 /** 유저정보에 Todo정보 추가 */
-User.statics.addTodo = async function (userId, todoInfo) {
-	const user = await this.findOne({ userId }).populate('todoList');
+User.statics.addTodo = async function (discordId, todoInfo) {
+	const user = await this.findOne({ discordId }).populate('todoList');
 	if (!user) {
 		throw new Error('User is not found.');
 	}
@@ -116,10 +116,10 @@ User.statics.addTodo = async function (userId, todoInfo) {
 /**
  * Random id 생성 후 저장 및 return
  * @this import('mongoose').Model
- * @param {String} userId
+ * @param {String} discordId
  */
-User.statics.getRandomId = async function (userId) {
-	const user = await this.findOne({ userId });
+User.statics.getRandomId = async function (discordId) {
+	const user = await this.findOne({ discordId });
 	if (!user) {
 		throw new Error('User is not found.');
 	}

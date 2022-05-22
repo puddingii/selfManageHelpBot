@@ -20,14 +20,14 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const channelId = interaction.guild.id.toString();
 			const minute = interaction.options.getInteger('minute');
 			const content = interaction.options.getString('content');
 			let result = 0;
 
 			/** DB Info */
-			const user = await UserModel.findByUserId(userId);
+			const user = await UserModel.findBydiscordId(discordId);
 			if (!user) {
 				result = 2;
 			}

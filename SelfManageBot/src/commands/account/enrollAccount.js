@@ -22,12 +22,14 @@ module.exports = {
 			option.setName('category').setDescription('카테고리(음식, 교통, 집세 등...)'),
 		)
 		.addStringOption(option => option.setName('content').setDescription('내용'))
-		.addStringOption(option => option.setName('fixedduration').setDescription('고정금액 주기')),
+		.addStringOption(option =>
+			option.setName('fixedduration').setDescription('고정금액 주기'),
+		),
 	/** @param {import('discord.js').CommandInteraction} interaction */
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const isFixed = JSON.parse(interaction.options.getString('isfixed'));
 			const amount = interaction.options.getInteger('amount');
 			const category = interaction.options.getString('category') ?? 'etc';
@@ -35,16 +37,18 @@ module.exports = {
 			const fixedDuration = interaction.options.getString('fixedduration') ?? '';
 			let replyContent = 'Save account information.';
 
-			const type = ['d', 'w', 'm', 'y']
-			const durationType = fixedDuration.slice(-1)
-			const cnt = parseInt(fixedDuration.slice(0, -1), 10)
+			const type = ['d', 'w', 'm', 'y'];
+			const durationType = fixedDuration.slice(-1);
+			const cnt = parseInt(fixedDuration.slice(0, -1), 10);
 			if (isFixed && (!type.includes(durationType) || typeof cnt !== 'number')) {
-				await interaction.reply({ content: 'fixedDuration값이 잘못되었음. option) 12d 2w 1m 1y' });
+				await interaction.reply({
+					content: 'fixedDuration값이 잘못되었음. option) 12d 2w 1m 1y',
+				});
 				return;
 			}
 
 			/** DB Info */
-			const user = await UserModel.findByUserId(userId);
+			const user = await UserModel.findBydiscordId(discordId);
 			if (!user) {
 				replyContent = '[Fail]User information is not existed';
 			} else {
@@ -54,7 +58,7 @@ module.exports = {
 					amount,
 					category,
 					content,
-					fixedDuration
+					fixedDuration,
 				});
 			}
 

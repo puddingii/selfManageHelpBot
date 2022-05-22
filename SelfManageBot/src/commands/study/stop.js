@@ -12,11 +12,11 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const channelId = interaction.guild.id.toString();
 
 			const studyController = new StudyController();
-			const result = studyController.stopStudy({ userId, channelId });
+			const result = studyController.stopStudy({ discordId, channelId });
 
 			let content;
 			switch (result) {

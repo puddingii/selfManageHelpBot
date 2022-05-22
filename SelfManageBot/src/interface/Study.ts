@@ -8,7 +8,7 @@ export namespace Study {
 		};
 	};
 	export type userInfo = {
-		userId: string;
+		discordId: string;
 		channelId: string;
 	};
 	export type endStudyReturns =

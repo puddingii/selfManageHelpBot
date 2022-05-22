@@ -17,13 +17,13 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const todoString = (interaction.options.getString('todolist') ?? '').split(',');
 			const todoList = new Set(todoString);
 			let result = todoString ? 1 : 0;
 
 			/** DB Info */
-			const user = await UserModel.findByUserId(userId);
+			const user = await UserModel.findBydiscordId(discordId);
 			if (!user) {
 				result = 2;
 			}

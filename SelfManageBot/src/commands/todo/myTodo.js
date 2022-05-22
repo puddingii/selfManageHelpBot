@@ -20,7 +20,7 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const isCompleted = JSON.parse(interaction.options.getString('iscompleted'));
 			const embedBox = new MessageEmbed();
 			embedBox
@@ -32,7 +32,7 @@ module.exports = {
 			let result = 1;
 
 			/** DB Info */
-			const userInfo = await UserModel.findByUserId(userId);
+			const userInfo = await UserModel.findBydiscordId(discordId);
 			let todoList;
 
 			if (!userInfo) {

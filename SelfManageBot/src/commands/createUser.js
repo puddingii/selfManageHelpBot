@@ -8,7 +8,7 @@ module.exports = {
 		.setName('createuser')
 		.setDescription('Create User')
 		.addStringOption(option =>
-			option.setName('webid').setDescription('웹 아이디').setRequired(true),
+			option.setName('userid').setDescription('웹 아이디').setRequired(true),
 		)
 		.addStringOption(option =>
 			option.setName('passwd').setDescription('비번').setRequired(true),
@@ -20,21 +20,21 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const webId = interaction.options.getString('webid');
+			const userId = interaction.options.getString('userid');
 			const passwd = interaction.options.getString('passwd');
 			const nickname = interaction.options.getString('nickname');
 
 			/** DB Info */
-			const userInfo = await UserModel.findByWeb({ webId, nickname });
+			const userInfo = await UserModel.findByWeb({ userId, nickname });
 			let content = 'Create User!';
 
 			/** 유저정보가 없을 때 */
 			if (!userInfo) {
-				await UserModel.create({ webId, passwd, nickname });
+				await UserModel.create({ userId, passwd, nickname });
 			} else if (userInfo.nickname === nickname) {
 				content = 'Nickname is duplicated';
-			} else if (userInfo.webId === webId) {
-				content = 'WebId is duplicated';
+			} else if (userInfo.userId === userId) {
+				content = 'UserId is duplicated';
 			} else {
 				content = 'Create Error';
 			}

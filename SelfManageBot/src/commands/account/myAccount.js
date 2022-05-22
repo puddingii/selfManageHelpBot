@@ -13,7 +13,7 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const embedBox = new MessageEmbed();
 			embedBox
 				.setColor('#0099ff')
@@ -23,7 +23,7 @@ module.exports = {
 				.setTimestamp();
 
 			/** DB Info */
-			const user = await UserModel.findByUserId(userId);
+			const user = await UserModel.findBydiscordId(discordId);
 			if (!user) {
 				embedBox.addField('Fail', 'User information is not existed');
 			} else {

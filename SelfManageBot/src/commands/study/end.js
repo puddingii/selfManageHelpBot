@@ -18,7 +18,7 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const channelId = interaction.guild.id.toString();
 			const title = interaction.options.getString('title');
 			let result;
@@ -26,14 +26,14 @@ module.exports = {
 			/** Title option is required */
 			if (title) {
 				const studyController = new StudyController();
-				result = studyController.endStudy({ userId, channelId });
+				result = studyController.endStudy({ discordId, channelId });
 			} else {
 				result = 0;
 			}
 
 			/** If controller is working normally */
 			if (typeof result === 'object') {
-				const owner = await UserModel.findByUserId(userId);
+				const owner = await UserModel.findBydiscordId(discordId);
 				const newStudyInfo = await StudyModel.create({
 					title,
 					startDate: result.startDate,
@@ -41,7 +41,7 @@ module.exports = {
 					commentList: result.commentList,
 					owner,
 				});
-				result = await UserModel.addStudy(userId, newStudyInfo);
+				result = await UserModel.addStudy(discordId, newStudyInfo);
 			}
 
 			let content;

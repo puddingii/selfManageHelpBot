@@ -16,7 +16,7 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const channelId = interaction.guild.id.toString();
 			const title = interaction.options.getString('title');
 			const content = interaction.options.getString('content');
@@ -25,7 +25,7 @@ module.exports = {
 			if (title) {
 				const studyController = new StudyController();
 				result = studyController.addComment(
-					{ userId, channelId },
+					{ discordId, channelId },
 					{ title, content, isSecret: false },
 				);
 			}

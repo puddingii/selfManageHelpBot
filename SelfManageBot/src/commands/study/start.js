@@ -10,11 +10,11 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const channelId = interaction.guild.id.toString();
 
 			const studyController = new StudyController();
-			const result = studyController.startStudy({ userId, channelId });
+			const result = studyController.startStudy({ discordId, channelId });
 			const content = result ? 'Start study!' : '[Fail]Already studying...';
 
 			await interaction.reply({ content });

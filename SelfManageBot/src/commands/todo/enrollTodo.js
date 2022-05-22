@@ -14,19 +14,19 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 			const content = interaction.options.getString('content');
 			let result = 0;
 
 			/** DB Info */
-			const user = await UserModel.findByUserId(userId);
+			const user = await UserModel.findBydiscordId(discordId);
 			if (!user) {
 				result = 2;
 			}
 
 			if (content && result === 0) {
 				const newTodo = await TodoModel.createTodo({ content, owner: user });
-				result = await UserModel.addTodo(userId, newTodo);
+				result = await UserModel.addTodo(discordId, newTodo);
 			}
 			let replyContent;
 

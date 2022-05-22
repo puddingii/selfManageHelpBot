@@ -11,10 +11,10 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			/** Discord Info */
-			const userId = interaction.user.id.toString();
+			const discordId = interaction.user.id.toString();
 
 			/** DB Info */
-			const result = await UserModel.getRandomId(userId);
+			const result = await UserModel.getRandomId(discordId);
 
 			let replyContent;
 			switch (result) {

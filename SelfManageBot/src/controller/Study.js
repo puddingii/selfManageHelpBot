@@ -22,15 +22,15 @@ module.exports = class Study {
 	 * @returns {Number} 1 - success,  2 - channel is different,  3 - study status is false
 	 */
 	addComment(userInfo, comment) {
-		const { userId, channelId } = userInfo;
+		const { discordId, channelId } = userInfo;
 		if (
-			this.studyInfo[userId]?.isStudying &&
-			this.studyInfo[userId].channelId === channelId
+			this.studyInfo[discordId]?.isStudying &&
+			this.studyInfo[discordId].channelId === channelId
 		) {
-			this.studyInfo[userId].commentList.push({ ...comment, date: `${dayjs()}` });
+			this.studyInfo[discordId].commentList.push({ ...comment, date: `${dayjs()}` });
 			return 1;
 		}
-		return this.studyInfo[userId]?.isStudying ? 2 : 3;
+		return this.studyInfo[discordId]?.isStudying ? 2 : 3;
 	}
 
 	/**
@@ -39,13 +39,13 @@ module.exports = class Study {
 	 * @returns {import('../interface/Study').Study.endStudyReturns} Object - success ,2 - channel is different,  3 - study status is false
 	 */
 	endStudy(userInfo) {
-		const { userId, channelId } = userInfo;
-		if (this.studyInfo[userId].channelId !== channelId) {
+		const { discordId, channelId } = userInfo;
+		if (this.studyInfo[discordId].channelId !== channelId) {
 			return 2;
 		}
-		if (this.studyInfo[userId]?.isStudying) {
-			this.studyInfo[userId].isStudying = false;
-			return { ...this.studyInfo[userId], endDate: `${dayjs()}` };
+		if (this.studyInfo[discordId]?.isStudying) {
+			this.studyInfo[discordId].isStudying = false;
+			return { ...this.studyInfo[discordId], endDate: `${dayjs()}` };
 		}
 		return 3;
 	}
@@ -57,11 +57,11 @@ module.exports = class Study {
 	 * @returns {Number} 0 - already studying(failed),  1 - success
 	 */
 	startStudy(userInfo) {
-		const { userId, channelId } = userInfo;
-		if (this.studyInfo[userId]?.isStudying) {
+		const { discordId, channelId } = userInfo;
+		if (this.studyInfo[discordId]?.isStudying) {
 			return 0;
 		}
-		this.studyInfo[userId] = {
+		this.studyInfo[discordId] = {
 			channelId,
 			startDate: `${dayjs()}`,
 			commentList: [],
@@ -76,12 +76,12 @@ module.exports = class Study {
 	 * @returns {Number} 1 - success,  2 - channel is different,  3 - study status is false
 	 */
 	stopStudy(userInfo) {
-		const { userId, channelId } = userInfo;
-		if (this.studyInfo[userId].channelId !== channelId) {
+		const { discordId, channelId } = userInfo;
+		if (this.studyInfo[discordId].channelId !== channelId) {
 			return 2;
 		}
-		if (this.studyInfo[userId]?.isStudying) {
-			this.studyInfo[userId].isStudying = false;
+		if (this.studyInfo[discordId]?.isStudying) {
+			this.studyInfo[discordId].isStudying = false;
 			return 1;
 		}
 		return 3;
