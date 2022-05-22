@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 const User = new mongoose.Schema({
 	userId: {
 		type: String,
-		required: true,
 		unique: true,
 	},
 	nickname: {
 		type: String,
-		required: true,
+		unique: true,
 	},
 	channelList: [
 		{
@@ -29,20 +28,22 @@ const User = new mongoose.Schema({
 			ref: 'Todo',
 		},
 	],
-	accessKey: {
+	webId: {
 		type: String,
-		default: '',
+		required: true,
+		unique: true,
+	},
+	passwd: {
+		type: String,
+		required: true,
 	},
 });
 
-// User.pre('save', async function () {
-// 	if (this.accessKey !== '' && this.isModified('accessKey')) {
-// 		this.accessKey = await bcrypt.hash(
-// 			this.accessKey,
-// 			parseInt(process.env.HASH_ROUND, 10),
-// 		);
-// 	}
-// });
+User.pre('save', async function () {
+	if (this.passwd !== '' && this.isModified('passwd')) {
+		this.passwd = await bcrypt.hash(this.passwd, parseInt(process.env.HASH_ROUND, 10));
+	}
+});
 
 /**
  * 아이디로 유저정보 탐색
@@ -51,6 +52,23 @@ const User = new mongoose.Schema({
  */
 User.statics.findByUserId = async function (userId) {
 	const userInfo = await this.findOne({ userId });
+	return userInfo;
+};
+
+/**
+ * 아이디로 유저정보 탐색
+ * @this import('mongoose').Model
+ * @param {{webId: String, nickname?: String}}
+ */
+User.statics.findByWeb = async function (orOptions) {
+	const orOptionList = [];
+	Object.entries(orOptions).forEach(([key, value]) => {
+		const obj = {};
+		obj[key] = value;
+		orOptionList.push(obj);
+	});
+
+	const userInfo = await this.findOne({ $or: orOptionList });
 	return userInfo;
 };
 

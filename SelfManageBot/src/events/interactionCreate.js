@@ -20,7 +20,8 @@ module.exports = {
 		if (!command) {
 			return;
 		}
-		if (commandName !== 'init' && commandName !== 'enrolluser') {
+		const notCheckCommandList = ['init', 'enrolluser', 'createuser'];
+		if (!notCheckCommandList.includes(commandName)) {
 			const isExist = await isEnrolledUser(interaction);
 			if (!isExist) {
 				await interaction.reply('You are not enrolled this server.');
