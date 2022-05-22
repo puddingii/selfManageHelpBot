@@ -73,8 +73,8 @@ User.statics.findByWeb = async function (orOptions) {
 };
 
 /** 유저정보에 채널 추가 */
-User.statics.addChannel = async function (userId, channelInfo) {
-	const user = await this.findOne({ userId }).populate('channelList');
+User.statics.addChannel = async function (userInfo, channelInfo) {
+	const user = await userInfo.populate('channelList');
 	if (!user) {
 		throw new Error('User is not found.');
 	}

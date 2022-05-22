@@ -54,7 +54,7 @@ module.exports = {
 			if (!isExistCUGInfo) {
 				await ChannelUserGoalModel.create({ user: userInfo, channel: channelInfo });
 				await ChannelModel.addUser(channelId, userInfo);
-				await UserModel.addChannel(userId, channelInfo);
+				await UserModel.addChannel(userInfo, channelInfo);
 				await interaction.reply({ content: 'Connect User and Discord!' });
 				return;
 			}
