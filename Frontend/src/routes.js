@@ -22,6 +22,7 @@ import Typography from 'views/Typography.js'
 import Icons from 'views/Icons.js'
 import Notifications from 'views/Notifications.js'
 import Upgrade from 'views/Upgrade.js'
+import { Study } from 'views/Study'
 import AccountBook from 'views/AccountBook.js'
 
 const dashboardRoutes = [
@@ -83,5 +84,24 @@ const dashboardRoutes = [
 		layout: '/admin',
 	},
 ]
+
+const smbRoutes = [
+	{
+		path: '/',
+		name: 'Study',
+		icon: 'nc-icon nc-bell-55',
+		component: Study,
+		layout: '/study',
+	},
+	{
+		path: '/',
+		name: 'Todo',
+		icon: 'nc-icon nc-bell-55',
+		component: Notifications,
+		layout: '/todo',
+	},
+]
+
+export { smbRoutes }
 
 export default dashboardRoutes
