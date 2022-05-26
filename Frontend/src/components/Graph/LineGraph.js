@@ -4,15 +4,13 @@ import recur from 'moment-recur'
 import { useEffect, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { CardView } from 'components/CardView'
-import { Spinner } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 
-const dateOptions = {
-	type: '', // week or month      -> recur parameter unit 1 or 4
-	unitType: '', // won or minutes
-	startDate: '', //YYYY-MM-DD
-}
-
+/**
+ *
+ * @param {import('../../../src/interface/Component').ComponentOptions.DefaultLineGraph} param0
+ * @returns {Component}
+ */
 const LineGraph = ({ data, dateOptions, action, title, subTitle = null }) => {
 	const dispatch = useDispatch()
 
@@ -127,6 +125,11 @@ const LineGraph = ({ data, dateOptions, action, title, subTitle = null }) => {
 	)
 }
 
+/**
+ *
+ * @param {import('../../../src/interface/Component').ComponentOptions.DefaultLineGraph} props
+ * @returns {Component}
+ */
 const StudyWeekGraph = props => {
 	const data = useSelector(({ study }) => study.week)
 	props.dateOptions.type = 'week'
