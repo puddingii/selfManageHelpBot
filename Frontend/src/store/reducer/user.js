@@ -17,6 +17,8 @@ export const userSlice = createSlice({
 	initialState: {
 		value: 0,
 		temp: {},
+		userId: 'gun4930',
+		nickname: '무야호',
 	},
 	reducers: {
 		increment: state => {
@@ -37,18 +39,18 @@ export const userSlice = createSlice({
 				console.log('Data rejected')
 				state.temp = action.payload
 			})
-			.addMatcher(
-				action => {
-					console.log(action)
-					return true
-				},
-				(state, action) => {
-					console.log('Matcher')
-				},
-			)
-			.addDefaultCase((state, action) => {
-				console.log('DefaultCase')
-			})
+		// .addMatcher(
+		// 	action => {
+		// 		console.log(action)
+		// 		return true
+		// 	},
+		// 	(state, action) => {
+		// 		console.log('Matcher')
+		// 	},
+		// )
+		// .addDefaultCase((state, action) => {
+		// 	console.log('DefaultCase')
+		// })
 	},
 })
 

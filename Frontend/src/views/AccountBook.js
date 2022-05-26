@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import ChartistGraph from 'react-chartist'
 import { connect } from 'react-redux'
+import dayjs from 'dayjs'
 
 // react-bootstrap components
 import {
@@ -21,29 +22,20 @@ import {
 import { increment, fetchUserById } from 'store/reducer/user'
 import SummaryMiniBox from 'components/Box/SummaryMiniBox'
 import TableBox from 'components/Box/TableBox'
-import AccountTable from 'components/CustomTable/AccountTable'
 import { accountBookColumns } from '../code'
+import { getAccountBookList } from 'store/reducer/accountBook'
 
-function AccountBook({ onBtnClick }) {
-	const tableData = [
-		{ id: '1', content: 'Book 1', amount: 100000, category: '식사', isFixed: false },
-		{ id: '2', content: 'Book 2', amount: 100000, category: '식사', isFixed: true },
-		{ id: '3', content: 'Book 3', amount: 100000, category: '식사', isFixed: false },
-		{ id: '4', content: 'Book 4', amount: 100000, category: '식사', isFixed: true },
-		{ id: '5', content: 'Book 5', amount: 100000, category: '식사', isFixed: false },
-		{ id: '6', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '7', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '8', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '9', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '61', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '62', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '63', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '64', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '65', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '66', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '67', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-		{ id: '68', content: 'Book 6', amount: 100000, category: '식사', isFixed: false },
-	]
+function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
+	const [duration, setDuration] = useState(7)
+	useEffect(() => {
+		getAccountList({
+			userId: userInfo.userId,
+			startDate: dayjs().subtract(duration, 'day').format('YYYY-MM-DD'),
+			endDate: dayjs().format('YYYY-MM-DD'),
+		})
+	}, [])
+
+	const tableData = accountInfo.accountList
 
 	const summaryBoxOptionList = [
 		{
@@ -135,12 +127,12 @@ function AccountBook({ onBtnClick }) {
 				</Row>
 				<Row>
 					<Col>
-						<TableBox title="예?" description="Here is a subtitle for this table">
-							<AccountTable
-								tableData={tableData}
-								columns={accountBookColumns}
-							></AccountTable>
-						</TableBox>
+						<TableBox
+							title="예?"
+							description="Here is a subtitle for this table"
+							tableData={tableData}
+							columns={accountBookColumns}
+						></TableBox>
 					</Col>
 				</Row>
 				<Row>
@@ -595,10 +587,15 @@ function AccountBook({ onBtnClick }) {
 	)
 }
 
-function mapDispatchToProps(dispatch, ownProps) {
+const mapStateToProps = state => {
+	return { userInfo: state.user, accountInfo: state.accountBook }
+}
+
+const mapDispatchToProps = (dispatch, ownProps) => {
 	return {
-		onBtnClick: () => dispatch(fetchUserById('hi')),
+		getAccountList: ({ userId, startDate, endDate }) =>
+			dispatch(getAccountBookList({ userId, startDate, endDate })),
 	}
 }
 
-export default connect(null, mapDispatchToProps)(AccountBook)
+export default connect(mapStateToProps, mapDispatchToProps)(AccountBook)

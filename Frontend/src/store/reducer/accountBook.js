@@ -154,40 +154,34 @@ export const accountBookSlice = createSlice({
 				state.isAjaxSucceed = false
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})
+		/** insertAccountBook */
+		builder
+			.addCase(insertAccountBook.fulfilled, (state, action) => {
+				const { code, msg } = action.payload
+
+				state.isAjaxSucceed = code !== 1
+				state.ajaxMsg = msg
+			})
+			.addCase(insertAccountBook.rejected, (state, action) => {
+				state.isAjaxSucceed = false
+				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
+			})
+		/** deleteAccountBook */
+		builder
+			.addCase(deleteAccountBook.fulfilled, (state, action) => {
+				const { code, msg } = action.payload
+
+				state.isAjaxSucceed = code !== 1
+				state.ajaxMsg = msg
+			})
+			.addCase(deleteAccountBook.rejected, (state, action) => {
+				state.isAjaxSucceed = false
+				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
+			})
 			.addDefaultCase((state, action) => {
 				state.isAjaxSucceed = true
 				state.accountList = []
-			}),
-			/** insertAccountBook */
-			builder
-				.addCase(insertAccountBook.fulfilled, (state, action) => {
-					const { code, msg } = action.payload
-
-					state.isAjaxSucceed = code !== 1
-					state.ajaxMsg = msg
-				})
-				.addCase(insertAccountBook.rejected, (state, action) => {
-					state.isAjaxSucceed = false
-					state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
-				})
-				.addDefaultCase((state, action) => {
-					state.isAjaxSucceed = true
-				}),
-			/** deleteAccountBook */
-			builder
-				.addCase(deleteAccountBook.fulfilled, (state, action) => {
-					const { code, msg } = action.payload
-
-					state.isAjaxSucceed = code !== 1
-					state.ajaxMsg = msg
-				})
-				.addCase(deleteAccountBook.rejected, (state, action) => {
-					state.isAjaxSucceed = false
-					state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
-				})
-				.addDefaultCase((state, action) => {
-					state.isAjaxSucceed = true
-				})
+			})
 	},
 })
 

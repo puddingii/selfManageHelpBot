@@ -1,8 +1,9 @@
 export const accountBookColumns = [
 	{
-		dataField: 'id',
-		text: 'Product ID',
+		dataField: 'accountId',
+		text: 'No',
 		headerClasses: 'border-0',
+		headerStyle: { width: '50px' },
 	},
 	{
 		dataField: 'content',
