@@ -1,34 +1,65 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import ChartistGraph from 'react-chartist'
 import { connect } from 'react-redux'
 import dayjs from 'dayjs'
 
 // react-bootstrap components
-import { Dropdown, Nav, Container, Tabs, Tab } from 'react-bootstrap'
+import { Dropdown, Nav, Container, Row, Col } from 'react-bootstrap'
 import { increment, fetchUserById } from 'store/reducer/user'
+import TableBox from 'components/Box/TableBox'
 import { getAccountBookList } from 'store/reducer/accountBook'
 
-import Summary from 'components/AccountBook/AccountBookSummary'
-import Detail from 'components/AccountBook/AccountBookDetail'
-import Calendar from 'components/AccountBook/AccountBookCalendar'
-
-function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
+function AccountBookDetail({ onBtnClick, getAccountList, userInfo, accountInfo }) {
 	const [duration, setDuration] = useState(7)
+	useEffect(() => {
+		console.log('hi')
+		getAccountList({
+			userId: userInfo.userId,
+			startDate: dayjs().subtract(duration, 'day').format('YYYY-MM-DD'),
+			endDate: dayjs().format('YYYY-MM-DD'),
+		})
+	}, [])
+
+	const onClickDurationBtn = () => {}
+
+	/** 데이터 초기화 */
+	const tableData = accountInfo.accountList
+	const accountBookColumns = [
+		{
+			dataField: 'accountId',
+			text: 'No',
+			headerClasses: 'border-0',
+			headerStyle: { width: '50px' },
+		},
+		{
+			dataField: 'content',
+			text: '내용',
+			headerClasses: 'border-0',
+		},
+		{
+			dataField: 'amount',
+			text: '금액',
+			headerClasses: 'border-0',
+		},
+		{
+			dataField: 'category',
+			text: '카테고리',
+			headerClasses: 'border-0',
+		},
+		{
+			dataField: 'date',
+			text: '날짜',
+			headerClasses: 'border-0',
+		},
+		{
+			dataField: 'isFixed',
+			text: '고정지출',
+			headerClasses: 'border-0',
+		},
+	]
 
 	return (
 		<>
 			<Container fluid>
-				<Tabs defaultActiveKey="summary" className="mb-3">
-					<Tab eventKey="summary" title="요약">
-						<Summary />
-					</Tab>
-					<Tab eventKey="detail" title="자세히 보기">
-						<Detail />
-					</Tab>
-					<Tab eventKey="calendar" title="캘린더">
-						<Calendar />
-					</Tab>
-				</Tabs>
 				<Dropdown as={Nav.Item}>
 					<Dropdown.Toggle
 						as={Nav.Link}
@@ -53,6 +84,16 @@ function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
 						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
+				<Row>
+					<Col>
+						<TableBox
+							title="예?"
+							description="Here is a subtitle for this table"
+							tableData={tableData}
+							columns={accountBookColumns}
+						></TableBox>
+					</Col>
+				</Row>
 			</Container>
 		</>
 	)
@@ -69,4 +110,4 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AccountBook)
+export default connect(mapStateToProps, mapDispatchToProps)(AccountBookDetail)
