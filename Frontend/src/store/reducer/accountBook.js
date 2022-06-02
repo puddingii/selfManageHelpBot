@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { getRepeatCnt } from '../../util/dayUtil'
+import _ from 'lodash'
 
 /**
  * accountList를 참고하여 summary 반환
@@ -36,7 +37,7 @@ const calcSummary = (accountList, dateInfo) => {
 				summary.notFixedIncome += accountInfo.amount
 			} else {
 				/** 지출 */
-				summary.fixedOutcome += accountInfo.amount
+				summary.notFixedOutcome += accountInfo.amount
 			}
 		}
 	})
@@ -52,18 +53,18 @@ export const getAccountBookList = createAsyncThunk(
 	 * @returns {import('../../interface/Store').ifStore.AccountBookAjax.AccountList}
 	 */
 	async params => {
-		let { data } = await axios.get(
+		const { data: notFixedList } = await axios.get(
 			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
 			{ params },
 		)
-		if (data.length > 0) {
-			data = data.map(info => {
-				const isFixed = info.isFixed === 'true'
-				const amount =
-					typeof info.amount === `string` ? parseInt(info.amount, 10) : info.amount
-				return { ...info, isFixed, amount }
-			})
-		}
+
+		const { data: fixedList } = await axios.get(
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/fixedList`,
+			{ params: { userId: params.userId } },
+		)
+
+		let data = notFixedList.filter(notFixedInfo => !notFixedInfo.isFixed)
+		data = data.concat(fixedList)
 
 		return data
 	},
@@ -95,7 +96,7 @@ export const deleteAccountBook = createAsyncThunk(
 	async data => {
 		const response = await axios.delete(
 			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
-			data,
+			{ data },
 		)
 		return response.data
 	},
@@ -105,7 +106,7 @@ export const deleteAccountBook = createAsyncThunk(
 export const updateAccountBook = createAsyncThunk(
 	'accountBook/updateAccountBook',
 	/**
-	 * @param {{ accountId: string, amount?: number, isFixed?: boolean, date?: string }} data
+	 * @param {{ accountId: string, amount?: number, isFixed?: boolean, date?: string, fixedDuration?: string }} data
 	 * @returns {{ msg: string, code: string }}
 	 */
 	async data => {
@@ -147,7 +148,7 @@ export const accountBookSlice = createSlice({
 						arg: { startDate, endDate },
 					},
 				} = action
-				state.accountList = action.payload
+				state.accountList = payload
 				state.summaryValues = calcSummary(state.accountList, { startDate, endDate })
 			})
 			.addCase(getAccountBookList.rejected, (state, action) => {
@@ -180,7 +181,6 @@ export const accountBookSlice = createSlice({
 			})
 			.addDefaultCase((state, action) => {
 				state.isAjaxSucceed = true
-				state.accountList = []
 			})
 	},
 })

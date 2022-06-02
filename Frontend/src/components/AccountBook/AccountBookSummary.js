@@ -8,86 +8,108 @@ import { Card, Dropdown, Nav, Container, Row, Col } from 'react-bootstrap'
 import { increment, fetchUserById } from 'store/reducer/user'
 import SummaryMiniBox from 'components/Box/SummaryMiniBox'
 import { getAccountBookList } from 'store/reducer/accountBook'
+import { setComma } from 'util/common'
 
 function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
-	const [duration, setDuration] = useState(7)
+	const [durationType, setDurationType] = useState('d')
+	const [isFixedIncome, setIsFixedIncome] = useState(true)
+	const [isFixedOutcome, setIsFixedOutcome] = useState(true)
+	const [isFixedSum, setIsFixedSum] = useState(true)
+
+	const durationInfo = {
+		d: {
+			cnt: 35,
+			name: '일간',
+		},
+		w: {
+			cnt: 12,
+			name: '주간',
+		},
+		m: {
+			cnt: 12,
+			name: '월간',
+		},
+		y: {
+			cnt: 3,
+			name: '년간',
+		},
+	}
 	useEffect(() => {
-		console.log('hi')
 		getAccountList({
 			userId: userInfo.userId,
-			startDate: dayjs().subtract(duration, 'day').format('YYYY-MM-DD'),
+			startDate: dayjs()
+				.subtract(durationInfo[durationType].cnt, durationType)
+				.format('YYYY-MM-DD'),
 			endDate: dayjs().format('YYYY-MM-DD'),
 		})
 	}, [])
 
-	const onClickDurationBtn = () => {}
+	const {
+		summaryValues: { fixedOutcome, fixedIncome, notFixedIncome, notFixedOutcome },
+	} = accountInfo
 
 	const summaryBoxOptionList = [
 		{
 			title: '수입',
-			value: '3,500',
-			btnName: '고정수입 포함',
+			value: `${setComma(
+				isFixedIncome ? fixedIncome + notFixedIncome : notFixedIncome,
+			)}원`,
 			mainIconOption: {
-				type: 'fas fa-caret-up',
-				color: 'text-success',
+				type: 'icon',
+				class: 'fas fa-caret-up text-success',
 			},
 			subIconOption: {
-				type: 'fas fa-redo',
+				type: 'checkbox',
+				name: '고정수입 포함',
+				value: true,
+				onClick: () => {
+					setIsFixedIncome(!isFixedIncome)
+				},
 			},
-			onBtnClick,
 		},
 		{
 			title: '지출',
-			value: '2,500',
-			btnName: '고정지출 포함',
+			value: `${setComma(
+				isFixedOutcome ? fixedOutcome + notFixedOutcome : notFixedOutcome,
+			)}원`,
 			mainIconOption: {
-				type: 'fas fa-caret-down',
-				color: 'text-danger',
+				type: 'icon',
+				class: 'fas fa-caret-down text-danger',
 			},
 			subIconOption: {
-				type: 'fas fa-redo fa-spin',
+				type: 'checkbox',
+				name: '고정지출 포함',
+				value: true,
+				onClick: e => {
+					setIsFixedOutcome(e.target.checked)
+				},
 			},
 		},
 		{
 			title: '합계',
-			value: '2,500',
-			btnName: '고정지출 포함',
+			value: `${setComma(
+				isFixedSum
+					? fixedOutcome + notFixedOutcome + fixedIncome + notFixedIncome
+					: notFixedOutcome + notFixedIncome,
+			)}원`,
 			mainIconOption: {
-				type: 'fas fa-chart-pie',
-				color: 'text-warning',
+				type: 'icon',
+				class: 'fas fa-chart-pie text-warning',
 			},
 			subIconOption: {
-				type: 'fas fa-redo fa-spin',
+				type: 'checkbox',
+				name: '고정액 포함',
+				value: true,
+				onClick: () => {
+					setIsFixedSum(!isFixedSum)
+				},
 			},
 		},
 	]
 	return (
 		<>
 			<Container fluid>
-				<Dropdown as={Nav.Item}>
-					<Dropdown.Toggle
-						as={Nav.Link}
-						data-toggle="dropdown"
-						id="dropdown-67443507"
-						variant="default"
-						className="m-0"
-					>
-						<i className="nc-icon nc-planet"></i>
-						<span className="notification">5</span>
-						<span className="d-lg-none ml-1">Notification</span>
-					</Dropdown.Toggle>
-					<Dropdown.Menu>
-						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
-							일간
-						</Dropdown.Item>
-						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
-							주간
-						</Dropdown.Item>
-						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
-							월간
-						</Dropdown.Item>
-					</Dropdown.Menu>
-				</Dropdown>
+				<h4>수입/지출 분석(이번달)</h4>
 				<Row>
 					{summaryBoxOptionList.map(option => {
 						return (
@@ -104,6 +126,30 @@ function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
 						)
 					})}
 				</Row>
+				<Dropdown as={Nav.Item}>
+					<Dropdown.Toggle
+						as={Nav.Link}
+						data-toggle="dropdown"
+						id="dropdown-67443507"
+						variant="default"
+						className="m-0"
+					>
+						<i className="nc-icon nc-planet"></i>
+						<span className="notification">월간</span>
+						<span className="d-lg-none ml-1">Notification</span>
+					</Dropdown.Toggle>
+					<Dropdown.Menu>
+						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
+							일간
+						</Dropdown.Item>
+						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
+							주간
+						</Dropdown.Item>
+						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
+							월간
+						</Dropdown.Item>
+					</Dropdown.Menu>
+				</Dropdown>
 				<Row>
 					<Col md="8">
 						<Card>

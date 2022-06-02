@@ -1,9 +1,9 @@
-export type ComponentOptions = {
+export interface ComponentOptions {
 	title: string
 	description: string
 }
 
-type AccountTable = {
+interface AccountTable {
 	columns: Array<object>
 	tableData: Array<object>
 }

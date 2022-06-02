@@ -41,6 +41,6 @@ export const convertDurationToDay = duration => {
  * getRepeatCnt('2022-03-01', '2022-03-11', '1w') // 2
  */
 export const getRepeatCnt = (startDate, endDate, duration) => {
-	const diff = dayjs(startDate).diff(endDate, 'd')
-	return diff / convertDurationToDay(duration) + 1
+	const diff = Math.abs(dayjs(endDate).diff(startDate, 'd'))
+	return Math.floor(diff / convertDurationToDay(duration)) + 1
 }

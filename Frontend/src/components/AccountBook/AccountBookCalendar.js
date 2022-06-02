@@ -5,7 +5,6 @@ import dayjs from 'dayjs'
 // react-bootstrap components
 import { Dropdown, Nav, Container, Row, Col } from 'react-bootstrap'
 import { increment, fetchUserById } from 'store/reducer/user'
-import TableBox from 'components/Box/TableBox'
 import { getAccountBookList } from 'store/reducer/accountBook'
 
 function AccountBookDetail({ onBtnClick, getAccountList, userInfo, accountInfo }) {
@@ -85,14 +84,7 @@ function AccountBookDetail({ onBtnClick, getAccountList, userInfo, accountInfo }
 					</Dropdown.Menu>
 				</Dropdown>
 				<Row>
-					<Col>
-						<TableBox
-							title="예?"
-							description="Here is a subtitle for this table"
-							tableData={tableData}
-							columns={accountBookColumns}
-						></TableBox>
-					</Col>
+					<Col></Col>
 				</Row>
 			</Container>
 		</>

@@ -15,26 +15,59 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Row, Col } from 'react-bootstrap'
+import styled from 'styled-components'
+import { setComma } from 'util/common'
+
+const ClickableIcon = styled.i`
+	cursor: pointer;
+`
+
+const CustomInput = styled.input`
+	margin-right: 8px;
+`
 
 /** @param {import('../../interface/Component').ComponentOptions.SummaryMiniBox} */
-function SummaryMiniBox({
-	title,
-	value,
-	onBtnClick,
-	btnName,
-	mainIconOption,
-	subIconOption,
-}) {
+function SummaryMiniBox({ title, value, mainIconOption, subIconOption }) {
+	const getBtn = (type, isMain) => {
+		const option = isMain ? mainIconOption : subIconOption
+		switch (type) {
+			case 'icon':
+				return !option.onClick ? (
+					<i
+						onClick={option.onClick}
+						className={`nc-icon ${option.class} ${isMain ? '' : 'mr-1'}`}
+					/>
+				) : (
+					<ClickableIcon
+						onClick={option.onClick}
+						className={`nc-icon ${option.class} ${isMain ? '' : 'mr-1'}`}
+					/>
+				)
+			case 'button':
+				return <button onClick={option.onClick}>{option.name}</button>
+			case 'checkbox':
+				return (
+					<CustomInput
+						defaultChecked={option.value}
+						type="checkbox"
+						onChange={option.onClick}
+					/>
+				)
+			default:
+				return
+		}
+	}
+
 	return (
 		<Card className="card-stats">
 			<Card.Body>
 				<Row>
 					<Col xs="4">
 						<div className="icon-big text-center icon-warning">
-							<i className={`nc-icon ${mainIconOption.type} ${mainIconOption.color}`}></i>
+							{getBtn(mainIconOption.type, true)}
 						</div>
 					</Col>
 					<Col xs="8">
@@ -47,9 +80,9 @@ function SummaryMiniBox({
 			</Card.Body>
 			<Card.Footer>
 				<hr></hr>
-				<div className="stats" onClick={onBtnClick}>
-					<i className={`${subIconOption.type} mr-1`}></i>
-					{btnName}
+				<div className="stats">
+					{getBtn(subIconOption.type, false)}
+					{subIconOption.type !== 'button' ? subIconOption.name : ''}
 				</div>
 			</Card.Footer>
 		</Card>
@@ -59,15 +92,19 @@ function SummaryMiniBox({
 SummaryMiniBox.propTypes = {
 	title: PropTypes.string.isRequired,
 	value: PropTypes.string.isRequired,
-	onBtnClick: PropTypes.func,
-	btnName: PropTypes.string.isRequired,
 	mainIconOption: PropTypes.shape({
 		type: PropTypes.string.isRequired,
-		color: PropTypes.string.isRequired,
+		class: PropTypes.string,
+		name: PropTypes.string,
+		value: PropTypes.any,
+		onClick: PropTypes.func,
 	}).isRequired,
 	subIconOption: PropTypes.shape({
 		type: PropTypes.string.isRequired,
-	}).isRequired,
+		class: PropTypes.string,
+		name: PropTypes.string,
+		onClick: PropTypes.func,
+	}),
 }
 
 export default SummaryMiniBox

@@ -1,13 +1,14 @@
-type iconOption = {
+interface iconOption {
 	type: string
-	color: string
+	class: string
+	name: string
+	value: any
+	onClick: Function
 }
 
-export type ComponentOptions = {
+export interface ComponentOptions {
 	title: string
 	value: string
-	onBtnClick?: Function
-	btnName: string
 	mainIconOption: iconOption
 	subIconOption: iconOption
 }

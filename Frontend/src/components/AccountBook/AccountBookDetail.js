@@ -1,29 +1,62 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { connect } from 'react-redux'
+import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
+import { ko } from 'date-fns/esm/locale'
+import styled from 'styled-components'
+import _ from 'lodash'
 
 // react-bootstrap components
-import { Dropdown, Nav, Container, Row, Col } from 'react-bootstrap'
-import { increment, fetchUserById } from 'store/reducer/user'
+import { Row, Col } from 'react-bootstrap'
 import TableBox from 'components/Box/TableBox'
-import { getAccountBookList } from 'store/reducer/accountBook'
+import {
+	getAccountBookList,
+	updateAccountBook,
+	deleteAccountBook,
+} from 'store/reducer/accountBook'
 
-function AccountBookDetail({ onBtnClick, getAccountList, userInfo, accountInfo }) {
-	const [duration, setDuration] = useState(7)
+import 'react-date-range/dist/styles.css'
+import 'react-date-range/dist/theme/default.css'
+import 'react-datepicker/dist/react-datepicker.css'
+import { setComma } from 'util/common'
+
+const CustomDatePicker = styled(DatePicker)`
+	width: 190px;
+`
+
+const CenterCol = styled(Col)`
+	float: none;
+	margin: 0 auto;
+`
+
+function AccountBookDetail({
+	getAccountList,
+	userInfo,
+	accountInfo,
+	updateAccount,
+	deleteAccount,
+}) {
+	const [dateRange, setDateRange] = useState([null, null])
+	const [startDate, endDate] = dateRange
+
 	useEffect(() => {
-		console.log('hi')
 		getAccountList({
 			userId: userInfo.userId,
-			startDate: dayjs().subtract(duration, 'day').format('YYYY-MM-DD'),
+			startDate: dayjs().subtract(7, 'day').format('YYYY-MM-DD'),
 			endDate: dayjs().format('YYYY-MM-DD'),
 		})
 	}, [])
 
-	const onClickDurationBtn = () => {}
-
 	/** 데이터 초기화 */
-	const tableData = accountInfo.accountList
-	const accountBookColumns = [
+	let tableData = accountInfo.accountList
+	tableData = tableData.map(data => {
+		let fixData = Object.assign({}, data)
+		fixData.amount = `${setComma(fixData.amount)}원` // TODO 공용컴포넌트에서 타입 숫자 감지후 변환 생각해볼것
+		fixData.date = dayjs(fixData.date).format('YYYY-MM-DD')
+		return fixData
+	})
+
+	const defaultColumns = [
 		{
 			dataField: 'accountId',
 			text: 'No',
@@ -45,56 +78,83 @@ function AccountBookDetail({ onBtnClick, getAccountList, userInfo, accountInfo }
 			text: '카테고리',
 			headerClasses: 'border-0',
 		},
+	]
+
+	const notFixedColumns = _.clone(defaultColumns)
+	notFixedColumns.push({
+		dataField: 'date',
+		text: '날짜',
+		headerClasses: 'border-0',
+	})
+
+	const fixedColumns = _.clone(defaultColumns)
+	fixedColumns.push(
 		{
 			dataField: 'date',
 			text: '날짜',
 			headerClasses: 'border-0',
 		},
 		{
-			dataField: 'isFixed',
-			text: '고정지출',
+			dataField: 'fixedDuration',
+			text: '주기',
 			headerClasses: 'border-0',
 		},
-	]
+	)
+
+	const onClickTableUpdate = () => {
+		console.log('update!')
+	}
+
+	const onClickTableDelete = async accountId => {
+		const result = await deleteAccount({ userId: userInfo.userId, accountId })
+		return result
+	}
 
 	return (
 		<>
-			<Container fluid>
-				<Dropdown as={Nav.Item}>
-					<Dropdown.Toggle
-						as={Nav.Link}
-						data-toggle="dropdown"
-						id="dropdown-67443507"
-						variant="default"
-						className="m-0"
-					>
-						<i className="nc-icon nc-planet"></i>
-						<span className="notification">5</span>
-						<span className="d-lg-none ml-1">Notification</span>
-					</Dropdown.Toggle>
-					<Dropdown.Menu>
-						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
-							일간
-						</Dropdown.Item>
-						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
-							주간
-						</Dropdown.Item>
-						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
-							월간
-						</Dropdown.Item>
-					</Dropdown.Menu>
-				</Dropdown>
-				<Row>
-					<Col>
-						<TableBox
-							title="예?"
-							description="Here is a subtitle for this table"
-							tableData={tableData}
-							columns={accountBookColumns}
-						></TableBox>
-					</Col>
-				</Row>
-			</Container>
+			<Row>
+				<CenterCol md={3}>
+					<CustomDatePicker
+						dateFormat="yyyy-MM-dd"
+						locale={ko}
+						selectsRange={true}
+						startDate={startDate}
+						endDate={endDate}
+						onChange={update => {
+							setDateRange(update)
+						}}
+						selectedRange={`${dayjs()
+							.subtract(7, 'day')
+							.format('YYYY-MM-DD')} - ${dayjs().format('YYYY-MM-DD')}`}
+					/>
+				</CenterCol>
+			</Row>
+			<Row>
+				<Col>
+					<TableBox
+						columnId="accountId"
+						title="예?"
+						description="Here is a subtitle for this table"
+						tableData={tableData}
+						columns={notFixedColumns}
+						onClickUpdate={onClickTableUpdate}
+						onClickDelete={onClickTableDelete}
+					></TableBox>
+				</Col>
+			</Row>
+			<Row>
+				<Col>
+					<TableBox
+						columnId="accountId"
+						title="예?"
+						description="Here is a subtitle for this table"
+						tableData={tableData}
+						columns={fixedColumns}
+						onClickUpdate={onClickTableUpdate}
+						onClickDelete={onClickTableDelete}
+					></TableBox>
+				</Col>
+			</Row>
 		</>
 	)
 }
@@ -105,8 +165,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
 	return {
-		getAccountList: ({ userId, startDate, endDate }) =>
-			dispatch(getAccountBookList({ userId, startDate, endDate })),
+		getAccountList: param => dispatch(getAccountBookList(param)),
+		updateAccount: param => dispatch(updateAccountBook(param)),
+		deleteAccount: param => dispatch(deleteAccountBook(param)),
 	}
 }
 
