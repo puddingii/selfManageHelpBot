@@ -12,21 +12,37 @@ import Summary from 'components/AccountBook/AccountBookSummary'
 import Detail from 'components/AccountBook/AccountBookDetail'
 import Calendar from 'components/AccountBook/AccountBookCalendar'
 
-function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
-	const [duration, setDuration] = useState(7)
-
+function AccountBook() {
+	const [tabType, setTabType] = useState('summary')
+	const getDynamicComponent = tab => {
+		if (tab === tabType) {
+			switch (tabType) {
+				case 'summary':
+					return <Summary />
+				case 'detail':
+					return <Detail />
+				case 'calendar':
+					return <Calendar />
+				default:
+			}
+		}
+	}
 	return (
 		<>
 			<Container fluid>
-				<Tabs defaultActiveKey="summary" className="mb-3">
+				<Tabs
+					defaultActiveKey={tabType}
+					onSelect={type => setTabType(type)}
+					className="mb-3"
+				>
 					<Tab eventKey="summary" title="요약">
-						<Summary />
+						{getDynamicComponent('summary')}
 					</Tab>
 					<Tab eventKey="detail" title="자세히 보기">
-						<Detail />
+						{getDynamicComponent('detail')}
 					</Tab>
 					<Tab eventKey="calendar" title="캘린더">
-						<Calendar />
+						{getDynamicComponent('calendar')}
 					</Tab>
 				</Tabs>
 			</Container>
@@ -34,15 +50,4 @@ function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
 	)
 }
 
-const mapStateToProps = state => {
-	return { userInfo: state.user, accountInfo: state.accountBook }
-}
-
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		getAccountList: ({ userId, startDate, endDate }) =>
-			dispatch(getAccountBookList({ userId, startDate, endDate })),
-	}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(AccountBook)
+export default AccountBook

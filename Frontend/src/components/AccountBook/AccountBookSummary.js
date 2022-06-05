@@ -17,8 +17,9 @@ function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
 	const [isFixedSum, setIsFixedSum] = useState(true)
 
 	const durationInfo = {
+		// FIXME 위에 부분이랑 아래부분 cnt 다르게 할것
 		d: {
-			cnt: 35,
+			cnt: 30,
 			name: '일간',
 		},
 		w: {

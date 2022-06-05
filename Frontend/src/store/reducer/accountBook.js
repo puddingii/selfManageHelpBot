@@ -91,14 +91,15 @@ export const deleteAccountBook = createAsyncThunk(
 	'accountBook/deleteAccountBook',
 	/**
 	 * @param {{ userId: string, accountId: string }} data
-	 * @returns {{ msg: string, code: string }}
+	 * @returns {{ msg: string, code: string, accountId: number }}
 	 */
 	async data => {
 		const response = await axios.delete(
 			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
 			{ data },
 		)
-		return response.data
+
+		return { ...response.data, accountId: data.accountId }
 	},
 )
 
@@ -122,7 +123,7 @@ export const accountBookSlice = createSlice({
 	name: 'accountBook',
 	initialState: {
 		value: 0,
-		/** @type {import('../../interface/Store').ifStore.AccountBookAjaxResult.AccountBook} 가계부 리스트 */
+		/** @type {import('../../interface/Store').ifStore.AccountBookAjax.AccountList} 가계부 리스트 */
 		accountList: [],
 		summaryValues: {
 			fixedIncome: 0,
@@ -170,7 +171,13 @@ export const accountBookSlice = createSlice({
 		/** deleteAccountBook */
 		builder
 			.addCase(deleteAccountBook.fulfilled, (state, action) => {
-				const { code, msg } = action.payload
+				const { code, msg, accountId } = action.payload
+
+				if (code === 1) {
+					state.accountList = state.accountList.filter(account => {
+						return account.accountId !== accountId
+					})
+				}
 
 				state.isAjaxSucceed = code !== 1
 				state.ajaxMsg = msg
