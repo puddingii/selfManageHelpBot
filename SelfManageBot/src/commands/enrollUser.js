@@ -39,9 +39,9 @@ module.exports = {
 				return;
 			}
 
-			if (userInfo.discordId) {
-				await interaction.reply({ content: 'Already enroll' });
-				return;
+			if (!userInfo.discordId) {
+				userInfo.discordId = discordId;
+				await userInfo.save();
 			}
 
 			userInfo.discordId = discordId;

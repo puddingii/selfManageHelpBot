@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const dayjs = require('dayjs');
 const TodoCounter = require('./Counter');
 
 const AccountBook = new mongoose.Schema({
@@ -22,15 +23,15 @@ const AccountBook = new mongoose.Schema({
 	},
 	date: {
 		type: Date,
-		default: Date.now,
+		default: dayjs().subtract(9, 'hour').toDate(),
 	},
 	accountId: {
 		type: Number,
 	},
 	fixedDuration: {
 		type: String,
-		default: '1m'
-	}
+		default: '1m',
+	},
 });
 
 /**

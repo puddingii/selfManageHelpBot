@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const dayjs = require('dayjs');
+
 const TodoCounter = require('./Counter');
 
 const Todo = new mongoose.Schema({
@@ -8,7 +10,7 @@ const Todo = new mongoose.Schema({
 	},
 	date: {
 		type: Date,
-		default: Date.now,
+		default: dayjs().subtract(9, 'hour').toDate(),
 	},
 	isCompleted: {
 		type: Boolean,
