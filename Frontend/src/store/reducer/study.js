@@ -1,10 +1,19 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
+/**
+ * @type {import('../../interface/store/study').StudyState}
+ */
+const initialState = {
+	week: {},
+	month: {},
+}
+
 //@ts-check
 
 /**
- * @param {{startDate: String, count:Number}} param
+ * @param {import('../../interface/store/study').StudyFetchParam} param
+ * @returns {import('../../interface/store/study').WeekData}
  */
 const studyTimeByDate = async (param, thunkAPI) => {
 	const res = await axios.post('http://localhost:8080/api/study/time', param, {
@@ -22,11 +31,7 @@ export const fetchStudyWeekTimeByDate = createAsyncThunk(
 
 export const studySlice = createSlice({
 	name: 'study',
-	initialState: {
-		week: {},
-		month: {},
-		average: {},
-	},
+	initialState: initialState,
 	reducers: {},
 	extraReducers: builder => {
 		builder.addCase(fetchStudyWeekTimeByDate.fulfilled, (state, action) => {
