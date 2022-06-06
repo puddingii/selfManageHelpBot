@@ -5,7 +5,7 @@ import _ from 'lodash'
 
 /**
  * accountList를 참고하여 summary 반환
- * @param {import('../../interface/Store').ifStore.AccountBookAjaxResult.AccountBook} accountList 가계부 리스트
+ * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} accountList 가계부 리스트
  * @param {{startDate: string, endDate: string}} dateInfo
  */
 const calcSummary = (accountList, dateInfo) => {
@@ -50,18 +50,20 @@ export const getAccountBookList = createAsyncThunk(
 	'accountBook/getAccountBookList',
 	/**
 	 * @param {{userId: string, startDate: string, endDate: string}} params
-	 * @returns {import('../../interface/Store').ifStore.AccountBookAjax.AccountList}
+	 * @returns {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]}
 	 */
 	async params => {
-		const { data: notFixedList } = await axios.get(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
-			{ params },
-		)
+		const { data: notFixedList } = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
+			method: 'get',
+			params,
+		})
 
-		const { data: fixedList } = await axios.get(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/fixedList`,
-			{ params: { userId: params.userId } },
-		)
+		const { data: fixedList } = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/fixedList`,
+			method: 'get',
+			params: { userId: params.userId },
+		})
 
 		let data = notFixedList.filter(notFixedInfo => !notFixedInfo.isFixed)
 		data = data.concat(fixedList)
@@ -78,10 +80,11 @@ export const insertAccountBook = createAsyncThunk(
 	 * @returns {{ msg: string, code: string }}
 	 */
 	async data => {
-		const response = await axios.post(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
-			{ data },
-		)
+		const response = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+			method: 'post',
+			data,
+		})
 		return response.data
 	},
 )
@@ -94,10 +97,11 @@ export const deleteAccountBook = createAsyncThunk(
 	 * @returns {{ msg: string, code: string, accountId: number }}
 	 */
 	async data => {
-		const response = await axios.delete(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
-			{ data },
-		)
+		const response = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+			method: 'delete',
+			data,
+		})
 
 		return { ...response.data, accountId: data.accountId }
 	},
@@ -107,15 +111,37 @@ export const deleteAccountBook = createAsyncThunk(
 export const updateAccountBook = createAsyncThunk(
 	'accountBook/updateAccountBook',
 	/**
-	 * @param {{ accountId: string, amount?: number, isFixed?: boolean, date?: string, fixedDuration?: string }} data
-	 * @returns {{ msg: string, code: string }}
+	 * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} data
+	 * @returns {{ msg: string, code: string, updatedData: import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo }}
 	 */
 	async data => {
-		const response = await axios.patch(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+		console.log('1')
+		const response = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+			method: 'patch',
 			data,
-		)
-		return response.data
+			// data: {
+			// 	userId: 'gun4930',
+			// 	amount: -1300,
+			// 	isFixed: false,
+			// 	category: '식비',
+			// 	content: '점심빱46',
+			// 	date: '2022-06-05',
+			// },
+			// proxy: {
+			// 	//http://hotcat.ddns.net:10010
+			// 	protocol: 'http',
+			// 	host: 'hotcat.ddns.net',
+			// 	port: 10010,
+			// },
+			// headers: {
+			// 	'Access-Control-Allow-Origin': '*',
+			// },
+			// withCredentials: true,
+		})
+		console.log({ ...response.data }, { data })
+
+		return { ...response.data, updatedData: data }
 	},
 )
 
@@ -123,7 +149,7 @@ export const accountBookSlice = createSlice({
 	name: 'accountBook',
 	initialState: {
 		value: 0,
-		/** @type {import('../../interface/Store').ifStore.AccountBookAjax.AccountList} 가계부 리스트 */
+		/** @type {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} 가계부 리스트 */
 		accountList: [],
 		summaryValues: {
 			fixedIncome: 0,
@@ -183,6 +209,27 @@ export const accountBookSlice = createSlice({
 				state.ajaxMsg = msg
 			})
 			.addCase(deleteAccountBook.rejected, (state, action) => {
+				state.isAjaxSucceed = false
+				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
+			})
+		/** updateAccountBook */
+		builder
+			.addCase(updateAccountBook.fulfilled, (state, action) => {
+				const { code, msg, updatedData } = action.payload
+
+				if (code === 1) {
+					const accountIdx = state.accountList.findIndex(
+						account => updatedData.accountId === account.accountId,
+					)
+					if (accountIdx !== -1) {
+						state.accountList[accountIdx] = updatedData
+					}
+				}
+
+				state.isAjaxSucceed = code !== 1
+				state.ajaxMsg = msg
+			})
+			.addCase(updateAccountBook.rejected, (state, action) => {
 				state.isAjaxSucceed = false
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})

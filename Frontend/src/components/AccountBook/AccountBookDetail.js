@@ -115,8 +115,9 @@ function AccountBookDetail() {
 		},
 	)
 
-	const onClickTableUpdate = () => {
-		console.log('update!')
+	const onClickTableUpdate = accountInfo => {
+		const result = dispatch(updateAccountBook(accountInfo))
+		return result
 	}
 
 	const onClickTableDelete = async accountId => {
@@ -181,14 +182,6 @@ function AccountBookDetail() {
 			</Row>
 		</>
 	)
-}
-
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		getAccountList: param => dispatch(getAccountBookList(param)),
-		updateAccount: param => dispatch(updateAccountBook(param)),
-		deleteAccount: param => dispatch(deleteAccountBook(param)),
-	}
 }
 
 export default AccountBookDetail

@@ -7,6 +7,7 @@ import BSTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import _ from 'lodash'
 
 /** 테이블 페이지네이션 옵션 */
 const paginationOption = {
@@ -234,6 +235,11 @@ const TableBox = ({
 												type={getFormControlType(typeof currentRow[column.dataField])}
 												defaultValue={currentRow[column.dataField]}
 												defaultChecked={currentRow[column.dataField]}
+												onChange={e => {
+													const info = _.cloneDeep(currentRow)
+													info[column.dataField] = e.target.value
+													setCurrentRow(info)
+												}}
 											/>
 										</Col>
 									</Form.Group>
