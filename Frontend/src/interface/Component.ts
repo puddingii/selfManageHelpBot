@@ -9,6 +9,8 @@ namespace ComponentOptions {
 	export type DefaultLineGraph = import('./components/LineGraph').DefaultLineGraph
 
 	export type LineGraph = import('./components/LineGraph').LineGraph
+
+	export type Modal = import('./components/Modal').Modal
 }
 
 export type { ComponentOptions }
