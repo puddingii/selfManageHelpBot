@@ -27,6 +27,7 @@
     "react-date-range": "^1.4.0",
     "react-datepicker": "^4.8.0",
     "react-dom": "17.0.1",
+    "react-hook-form": "^7.31.3",
     "react-notification-alert": "0.0.13",
     "react-redux": "^8.0.1",
     "react-router": "5.2.0",

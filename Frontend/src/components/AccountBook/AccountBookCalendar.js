@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 import { Dropdown, Nav, Container, Row, Col } from 'react-bootstrap'
 import { increment, fetchUserById } from 'store/reducer/user'
 import { getAccountBookList } from 'store/reducer/accountBook'
+import { AccountBookModal } from '../Modal/Modal'
 
 function AccountBookDetail({ onBtnClick, getAccountList, userInfo, accountInfo }) {
 	const [duration, setDuration] = useState(7)
@@ -85,6 +86,11 @@ function AccountBookDetail({ onBtnClick, getAccountList, userInfo, accountInfo }
 				</Dropdown>
 				<Row>
 					<Col></Col>
+				</Row>
+				<Row>
+					<Col>
+						<AccountBookModal />
+					</Col>
 				</Row>
 			</Container>
 		</>
