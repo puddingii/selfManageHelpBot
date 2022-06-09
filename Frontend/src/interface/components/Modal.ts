@@ -1,6 +1,6 @@
 export interface Modal {
 	title: string
-	fields: ModalField | ModalRequiredField
+	fields: Array<ModalField | ModalRequiredField>
 	buttons: ModalButtons
 }
 
@@ -36,17 +36,16 @@ type ModalField = ModalInputType &
 	Readonly<{
 		label: string
 		name: string
-		placeholder?: string
-		readonly?: boolean
-		pattern?: string
-		validate?: (value: Pick<ModalInputType, 'type'>) => boolean
+		id?: string
+		disabled?: boolean
 	}>
 
 type ModalInputType = ModalInputSelect | ModalInputCheckbox | ModalInputText
 
 interface ModalInputSelect {
 	type: 'select'
-	options: ModalInputSelectOptions
+	value: string | number
+	options: Array<ModalInputSelectOptions>
 }
 
 type ModalInputSelectOptions = {
@@ -62,4 +61,8 @@ interface ModalInputCheckbox {
 interface ModalInputText {
 	type: 'text' | 'password'
 	value: string
+	placeholder?: string
+	readonly?: boolean
+	pattern?: string
+	validate?: (value: Pick<ModalInputType, 'type'>) => boolean
 }

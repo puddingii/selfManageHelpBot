@@ -1,4 +1,4 @@
-import React, { useRef, useState, useLayoutEffect } from 'react'
+import React, { useRef, useState, useLayoutEffect, useEffect, forwardRef } from 'react'
 import { Button, Container, Modal } from 'react-bootstrap'
 import { Row, Col, Form } from 'react-bootstrap'
 import { useForm } from 'react-hook-form'
@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form'
  * @returns {Component}
  */
 export const AccountBookModal = props => {
-	return <CommonModal />
+	return <CommonModal {...props} />
 }
 
 /**
@@ -18,6 +18,7 @@ export const AccountBookModal = props => {
  * @returns {Component}
  */
 const CommonModal = ({ title, fields, buttons }) => {
+	console.log(title, fields, buttons)
 	const [show, setShow] = useState(true)
 
 	const handleClose = () => setShow(false)
@@ -34,7 +35,12 @@ const CommonModal = ({ title, fields, buttons }) => {
 	const onSubmit = data => {
 		console.log(data)
 	}
-	const elementIdPrefix = new Date().getTime()
+
+	useEffect(() => {
+		console.log('ah')
+		console.log(title, fields, buttons)
+	}, [title, fields, buttons])
+
 	return (
 		<>
 			<Modal show={show} onHide={handleClose}>
@@ -44,112 +50,28 @@ const CommonModal = ({ title, fields, buttons }) => {
 				<Modal.Body>
 					<Container>
 						<Form onSubmit={() => false}>
-							{inputs.map((e, i) => {
-								const elementId = e.id ? e.id : `${elementIdPrefix}-${i}`
-								const labelRef = useRef()
-								const inputRef = useRef()
-								useLayoutEffect(() => {
-									labelRef.current.style.lineHeight = inputRef.current.clientHeight + 'px'
-								}, [])
-								return (
-									<Row key={i} className="my-2">
-										<Col className="col-3">
-											<Form.Label
-												ref={labelRef}
-												htmlFor={elementId}
-												style={{
-													marginBottom: 0,
-												}}
-											>
-												{e.label}
-												{e.required && <RequiredSpan />}
-											</Form.Label>
-										</Col>
-										<Col className="col-9">
-											<Form.Control
-												id={elementId}
-												type={e.type}
-												placeholder={e.placeholder}
-												{...register(e.name, {
-													required: e.required,
-													value: e.value,
-													setValueAs: v => v.trim(),
-												})}
-												isInvalid={true}
-												ref={inputRef}
-											/>
-											{errors[e.name] && (
-												<Form.Control.Feedback type="invalid">
-													{e.errormessage}
-												</Form.Control.Feedback>
-											)}
-										</Col>
-									</Row>
-								)
-							})}
-							{/* 여러가지 input 테스트 */}
-							<Row className="my-2">
-								<Col className="col-3">
-									<Form.Label
-										style={{
-											// lineHeight: ref.current?.clientHeight + 'px',
-											marginBottom: 0,
-										}}
-									>
-										{'select'}
-									</Form.Label>
-								</Col>
-								<Col className="col-9">
-									<Form.Control as="select">
-										<option>1</option>
-										<option>2</option>
-										<option>3</option>
-										<option>4</option>
-										<option>5</option>
-									</Form.Control>
-									<Form.Control.Feedback type="invalid">{'셀렉트'}</Form.Control.Feedback>
-								</Col>
-							</Row>
-							<Row className="my-2">
-								<Col className="col-3">
-									<Form.Label
-										style={{
-											// lineHeight: ref.current?.clientHeight + 'px',
-											marginBottom: 0,
-										}}
-									>
-										{'check'}
-										<RequiredSpan />
-									</Form.Label>
-								</Col>
-								<Col className="col-9 text-center">
-									<Form.Check.Input
-										type="checkbox"
-										{...register('bool', {
-											value: true,
-										})}
-										disabled
-									></Form.Check.Input>
-									<Form.Control.Feedback type="invalid">{'췍'}</Form.Control.Feedback>
-								</Col>
-							</Row>
+							{fields &&
+								fields.map((fieldOptions, i) => (
+									<Field key={i} {...fieldOptions} errors={errors} register={register} />
+								))}
 						</Form>
 					</Container>
 				</Modal.Body>
 				<Modal.Footer>
-					{buttons.customs.map((button, i) => {
-						return (
-							<Button
-								key={i}
-								variant="secondary"
-								className="btn-fill"
-								onClick={button.handleClick}
-							>
-								{button.text}
-							</Button>
-						)
-					})}
-					{buttons.submit.use && (
+					{buttons?.customs &&
+						buttons.customs.map((button, i) => {
+							return (
+								<Button
+									key={i}
+									variant="secondary"
+									className="btn-fill"
+									onClick={button.handleClick}
+								>
+									{button.text}
+								</Button>
+							)
+						})}
+					{buttons?.submit.use && (
 						<Button
 							variant="secondary"
 							className={`btn-fill ${buttons.submit.className}`}
@@ -158,7 +80,7 @@ const CommonModal = ({ title, fields, buttons }) => {
 							{buttons.submit.text ? buttons.submit.text : 'Submit'}
 						</Button>
 					)}
-					{buttons.reset.use && (
+					{buttons?.reset.use && (
 						<Button
 							variant="secondary"
 							className={`btn-fill ${buttons.reset.className}`}
@@ -175,7 +97,92 @@ const CommonModal = ({ title, fields, buttons }) => {
 	)
 }
 
-const Field = () => {}
+const Field = props => {
+	const elementId = props.id ? props.id : `${new Date().getTime()}`
+	const labelRef = useRef()
+	const inputRef = useRef()
+	useEffect(() => {
+		console.log(inputRef.current.clientHeight)
+		labelRef.current.style.lineHeight = inputRef.current.clientHeight + 'px'
+	}, [])
+	return (
+		<Row className="my-2">
+			<Col className="col-3">
+				<Form.Label
+					ref={labelRef}
+					htmlFor={elementId}
+					style={{
+						marginBottom: 0,
+					}}
+				>
+					{props.label}
+					{props.required && <RequiredSpan />}
+				</Form.Label>
+			</Col>
+			<Col className="col-9">
+				<FieldInput {...props} isInvalid={props.errors[props.name]} ref={inputRef} />
+				{props.errors[props.name] && (
+					<Form.Control.Feedback type="invalid">
+						{props.errormessage}
+					</Form.Control.Feedback>
+				)}
+			</Col>
+		</Row>
+	)
+}
+
+const FieldInput = forwardRef((props, ref) => {
+	switch (props.type) {
+		case 'text':
+		case 'password':
+			return (
+				<Form.Control
+					id={props.elementId}
+					type={props.type}
+					placeholder={props.placeholder}
+					{...props.register(props.name, {
+						required: props.required,
+						value: props.value,
+						setValueAs: v => v.trim(),
+					})}
+					ref={ref}
+				/>
+			)
+		case 'checkbox':
+			return (
+				<Form.Check.Input
+					id={props.elementId}
+					type="checkbox"
+					{...props.register(props.name, {
+						value: props.value,
+					})}
+					disabled={props.disabled}
+					ref={ref}
+				></Form.Check.Input>
+			)
+		case 'select':
+			return (
+				<Form.Control
+					id={props.elementId}
+					as="select"
+					{...props.register(props.name, {
+						value: props.value,
+					})}
+					disabled={props.disabled}
+					ref={ref}
+				>
+					{props.options &&
+						props.options.map(option => (
+							<option key={option.value} value={option.value}>
+								{option.text}
+							</option>
+						))}
+				</Form.Control>
+			)
+	}
+	return null
+})
+FieldInput.displayName = 'FieldInput'
 
 const RequiredSpan = () => {
 	return <span className="text-danger align-middle">*</span>
@@ -229,6 +236,59 @@ const buttons = [
 		},
 	},
 ]
+
+export const modalprops = {
+	title: 'Modal test~',
+	fields: [
+		{
+			label: 'ID',
+			placeholder: '유저아이디',
+			value: '',
+			type: 'text',
+			readonly: true,
+			name: 'userId',
+			required: true,
+			pattern: '',
+			validate: () => {},
+			errormessage: '아이디가 이상합니다',
+		},
+		{
+			label: '비밀번호',
+			placeholder: '비번',
+			value: '',
+			type: 'password',
+			name: 'passwd',
+			required: true,
+			errormessage: '비밀번호가 이상합니다',
+		},
+		{
+			label: '이름',
+			placeholder: '유저이름',
+			value: '롸',
+			type: 'select',
+			readonly: true,
+			name: 'userId2',
+			pattern: '',
+			validate: () => {},
+			options: [
+				{ val: 1, text: '가' },
+				{ val: 2, text: '나' },
+				{ val: 3, text: '다' },
+			],
+		},
+	],
+	buttons: {
+		submit: {
+			use: true,
+			text: '수정',
+		},
+		reset: {
+			use: true,
+			text: '초기화',
+		},
+	},
+}
+
 //버튼종류: submit, reset, custom
 // submit: text, 사용여부, className
 // reset: text, 사용여부, className
