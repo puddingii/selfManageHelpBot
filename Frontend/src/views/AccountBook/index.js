@@ -8,9 +8,9 @@ import { Dropdown, Nav, Container, Tabs, Tab } from 'react-bootstrap'
 import { increment, fetchUserById } from 'store/reducer/user'
 import { getAccountBookList } from 'store/reducer/accountBook'
 
-import Summary from 'components/AccountBook/AccountBookSummary'
-import Detail from 'components/AccountBook/AccountBookDetail'
-import Calendar from 'components/AccountBook/AccountBookCalendar'
+import Summary from 'views/AccountBook/AccountBookSummary'
+import Detail from 'views/AccountBook/AccountBookDetail'
+import Calendar from 'views/AccountBook/AccountBookCalendar'
 
 function AccountBook() {
 	const [tabType, setTabType] = useState('summary')

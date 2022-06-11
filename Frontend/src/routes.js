@@ -23,7 +23,7 @@ import Icons from 'views/Icons.js'
 import Notifications from 'views/Notifications.js'
 import Upgrade from 'views/Upgrade.js'
 import { Study } from 'views/Study'
-import AccountBook from 'views/AccountBook.js'
+import AccountBook from 'views/AccountBook/index.js'
 
 const dashboardRoutes = [
 	{

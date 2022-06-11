@@ -115,31 +115,11 @@ export const updateAccountBook = createAsyncThunk(
 	 * @returns {{ msg: string, code: string, updatedData: import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo }}
 	 */
 	async data => {
-		console.log('1')
 		const response = await axios({
 			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
 			method: 'patch',
 			data,
-			// data: {
-			// 	userId: 'gun4930',
-			// 	amount: -1300,
-			// 	isFixed: false,
-			// 	category: '식비',
-			// 	content: '점심빱46',
-			// 	date: '2022-06-05',
-			// },
-			// proxy: {
-			// 	//http://hotcat.ddns.net:10010
-			// 	protocol: 'http',
-			// 	host: 'hotcat.ddns.net',
-			// 	port: 10010,
-			// },
-			// headers: {
-			// 	'Access-Control-Allow-Origin': '*',
-			// },
-			// withCredentials: true,
 		})
-		console.log({ ...response.data }, { data })
 
 		return { ...response.data, updatedData: data }
 	},
