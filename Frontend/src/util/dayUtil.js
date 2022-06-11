@@ -30,8 +30,9 @@ export const convertDurationToDay = duration => {
 }
 
 /**
- * 해당 기간동안 몇번이나 반복하는지 startDate를 포함하기 때문에 1이 기본값으로 리턴함
- * 1 + 반복횟수
+ * 해당 기간동안 몇번이나 반복하는지?
+ * (현재 날짜 - 등록 날짜) = 경과한 전체 일수
+ * (((경과한 전체 일수 - 현재 날짜의 일(ex - 11일)) % 주기 + 현재 날짜의 일) / 주기 * 액수
  * @param {string} startDate 시작 날짜
  * @param {string} endDate 끝 날짜
  * @param {string} duration 반복 날짜
@@ -40,7 +41,16 @@ export const convertDurationToDay = duration => {
  * getRepeatCnt('2022-03-01', '2022-03-05', '1w') // 1
  * getRepeatCnt('2022-03-01', '2022-03-11', '1w') // 2
  */
-export const getRepeatCnt = (startDate, endDate, duration) => {
+export const getRepeatCnt = (
+	startDate,
+	endDate = dayjs().format('YYYY-MM-DD'),
+	duration,
+) => {
 	const diff = Math.abs(dayjs(endDate).diff(startDate, 'd'))
-	return Math.floor(diff / convertDurationToDay(duration)) + 1
+	const today = dayjs(endDate).date()
+	const convertedDuration = convertDurationToDay(duration)
+	if (diff < convertedDuration) {
+		return 0
+	}
+	return Math.floor((((diff - today) % convertedDuration) + today) / convertedDuration)
 }

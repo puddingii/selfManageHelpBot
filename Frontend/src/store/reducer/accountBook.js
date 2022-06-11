@@ -8,7 +8,7 @@ import _ from 'lodash'
  * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} accountList 가계부 리스트
  * @param {{startDate: string, endDate: string}} dateInfo
  */
-const calcSummary = (accountList, dateInfo) => {
+export const calcSummary = (accountList, dateInfo) => {
 	const summary = {
 		fixedIncome: 0,
 		notFixedIncome: 0,
@@ -19,7 +19,7 @@ const calcSummary = (accountList, dateInfo) => {
 		if (accountInfo.isFixed) {
 			/** 고정 금액 */
 			const repeatCnt = getRepeatCnt(
-				dateInfo.startDate,
+				accountInfo.date,
 				dateInfo.endDate,
 				accountInfo.fixedDuration,
 			)
@@ -131,12 +131,6 @@ export const accountBookSlice = createSlice({
 		value: 0,
 		/** @type {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} 가계부 리스트 */
 		accountList: [],
-		summaryValues: {
-			fixedIncome: 0,
-			notFixedIncome: 0,
-			fixedOutcome: 0,
-			notFixedOutcome: 0,
-		},
 		isAjaxSucceed: true,
 		ajaxMsg: '',
 	},
@@ -156,7 +150,6 @@ export const accountBookSlice = createSlice({
 					},
 				} = action
 				state.accountList = payload
-				state.summaryValues = calcSummary(state.accountList, { startDate, endDate })
 			})
 			.addCase(getAccountBookList.rejected, (state, action) => {
 				state.isAjaxSucceed = false
