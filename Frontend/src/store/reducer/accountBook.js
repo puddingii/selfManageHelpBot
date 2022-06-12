@@ -5,10 +5,10 @@ import _ from 'lodash'
 
 /**
  * accountList를 참고하여 summary 반환
- * @param {import('../../interface/Store').ifStore.AccountBookAjaxResult.AccountBook} accountList 가계부 리스트
+ * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} accountList 가계부 리스트
  * @param {{startDate: string, endDate: string}} dateInfo
  */
-const calcSummary = (accountList, dateInfo) => {
+export const calcSummary = (accountList, dateInfo) => {
 	const summary = {
 		fixedIncome: 0,
 		notFixedIncome: 0,
@@ -19,7 +19,7 @@ const calcSummary = (accountList, dateInfo) => {
 		if (accountInfo.isFixed) {
 			/** 고정 금액 */
 			const repeatCnt = getRepeatCnt(
-				dateInfo.startDate,
+				accountInfo.date,
 				dateInfo.endDate,
 				accountInfo.fixedDuration,
 			)
@@ -50,18 +50,20 @@ export const getAccountBookList = createAsyncThunk(
 	'accountBook/getAccountBookList',
 	/**
 	 * @param {{userId: string, startDate: string, endDate: string}} params
-	 * @returns {import('../../interface/Store').ifStore.AccountBookAjax.AccountList}
+	 * @returns {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]}
 	 */
 	async params => {
-		const { data: notFixedList } = await axios.get(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
-			{ params },
-		)
+		const { data: notFixedList } = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
+			method: 'get',
+			params,
+		})
 
-		const { data: fixedList } = await axios.get(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/fixedList`,
-			{ params: { userId: params.userId } },
-		)
+		const { data: fixedList } = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/fixedList`,
+			method: 'get',
+			params: { userId: params.userId },
+		})
 
 		let data = notFixedList.filter(notFixedInfo => !notFixedInfo.isFixed)
 		data = data.concat(fixedList)
@@ -78,10 +80,11 @@ export const insertAccountBook = createAsyncThunk(
 	 * @returns {{ msg: string, code: string }}
 	 */
 	async data => {
-		const response = await axios.post(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
-			{ data },
-		)
+		const response = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+			method: 'post',
+			data,
+		})
 		return response.data
 	},
 )
@@ -91,14 +94,16 @@ export const deleteAccountBook = createAsyncThunk(
 	'accountBook/deleteAccountBook',
 	/**
 	 * @param {{ userId: string, accountId: string }} data
-	 * @returns {{ msg: string, code: string }}
+	 * @returns {{ msg: string, code: string, accountId: number }}
 	 */
 	async data => {
-		const response = await axios.delete(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
-			{ data },
-		)
-		return response.data
+		const response = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+			method: 'delete',
+			data,
+		})
+
+		return { ...response.data, accountId: data.accountId }
 	},
 )
 
@@ -106,15 +111,17 @@ export const deleteAccountBook = createAsyncThunk(
 export const updateAccountBook = createAsyncThunk(
 	'accountBook/updateAccountBook',
 	/**
-	 * @param {{ accountId: string, amount?: number, isFixed?: boolean, date?: string, fixedDuration?: string }} data
-	 * @returns {{ msg: string, code: string }}
+	 * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} data
+	 * @returns {{ msg: string, code: string, updatedData: import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo }}
 	 */
 	async data => {
-		const response = await axios.patch(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+		const response = await axios({
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
+			method: 'patch',
 			data,
-		)
-		return response.data
+		})
+
+		return { ...response.data, updatedData: data }
 	},
 )
 
@@ -122,14 +129,8 @@ export const accountBookSlice = createSlice({
 	name: 'accountBook',
 	initialState: {
 		value: 0,
-		/** @type {import('../../interface/Store').ifStore.AccountBookAjaxResult.AccountBook} 가계부 리스트 */
+		/** @type {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} 가계부 리스트 */
 		accountList: [],
-		summaryValues: {
-			fixedIncome: 0,
-			notFixedIncome: 0,
-			fixedOutcome: 0,
-			notFixedOutcome: 0,
-		},
 		isAjaxSucceed: true,
 		ajaxMsg: '',
 	},
@@ -149,7 +150,6 @@ export const accountBookSlice = createSlice({
 					},
 				} = action
 				state.accountList = payload
-				state.summaryValues = calcSummary(state.accountList, { startDate, endDate })
 			})
 			.addCase(getAccountBookList.rejected, (state, action) => {
 				state.isAjaxSucceed = false
@@ -170,12 +170,39 @@ export const accountBookSlice = createSlice({
 		/** deleteAccountBook */
 		builder
 			.addCase(deleteAccountBook.fulfilled, (state, action) => {
-				const { code, msg } = action.payload
+				const { code, msg, accountId } = action.payload
+
+				if (code === 1) {
+					state.accountList = state.accountList.filter(account => {
+						return account.accountId !== accountId
+					})
+				}
 
 				state.isAjaxSucceed = code !== 1
 				state.ajaxMsg = msg
 			})
 			.addCase(deleteAccountBook.rejected, (state, action) => {
+				state.isAjaxSucceed = false
+				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
+			})
+		/** updateAccountBook */
+		builder
+			.addCase(updateAccountBook.fulfilled, (state, action) => {
+				const { code, msg, updatedData } = action.payload
+
+				if (code === 1) {
+					const accountIdx = state.accountList.findIndex(
+						account => updatedData.accountId === account.accountId,
+					)
+					if (accountIdx !== -1) {
+						state.accountList[accountIdx] = updatedData
+					}
+				}
+
+				state.isAjaxSucceed = code !== 1
+				state.ajaxMsg = msg
+			})
+			.addCase(updateAccountBook.rejected, (state, action) => {
 				state.isAjaxSucceed = false
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})

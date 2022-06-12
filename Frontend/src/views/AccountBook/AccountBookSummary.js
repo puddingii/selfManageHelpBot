@@ -1,32 +1,33 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ChartistGraph from 'react-chartist'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import dayjs from 'dayjs'
 
 // react-bootstrap components
 import { Card, Dropdown, Nav, Container, Row, Col } from 'react-bootstrap'
-import { increment, fetchUserById } from 'store/reducer/user'
 import SummaryMiniBox from 'components/Box/SummaryMiniBox'
-import { getAccountBookList } from 'store/reducer/accountBook'
+import { calcSummary, getAccountBookList } from 'store/reducer/accountBook'
 import { setComma } from 'util/common'
 
-function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
+function AccountBook() {
+	const userInfo = useSelector(state => state.user)
+	const dispatch = useDispatch()
 	const [durationType, setDurationType] = useState('d')
 	const [isFixedIncome, setIsFixedIncome] = useState(true)
 	const [isFixedOutcome, setIsFixedOutcome] = useState(true)
-	const [isFixedSum, setIsFixedSum] = useState(true)
 
 	const durationInfo = {
+		// FIXME 위에 부분이랑 아래부분 cnt 다르게 할것
 		d: {
-			cnt: 35,
+			cnt: 30,
 			name: '일간',
 		},
 		w: {
-			cnt: 12,
+			cnt: 12 * 7,
 			name: '주간',
 		},
 		m: {
-			cnt: 12,
+			cnt: 12 * 30,
 			name: '월간',
 		},
 		y: {
@@ -35,19 +36,38 @@ function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
 		},
 	}
 	useEffect(() => {
-		getAccountList({
-			userId: userInfo.userId,
-			startDate: dayjs()
-				.subtract(durationInfo[durationType].cnt, durationType)
-				.format('YYYY-MM-DD'),
-			endDate: dayjs().format('YYYY-MM-DD'),
-		})
+		const startDate = dayjs()
+			.subtract(durationInfo[durationType].cnt, durationType)
+			.format('YYYY-MM-DD')
+		dispatch(
+			getAccountBookList({
+				userId: userInfo.userId,
+				startDate,
+				endDate: dayjs().format('YYYY-MM-DD'),
+			}),
+		)
 	}, [])
 
-	const {
-		summaryValues: { fixedOutcome, fixedIncome, notFixedIncome, notFixedOutcome },
-	} = accountInfo
+	const { fixedOutcome, fixedIncome, notFixedIncome, notFixedOutcome } = useSelector(
+		state => {
+			const firstDay = dayjs().set('date', 1)
+			let list = _.cloneDeep(state.accountBook.accountList)
+			list = list.filter(account => {
+				return (
+					account.isFixed ||
+					(dayjs(account.date).diff(firstDay) >= 0 && dayjs().diff(account.date) >= 0)
+				)
+			})
+			return calcSummary(list, {
+				startDate: firstDay.format('YYYY-MM-DD'),
+				endDate: dayjs().format('YYYY-MM-DD'),
+			})
+		},
+	)
 
+	const accountSum =
+		(isFixedIncome ? fixedIncome + notFixedIncome : notFixedIncome) +
+		(isFixedOutcome ? fixedOutcome + notFixedOutcome : notFixedOutcome)
 	const summaryBoxOptionList = [
 		{
 			title: '수입',
@@ -87,22 +107,15 @@ function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
 		},
 		{
 			title: '합계',
-			value: `${setComma(
-				isFixedSum
-					? fixedOutcome + notFixedOutcome + fixedIncome + notFixedIncome
-					: notFixedOutcome + notFixedIncome,
-			)}원`,
+			value: `${setComma(accountSum)}원`,
 			mainIconOption: {
 				type: 'icon',
 				class: 'fas fa-chart-pie text-warning',
 			},
 			subIconOption: {
-				type: 'checkbox',
-				name: '고정액 포함',
-				value: true,
-				onClick: () => {
-					setIsFixedSum(!isFixedSum)
-				},
+				type: 'icon',
+				name: '지출/수입 합계',
+				class: 'fas fa-check',
 			},
 		},
 	]
@@ -260,15 +273,4 @@ function AccountBook({ onBtnClick, getAccountList, userInfo, accountInfo }) {
 	)
 }
 
-const mapStateToProps = state => {
-	return { userInfo: state.user, accountInfo: state.accountBook }
-}
-
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		getAccountList: ({ userId, startDate, endDate }) =>
-			dispatch(getAccountBookList({ userId, startDate, endDate })),
-	}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(AccountBook)
+export default AccountBook

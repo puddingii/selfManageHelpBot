@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { connect, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
 import { ko } from 'date-fns/esm/locale'
@@ -21,6 +21,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { setComma } from 'util/common'
 import { modalprops } from 'components/Modal/Modal'
 
+// style
 const CustomDatePicker = styled(DatePicker)`
 	width: 190px;
 `
@@ -30,24 +31,34 @@ const CenterCol = styled(Col)`
 	margin: 0 auto;
 `
 
-function AccountBookDetail({
-	getAccountList,
-	userInfo,
-	accountInfo,
-	updateAccount,
-	deleteAccount,
-}) {
+// component
+function AccountBookDetail() {
+	const [startDate, setStartDate] = useState(dayjs().subtract(7, 'day').toDate())
+	const [endDate, setEndDate] = useState(dayjs().toDate())
+
+	// Redux Init
+	const accountInfo = useSelector(state => state.accountBook)
+	// computed 속성
+	const { fixedList, notFixedList } = useSelector(state => {
+		const list = _.cloneDeep(state.accountBook.accountList)
+		return list.reduce(
+			(acc, cur) => {
+				const curData = _.cloneDeep(cur)
+				curData.date = dayjs(curData.date).format('YYYY-MM-DD')
+				if (curData.isFixed) {
+					acc.fixedList.push(curData)
+				} else {
+					acc.notFixedList.push(curData)
+				}
+				return acc
+			},
+			{ fixedList: [], notFixedList: [] },
+		)
+	})
+	const userInfo = useSelector(state => state.user)
 	const dispatch = useDispatch()
-	const [dateRange, setDateRange] = useState([null, null])
-	const [startDate, endDate] = dateRange
 
 	useEffect(() => {
-		getAccountList({
-			userId: userInfo.userId,
-			startDate: dayjs().subtract(7, 'day').format('YYYY-MM-DD'),
-			endDate: dayjs().format('YYYY-MM-DD'),
-		})
-
 		notFixedModalProps.buttons.submit.callback = async data => {
 			const res = await dispatch(
 				updateAccountBook({ ...data, userId: 'gun4930' }),
@@ -56,14 +67,15 @@ function AccountBookDetail({
 		}
 	}, [])
 
-	/** 데이터 초기화 */
-	let tableData = accountInfo.accountList
-	tableData = tableData.map(data => {
-		let fixData = Object.assign({}, data)
-		fixData.amount = `${setComma(fixData.amount)}원` // TODO 공용컴포넌트에서 타입 숫자 감지후 변환 생각해볼것
-		fixData.date = dayjs(fixData.date).format('YYYY-MM-DD')
-		return fixData
-	})
+	useEffect(() => {
+		dispatch(
+			getAccountBookList({
+				userId: userInfo.userId,
+				startDate: dayjs(startDate).format('YYYY-MM-DD'),
+				endDate: dayjs(endDate).format('YYYY-MM-DD'),
+			}),
+		)
+	}, [startDate, endDate])
 
 	const defaultColumns = [
 		{
@@ -81,6 +93,9 @@ function AccountBookDetail({
 			dataField: 'amount',
 			text: '금액',
 			headerClasses: 'border-0',
+			formatter: cell => {
+				return <span>{`${setComma(cell)}원`}</span>
+			},
 		},
 		{
 			dataField: 'category',
@@ -89,14 +104,14 @@ function AccountBookDetail({
 		},
 	]
 
-	const notFixedColumns = _.clone(defaultColumns)
+	const notFixedColumns = _.cloneDeep(defaultColumns)
 	notFixedColumns.push({
 		dataField: 'date',
 		text: '날짜',
 		headerClasses: 'border-0',
 	})
 
-	const fixedColumns = _.clone(defaultColumns)
+	const fixedColumns = _.cloneDeep(defaultColumns)
 	fixedColumns.push(
 		{
 			dataField: 'date',
@@ -110,31 +125,42 @@ function AccountBookDetail({
 		},
 	)
 
-	const onClickTableUpdate = () => {
-		console.log('update!')
+	const onClickTableUpdate = accountInfo => {
+		const result = dispatch(updateAccountBook(accountInfo))
+		return result
 	}
 
 	const onClickTableDelete = async accountId => {
-		const result = await deleteAccount({ userId: userInfo.userId, accountId })
+		const result = dispatch(deleteAccountBook({ userId: userInfo.userId, accountId }))
 		return result
 	}
 
 	return (
 		<>
 			<Row>
-				<CenterCol md={3}>
+				<CenterCol md="3">
 					<CustomDatePicker
 						dateFormat="yyyy-MM-dd"
 						locale={ko}
-						selectsRange={true}
+						selected={startDate}
 						startDate={startDate}
 						endDate={endDate}
 						onChange={update => {
-							setDateRange(update)
+							setStartDate(update)
 						}}
-						selectedRange={`${dayjs()
-							.subtract(7, 'day')
-							.format('YYYY-MM-DD')} - ${dayjs().format('YYYY-MM-DD')}`}
+						selectsStart
+					/>
+					<CustomDatePicker
+						dateFormat="yyyy-MM-dd"
+						locale={ko}
+						selected={endDate}
+						startDate={startDate}
+						endDate={endDate}
+						minDate={startDate}
+						onChange={update => {
+							setEndDate(update)
+						}}
+						selectsEnd
 					/>
 				</CenterCol>
 			</Row>
@@ -142,9 +168,9 @@ function AccountBookDetail({
 				<Col>
 					<TableBox
 						columnId="accountId"
-						title="예?"
-						description="Here is a subtitle for this table"
-						tableData={tableData}
+						title="변동 수입/지출"
+						description="고치거나 삭제할 내역이 있다면 해당 부분을 클릭하세요!"
+						tableData={notFixedList}
 						columns={notFixedColumns}
 						onClickUpdate={onClickTableUpdate}
 						onClickDelete={onClickTableDelete}
@@ -156,9 +182,9 @@ function AccountBookDetail({
 				<Col>
 					<TableBox
 						columnId="accountId"
-						title="예?"
-						description="Here is a subtitle for this table"
-						tableData={tableData}
+						title="고정 수입/지출"
+						description="고치거나 삭제할 내역이 있다면 해당 부분을 클릭하세요!"
+						tableData={fixedList}
 						columns={fixedColumns}
 						onClickUpdate={onClickTableUpdate}
 						onClickDelete={onClickTableDelete}
@@ -169,20 +195,6 @@ function AccountBookDetail({
 		</>
 	)
 }
-
-const mapStateToProps = state => {
-	return { userInfo: state.user, accountInfo: state.accountBook }
-}
-
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		getAccountList: param => dispatch(getAccountBookList(param)),
-		updateAccount: param => dispatch(updateAccountBook(param)),
-		deleteAccount: param => dispatch(deleteAccountBook(param)),
-	}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(AccountBookDetail)
 
 const notFixedModalProps = {
 	title: '비고정지출 내역 수정',
@@ -231,3 +243,4 @@ const notFixedModalProps = {
 		},
 	},
 }
+export default AccountBookDetail
