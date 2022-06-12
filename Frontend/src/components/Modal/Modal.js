@@ -1,7 +1,15 @@
-import React, { useRef, useState, useLayoutEffect, useEffect, forwardRef } from 'react'
+import React, {
+	useRef,
+	useState,
+	useLayoutEffect,
+	useEffect,
+	forwardRef,
+	Component,
+	useImperativeHandle,
+} from 'react'
 import { Button, Container, Modal } from 'react-bootstrap'
 import { Row, Col, Form } from 'react-bootstrap'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
 /**
  *
@@ -18,80 +26,68 @@ export const AccountBookModal = props => {
  * @returns {Component}
  */
 const CommonModal = ({ title, fields, buttons }) => {
-	console.log(title, fields, buttons)
 	const [show, setShow] = useState(true)
 
 	const handleClose = () => setShow(false)
 	const handleShow = () => setShow(true)
 
-	const {
-		register,
-		handleSubmit,
-		watch,
-		reset,
-		formState: { errors },
-	} = useForm()
+	const methods = useForm()
 
 	const onSubmit = data => {
 		console.log(data)
 	}
 
-	useEffect(() => {
-		console.log('ah')
-		console.log(title, fields, buttons)
-	}, [title, fields, buttons])
-
 	return (
 		<>
 			<Modal show={show} onHide={handleClose}>
-				<Modal.Header closeButton>
-					<Modal.Title className="my-1">{title}</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<Container>
-						<Form onSubmit={() => false}>
-							{fields &&
-								fields.map((fieldOptions, i) => (
-									<Field key={i} {...fieldOptions} errors={errors} register={register} />
-								))}
-						</Form>
-					</Container>
-				</Modal.Body>
-				<Modal.Footer>
-					{buttons?.customs &&
-						buttons.customs.map((button, i) => {
-							return (
-								<Button
-									key={i}
-									variant="secondary"
-									className="btn-fill"
-									onClick={button.handleClick}
-								>
-									{button.text}
-								</Button>
-							)
-						})}
-					{buttons?.submit.use && (
-						<Button
-							variant="secondary"
-							className={`btn-fill ${buttons.submit.className}`}
-							onClick={handleSubmit(onSubmit)}
-						>
-							{buttons.submit.text ? buttons.submit.text : 'Submit'}
-						</Button>
-					)}
-					{buttons?.reset.use && (
-						<Button
-							variant="secondary"
-							className={`btn-fill ${buttons.reset.className}`}
-							onClick={() => {
-								reset({ keepDefaultValues: true })
-							}}
-						>
-							{buttons.reset.text ? buttons.reset.text : 'Reset'}
-						</Button>
-					)}
-				</Modal.Footer>
+				<FormProvider {...methods}>
+					<Modal.Header closeButton>
+						<Modal.Title className="my-1">{title}</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<Container>
+							<Form onSubmit={() => false}>
+								{fields &&
+									fields.map((fieldOptions, i) => <Field key={i} {...fieldOptions} />)}
+							</Form>
+						</Container>
+					</Modal.Body>
+					<Modal.Footer>
+						{buttons?.customs &&
+							buttons.customs.map((button, i) => {
+								return (
+									<Button
+										key={i}
+										variant="secondary"
+										className="btn-fill"
+										onClick={button.handleClick}
+									>
+										{button.text}
+									</Button>
+								)
+							})}
+						{buttons?.submit.use && (
+							<Button
+								variant="secondary"
+								className={`btn-fill ${buttons.submit.className}`}
+								onClick={methods.handleSubmit(onSubmit)}
+							>
+								{buttons.submit.text ? buttons.submit.text : 'Submit'}
+							</Button>
+						)}
+						{buttons?.reset.use && (
+							<Button
+								variant="secondary"
+								className={`btn-fill ${buttons.reset.className}`}
+								onClick={() => {
+									methods.reset({ keepDefaultValues: true })
+								}}
+							>
+								{buttons.reset.text ? buttons.reset.text : 'Reset'}
+							</Button>
+						)}
+					</Modal.Footer>
+				</FormProvider>
 			</Modal>
 		</>
 	)
@@ -102,8 +98,7 @@ const Field = props => {
 	const labelRef = useRef()
 	const inputRef = useRef()
 	useEffect(() => {
-		console.log(inputRef.current.clientHeight)
-		labelRef.current.style.lineHeight = inputRef.current.clientHeight + 'px'
+		labelRef.current.style.lineHeight = inputRef.current?.clientHeight + 'px'
 	}, [])
 	return (
 		<Row className="my-2">
@@ -120,55 +115,63 @@ const Field = props => {
 				</Form.Label>
 			</Col>
 			<Col className="col-9">
-				<FieldInput {...props} isInvalid={props.errors[props.name]} ref={inputRef} />
-				{props.errors[props.name] && (
-					<Form.Control.Feedback type="invalid">
-						{props.errormessage}
-					</Form.Control.Feedback>
-				)}
+				<FieldInput {...props} ref={inputRef} />
 			</Col>
 		</Row>
 	)
 }
 
-const FieldInput = forwardRef((props, ref) => {
+const FieldInput = forwardRef((props, inputRef) => {
+	const {
+		register,
+		formState: { errors },
+	} = useFormContext()
+	const inputReg = register(props.name, {
+		required: props.required,
+		value: props.value,
+		// setValueAs: v => v.trim(),
+	})
+	const ref = el => {
+		inputReg.ref(el)
+		inputRef.current = el
+	}
+
+	let component = null
+	console.log(errors)
 	switch (props.type) {
 		case 'text':
 		case 'password':
-			return (
+			component = (
 				<Form.Control
 					id={props.elementId}
 					type={props.type}
 					placeholder={props.placeholder}
-					{...props.register(props.name, {
-						required: props.required,
-						value: props.value,
-						setValueAs: v => v.trim(),
-					})}
+					isInvalid={errors[props.name]}
+					{...inputReg}
 					ref={ref}
 				/>
 			)
+			break
 		case 'checkbox':
-			return (
+			component = (
 				<Form.Check.Input
 					id={props.elementId}
 					type="checkbox"
-					{...props.register(props.name, {
-						value: props.value,
-					})}
 					disabled={props.disabled}
+					isInvalid={errors[props.name]}
+					{...inputReg}
 					ref={ref}
 				></Form.Check.Input>
 			)
+			break
 		case 'select':
-			return (
+			component = (
 				<Form.Control
-					id={props.elementId}
 					as="select"
-					{...props.register(props.name, {
-						value: props.value,
-					})}
+					id={props.elementId}
 					disabled={props.disabled}
+					isInvalid={errors[props.name]}
+					{...inputReg}
 					ref={ref}
 				>
 					{props.options &&
@@ -180,7 +183,14 @@ const FieldInput = forwardRef((props, ref) => {
 				</Form.Control>
 			)
 	}
-	return null
+	return (
+		<>
+			{component}
+			{errors[props.name] && (
+				<Form.Control.Feedback type="invalid">{props.errormessage}</Form.Control.Feedback>
+			)}
+		</>
+	)
 })
 FieldInput.displayName = 'FieldInput'
 
@@ -243,12 +253,12 @@ export const modalprops = {
 		{
 			label: 'ID',
 			placeholder: '유저아이디',
-			value: '',
+			value: 'defaultId',
 			type: 'text',
 			readonly: true,
 			name: 'userId',
 			required: true,
-			pattern: '',
+			// pattern: '',
 			validate: () => {},
 			errormessage: '아이디가 이상합니다',
 		},
