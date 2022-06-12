@@ -7,6 +7,7 @@ import BSTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { CommonModal, modalprops } from '../Modal/Modal'
 
 /** @param {import('../../interface/Component').ComponentOptions.TableBox} */
 function TableBox({
@@ -21,6 +22,7 @@ function TableBox({
 	onClickDelete,
 	succDelete,
 	failDelete,
+	modalProps,
 }) {
 	const [isModalShow, setModalShow] = useState(false)
 	const [currentRow, setCurrentRow] = useState({})
@@ -82,6 +84,7 @@ function TableBox({
 	const rowEvents = {
 		onClick: (e, row, rowIndex) => {
 			setCurrentRow(row)
+			console.log(row)
 			handleShow()
 		},
 	}
@@ -164,59 +167,14 @@ function TableBox({
 						},
 					}}
 				/>
-
-				<Modal show={isModalShow} onHide={handleClose}>
-					<Modal.Header closeButton>
-						<Modal.Title>가계부 수정</Modal.Title>
-					</Modal.Header>
-					<Form noValidate onSubmit={handleSubmit}>
-						<Modal.Body>
-							{columns.map((column, idx) => {
-								if (column.dataField === columnId) return
-								return (
-									<Form.Group as={Row} key={idx} controlId={column.dataField}>
-										<Form.Label column sm={3}>
-											{column.text}
-										</Form.Label>
-										<Col
-											sm={
-												getFormControlType(typeof currentRow[column.dataField]) ===
-												'checkbox'
-													? 2
-													: 9
-											}
-										>
-											<Form.Control
-												type={getFormControlType(typeof currentRow[column.dataField])}
-												defaultValue={currentRow[column.dataField]}
-												defaultChecked={currentRow[column.dataField]}
-											/>
-										</Col>
-									</Form.Group>
-								)
-							})}
-						</Modal.Body>
-						<Modal.Footer>
-							<Button variant="secondary" onClick={handleClose}>
-								닫기
-							</Button>
-							<div>
-								<Button
-									variant="danger"
-									style={{ marginRight: '10px' }}
-									onClick={() => {
-										onDeleteBtn(currentRow[columnId])
-									}}
-								>
-									삭제하기
-								</Button>
-								<Button variant="primary" onClick={onClickUpdate}>
-									수정하기
-								</Button>
-							</div>
-						</Modal.Footer>
-					</Form>
-				</Modal>
+				<CommonModal
+					{...modalProps}
+					fieldValues={currentRow}
+					isShow={isModalShow}
+					handleClose={() => {
+						setModalShow(false)
+					}}
+				/>
 			</Card.Body>
 		</Card>
 	)

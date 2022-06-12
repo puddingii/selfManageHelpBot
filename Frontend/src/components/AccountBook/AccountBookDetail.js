@@ -19,6 +19,7 @@ import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 import 'react-datepicker/dist/react-datepicker.css'
 import { setComma } from 'util/common'
+import { modalprops } from 'components/Modal/Modal'
 
 const CustomDatePicker = styled(DatePicker)`
 	width: 190px;
@@ -139,6 +140,7 @@ function AccountBookDetail({
 						columns={notFixedColumns}
 						onClickUpdate={onClickTableUpdate}
 						onClickDelete={onClickTableDelete}
+						modalProps={notFixedModalProps}
 					></TableBox>
 				</Col>
 			</Row>
@@ -152,6 +154,7 @@ function AccountBookDetail({
 						columns={fixedColumns}
 						onClickUpdate={onClickTableUpdate}
 						onClickDelete={onClickTableDelete}
+						modalProps={modalprops}
 					></TableBox>
 				</Col>
 			</Row>
@@ -172,3 +175,52 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(AccountBookDetail)
+
+const notFixedModalProps = {
+	title: '비고정지출 내역 수정',
+	fields: [
+		{
+			label: '내용',
+			placeholder: '내용',
+			value: '',
+			type: 'text',
+			name: 'content',
+		},
+		{
+			label: '금액',
+			placeholder: '금액',
+			value: '',
+			type: 'text',
+			name: 'amount',
+			required: true,
+			pattern: /^[-]?[0-9]+$/,
+			errormessage: '숫자만 입력 가능합니다.',
+		},
+		{
+			label: '카테고리',
+			placeholder: '카테고리',
+			value: '',
+			type: 'text',
+			name: 'category',
+		},
+		{
+			label: '날짜',
+			placeholder: '날짜',
+			value: '',
+			type: 'date',
+			name: 'date',
+		},
+	],
+	buttons: {
+		customs: [{ text: '삭제', handleClick: () => {} }],
+		submit: {
+			use: true,
+			text: '수정',
+			callback: data => {},
+		},
+		reset: {
+			use: true,
+			text: '초기화',
+		},
+	},
+}

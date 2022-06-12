@@ -16,30 +16,35 @@ import { FormProvider, useForm, useFormContext } from 'react-hook-form'
  * @param {import('../../../src/interface/Component').ComponentOptions.Modal} props
  * @returns {Component}
  */
-export const AccountBookModal = props => {
-	return <CommonModal {...props} />
-}
-
-/**
- *
- * @param {import('../../../src/interface/Component').ComponentOptions.Modal} props
- * @returns {Component}
- */
-const CommonModal = ({ title, fields, buttons }) => {
-	const [show, setShow] = useState(true)
-
-	const handleClose = () => setShow(false)
-	const handleShow = () => setShow(true)
-
+export const CommonModal = ({
+	title,
+	fields,
+	buttons,
+	fieldValues,
+	isShow,
+	handleClose,
+}) => {
 	const methods = useForm()
 
-	const onSubmit = data => {
-		console.log(data)
+	const onSubmit = async data => {
+		const callback =
+			typeof buttons.submit.callback === 'function'
+				? buttons.submit.callback
+				: async () => false
+		if (await callback(data)) {
+			handleClose()
+		}
 	}
+
+	useEffect(() => {
+		if (isShow) {
+			methods.reset({ keepDefaultValues: true })
+		}
+	}, [isShow])
 
 	return (
 		<>
-			<Modal show={show} onHide={handleClose}>
+			<Modal show={isShow} onHide={handleClose}>
 				<FormProvider {...methods}>
 					<Modal.Header closeButton>
 						<Modal.Title className="my-1">{title}</Modal.Title>
@@ -48,7 +53,9 @@ const CommonModal = ({ title, fields, buttons }) => {
 						<Container>
 							<Form onSubmit={() => false}>
 								{fields &&
-									fields.map((fieldOptions, i) => <Field key={i} {...fieldOptions} />)}
+									fields.map((fieldOptions, i) => (
+										<Field key={i} {...fieldOptions} fieldValues={fieldValues} />
+									))}
 							</Form>
 						</Container>
 					</Modal.Body>
@@ -128,8 +135,9 @@ const FieldInput = forwardRef((props, inputRef) => {
 	} = useFormContext()
 	const inputReg = register(props.name, {
 		required: props.required,
-		value: props.value,
-		// setValueAs: v => v.trim(),
+		value: props.fieldValues[props.name] ?? props.value,
+		pattern: props.pattern,
+		setValueAs: v => v.trim(),
 	})
 	const ref = el => {
 		inputReg.ref(el)
@@ -137,10 +145,10 @@ const FieldInput = forwardRef((props, inputRef) => {
 	}
 
 	let component = null
-	console.log(errors)
 	switch (props.type) {
 		case 'text':
 		case 'password':
+		case 'date':
 			component = (
 				<Form.Control
 					id={props.elementId}
@@ -198,55 +206,6 @@ const RequiredSpan = () => {
 	return <span className="text-danger align-middle">*</span>
 }
 
-const inputs = [
-	{
-		label: 'ID',
-		placeholder: '유저아이디',
-		value: '',
-		type: 'text',
-		readonly: true,
-		name: 'userId',
-		pattern: '',
-		validate: () => {},
-		errormessage: '',
-	},
-	{
-		label: '비밀번호',
-		placeholder: '비번',
-		value: '',
-		type: 'password',
-		name: 'passwd',
-		required: true,
-	},
-	{
-		label: 'ID',
-		placeholder: '유저아이디',
-		value: '',
-		type: 'select',
-		readonly: true,
-		name: 'userId2',
-		pattern: '',
-		validate: () => {},
-		errormessage: '',
-		options: [{ val: '', text: '' }],
-	},
-]
-
-const buttons = [
-	{
-		text: 'button1',
-		onClick: () => {
-			console.log('click!click!click!click!click!')
-		},
-	},
-	{
-		text: 'button2',
-		onClick: () => {
-			console.log('click!click!click!click!click!2')
-		},
-	},
-]
-
 export const modalprops = {
 	title: 'Modal test~',
 	fields: [
@@ -298,13 +257,3 @@ export const modalprops = {
 		},
 	},
 }
-
-//버튼종류: submit, reset, custom
-// submit: text, 사용여부, className
-// reset: text, 사용여부, className
-// customs: [{text, className, clickEvent}]
-// 위치 submit reset | customs 이런식으로
-// | submit reset customs
-// submit | customs reset
-
-// modal title
