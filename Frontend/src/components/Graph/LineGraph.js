@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 /**
  *
- * @param {import('../../../src/interface/Component').ComponentOptions.DefaultLineGraph} param0
+ * @param {import('../../../src/interface/Component').ComponentOptions.LineGraph} param0
  * @returns {Component}
  */
 const LineGraph = ({ data, dateOptions, action, title, subTitle = null }) => {

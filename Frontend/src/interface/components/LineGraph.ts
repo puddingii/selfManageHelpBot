@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
+import { WeekData } from 'interface/store/study'
 
 export interface DefaultLineGraph {
 	dateOptions: DateOptions
@@ -8,16 +9,11 @@ export interface DefaultLineGraph {
 }
 
 export interface LineGraph extends DefaultLineGraph {
-	data: Data
+	data: WeekData
 }
 
 interface DateOptions {
 	type: 'week' | 'month' // --> recur parameter unit 1 or 4
 	unitType: 'won' | 'minutes'
 	startDate: Date
-}
-
-interface Data {
-	list: Array<{ date: Date; time: Number }>
-	average: Number
 }
