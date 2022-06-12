@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
 import { ko } from 'date-fns/esm/locale'
@@ -37,6 +37,7 @@ function AccountBookDetail({
 	updateAccount,
 	deleteAccount,
 }) {
+	const dispatch = useDispatch()
 	const [dateRange, setDateRange] = useState([null, null])
 	const [startDate, endDate] = dateRange
 
@@ -46,6 +47,13 @@ function AccountBookDetail({
 			startDate: dayjs().subtract(7, 'day').format('YYYY-MM-DD'),
 			endDate: dayjs().format('YYYY-MM-DD'),
 		})
+
+		notFixedModalProps.buttons.submit.callback = async data => {
+			const res = await dispatch(
+				updateAccountBook({ ...data, userId: 'gun4930' }),
+			).unwrap()
+			return !!res.code
+		}
 	}, [])
 
 	/** 데이터 초기화 */
@@ -216,7 +224,6 @@ const notFixedModalProps = {
 		submit: {
 			use: true,
 			text: '수정',
-			callback: data => {},
 		},
 		reset: {
 			use: true,

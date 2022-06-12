@@ -38,7 +38,7 @@ export const CommonModal = ({
 
 	useEffect(() => {
 		if (isShow) {
-			methods.reset({ keepDefaultValues: true })
+			methods.reset()
 		}
 	}, [isShow])
 
@@ -87,7 +87,7 @@ export const CommonModal = ({
 								variant="secondary"
 								className={`btn-fill ${buttons.reset.className}`}
 								onClick={() => {
-									methods.reset({ keepDefaultValues: true })
+									methods.reset()
 								}}
 							>
 								{buttons.reset.text ? buttons.reset.text : 'Reset'}
