@@ -17,7 +17,8 @@
 */
 import dotenv from 'dotenv'
 import path from 'path'
-dotenv.config({ path: path.resolve(__dirname, '../.env') })
+const envPath = process.env.NODE_ENV === 'local' ? '../.env.local' : '../.env'
+dotenv.config({ path: path.resolve(__dirname, envPath) })
 
 import React from 'react'
 import ReactDOM from 'react-dom'
