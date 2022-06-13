@@ -19,6 +19,7 @@ import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 export const CommonModal = ({
 	title,
 	fields,
+	hiddenFields,
 	buttons,
 	fieldValues,
 	isShow,
@@ -55,6 +56,16 @@ export const CommonModal = ({
 								{fields &&
 									fields.map((fieldOptions, i) => (
 										<Field key={i} {...fieldOptions} fieldValues={fieldValues} />
+									))}
+								{hiddenFields &&
+									hiddenFields.map((fieldOptions, i) => (
+										<input
+											key={i}
+											type={fieldOptions.type}
+											{...methods.register(fieldOptions.name, {
+												value: fieldValues[fieldOptions.name],
+											})}
+										/>
 									))}
 							</Form>
 						</Container>
@@ -137,7 +148,7 @@ const FieldInput = forwardRef((props, inputRef) => {
 		required: props.required,
 		value: props.fieldValues[props.name] ?? props.value,
 		pattern: props.pattern,
-		setValueAs: v => v.trim(),
+		// setValueAs: v => v.trim(),
 	})
 	const ref = el => {
 		inputReg.ref(el)
@@ -206,6 +217,7 @@ const RequiredSpan = () => {
 	return <span className="text-danger align-middle">*</span>
 }
 
+/* 테스트용 데이터 */
 export const modalprops = {
 	title: 'Modal test~',
 	fields: [

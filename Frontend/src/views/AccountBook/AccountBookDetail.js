@@ -231,6 +231,7 @@ const notFixedModalProps = {
 			name: 'date',
 		},
 	],
+	hiddenFields: [{ type: 'hidden', value: '', name: 'accountId' }],
 	buttons: {
 		customs: [{ text: '삭제', handleClick: () => {} }],
 		submit: {

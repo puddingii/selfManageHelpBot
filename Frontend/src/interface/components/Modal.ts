@@ -8,6 +8,7 @@
 export interface Modal {
 	title: string
 	fields: Array<ModalField | ModalRequiredField>
+	hiddenFields: Array<ModalHiddenField>
 	buttons: ModalButtons
 	fieldValues: Record<string, string>
 }
@@ -75,4 +76,10 @@ interface ModalInputText {
 	readonly?: boolean
 	pattern?: string
 	validate?: (value: Pick<ModalInputType, 'type'>) => boolean
+}
+
+interface ModalHiddenField {
+	type: 'text'
+	value: string | number
+	name: string
 }
