@@ -42,7 +42,7 @@ const store = configureAppStore()
 
 ReactDOM.render(
 	<Provider store={store}>
-		<BrowserRouter>
+		<BrowserRouter basename={process.env.PUBLIC_URL}>
 			<Switch>
 				<Route path="/admin" render={props => <AdminLayout {...props} />} />
 				<Route path="/study" render={props => <Layout {...props} />} />
