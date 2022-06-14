@@ -17,8 +17,10 @@
 */
 import dotenv from 'dotenv'
 import path from 'path'
-const envPath = process.env.NODE_ENV === 'local' ? '../.env.local' : '../.env'
+console.log(process.env.REACT_APP_ENV)
+const envPath = process.env.REACT_APP_ENV === 'local' ? '../.env-local' : '../.env'
 dotenv.config({ path: path.resolve(__dirname, envPath) })
+console.log(process.env.REACT_APP_BACKEND_DOMAIN)
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -42,7 +44,7 @@ const store = configureAppStore()
 
 ReactDOM.render(
 	<Provider store={store}>
-		<BrowserRouter>
+		<BrowserRouter basename={process.env.PUBLIC_URL}>
 			<Switch>
 				<Route path="/admin" render={props => <AdminLayout {...props} />} />
 				<Route path="/study" render={props => <Layout {...props} />} />
