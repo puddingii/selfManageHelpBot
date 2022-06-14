@@ -61,7 +61,7 @@ export const CommonModal = ({
 									hiddenFields.map((fieldOptions, i) => (
 										<input
 											key={i}
-											type={fieldOptions.type}
+											type="hidden"
 											{...methods.register(fieldOptions.name, {
 												value: fieldValues[fieldOptions.name],
 											})}
@@ -78,7 +78,12 @@ export const CommonModal = ({
 										key={i}
 										variant="secondary"
 										className="btn-fill"
-										onClick={button.handleClick}
+										onClick={e => {
+											const formData = methods.watch()
+											if (button.handleClick(e, formData)) {
+												handleClose()
+											}
+										}}
 									>
 										{button.text}
 									</Button>

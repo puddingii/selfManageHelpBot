@@ -33,8 +33,7 @@ interface DefaultModalBtn {
 
 interface CustomModalBtn {
 	text: string
-	handleClick: (event?: React.MouseEvent<HTMLButtonElement>) => void
-	callback?: (param?: any) => boolean // true => close modal
+	handleClick: (event: React.MouseEvent<HTMLButtonElement>, formData: any) => boolean // true => close modal
 	className?: string
 }
 
@@ -79,7 +78,7 @@ interface ModalInputText {
 }
 
 interface ModalHiddenField {
-	type: 'text'
+	type?: 'hidden'
 	value: string | number
 	name: string
 }

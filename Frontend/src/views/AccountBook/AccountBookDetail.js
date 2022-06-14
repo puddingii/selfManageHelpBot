@@ -233,7 +233,18 @@ const notFixedModalProps = {
 	],
 	hiddenFields: [{ type: 'hidden', value: '', name: 'accountId' }],
 	buttons: {
-		customs: [{ text: '삭제', handleClick: () => {} }],
+		customs: [
+			{
+				text: '삭제',
+				handleClick: (event, formData) => {
+					console.log(formData)
+
+					// 삭제 로직 구현
+
+					return true
+				},
+			},
+		],
 		submit: {
 			use: true,
 			text: '수정',
