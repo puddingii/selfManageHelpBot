@@ -54,13 +54,13 @@ export const getAccountBookList = createAsyncThunk(
 	 */
 	async params => {
 		const { data: notFixedList } = await axios({
-			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list/`,
 			method: 'get',
 			params,
 		})
 
 		const { data: fixedList } = await axios({
-			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/fixedList`,
+			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/fixedList/`,
 			method: 'get',
 			params: { userId: params.userId },
 		})
