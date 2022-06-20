@@ -23,7 +23,7 @@ const AccountBook = new mongoose.Schema({
 	},
 	date: {
 		type: Date,
-		default: dayjs().subtract(9, 'hour').toDate(),
+		default: () => dayjs().subtract(9, 'hour').toDate(),
 	},
 	accountId: {
 		type: Number,
