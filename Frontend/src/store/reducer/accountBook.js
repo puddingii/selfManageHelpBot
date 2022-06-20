@@ -68,6 +68,8 @@ export const getAccountBookList = createAsyncThunk(
 		let data = notFixedList.filter(notFixedInfo => !notFixedInfo.isFixed)
 		data = data.concat(fixedList)
 
+		console.log(data)
+
 		return data
 	},
 )
@@ -150,10 +152,12 @@ export const accountBookSlice = createSlice({
 					},
 				} = action
 				state.accountList = payload
+				console.log('성공함', payload)
 			})
 			.addCase(getAccountBookList.rejected, (state, action) => {
 				state.isAjaxSucceed = false
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
+				console.log('실패함', action.error)
 			})
 		/** insertAccountBook */
 		builder
