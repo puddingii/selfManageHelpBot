@@ -1,5 +1,19 @@
 import dayjs from 'dayjs'
 
+export const formatDurationType = type => {
+	switch (type) {
+		case 'd':
+			return '일'
+		case 'w':
+			return '주'
+		case 'm':
+			return '달'
+		case 'y':
+			return '년'
+		default:
+	}
+}
+
 /**
  * month, year, week 등을 day로 계산
  * @param {string} duration 기간
@@ -49,7 +63,8 @@ export const getRepeatCnt = (
 	const diff = Math.abs(dayjs(endDate).diff(startDate, 'd'))
 	const today = dayjs(endDate).date()
 	const convertedDuration = convertDurationToDay(duration)
-	if (diff < convertedDuration) {
+	if (diff <= today) return 1
+	if (diff - today < convertedDuration) {
 		return 0
 	}
 	return Math.floor((((diff - today) % convertedDuration) + today) / convertedDuration)

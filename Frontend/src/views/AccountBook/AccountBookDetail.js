@@ -19,7 +19,7 @@ import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 import 'react-datepicker/dist/react-datepicker.css'
 import { setComma } from 'util/common'
-import { modalprops } from 'components/Modal/Modal'
+import { formatDurationType } from 'util/dayUtil'
 
 // style
 const CustomDatePicker = styled(DatePicker)`
@@ -50,6 +50,10 @@ function AccountBookDetail() {
 				} else {
 					acc.notFixedList.push(curData)
 				}
+
+				curData.fixedDuration = `${curData.durationCnt}${formatDurationType(
+					curData.durationType,
+				)}`
 				return acc
 			},
 			{ fixedList: [], notFixedList: [] },
@@ -58,14 +62,112 @@ function AccountBookDetail() {
 	const userInfo = useSelector(state => state.user)
 	const dispatch = useDispatch()
 
-	useEffect(() => {
-		notFixedModalProps.buttons.submit.callback = async data => {
-			const res = await dispatch(
-				updateAccountBook({ ...data, userId: 'gun4930' }),
-			).unwrap()
-			return !!res.code
-		}
-	}, [])
+	// Modal Props
+	const defaultModalProps = {
+		title: '수입/지출 내역수정',
+		fields: [
+			{
+				label: '내용',
+				placeholder: '내용',
+				value: '',
+				type: 'text',
+				name: 'content',
+			},
+			{
+				label: '금액',
+				placeholder: '금액',
+				value: '',
+				type: 'text',
+				name: 'amount',
+				required: true,
+				pattern: /^[-]?[0-9]+$/,
+				errormessage: '숫자만 입력 가능합니다.',
+			},
+			{
+				label: '카테고리',
+				placeholder: '카테고리',
+				value: '',
+				type: 'text',
+				name: 'category',
+			},
+		],
+		hiddenFields: [
+			{ type: 'hidden', value: '', name: 'accountId' },
+			{ type: 'hidden', value: '', name: 'isFixed' },
+		],
+		buttons: {
+			customs: [
+				{
+					text: '삭제',
+					handleClick: async (event, formData) => {
+						const res = await dispatch(
+							deleteAccountBook({ userId: 'gun4930', accountId: formData.accountId }),
+						).unwrap()
+						return !!res.code
+					},
+				},
+			],
+			submit: {
+				use: true,
+				text: '수정',
+				callback: async data => {
+					const param = {
+						userId: 'gun4930',
+						...data,
+					}
+					if (data.durationType) {
+						param.fixedDuration = `${data.durationCnt}${data.durationType}`
+					}
+					const res = await dispatch(updateAccountBook(param)).unwrap()
+					return !!res.code
+				},
+			},
+			reset: {
+				use: true,
+				text: '초기화',
+			},
+		},
+	}
+
+	const notFixedModalProps = _.cloneDeep(defaultModalProps)
+	notFixedModalProps.fields.push({
+		label: '날짜',
+		placeholder: '날짜',
+		value: '',
+		type: 'date',
+		name: 'date',
+	})
+
+	const fixedModalProps = _.cloneDeep(defaultModalProps)
+	fixedModalProps.fields.push(
+		{
+			label: '시작날짜',
+			placeholder: '시작날짜',
+			value: '',
+			type: 'date',
+			name: 'date',
+		},
+		{
+			label: '주기숫자',
+			type: 'text',
+			name: 'durationCnt',
+			value: '',
+			required: true,
+			pattern: /^[-]?[0-9]+$/,
+			errormessage: '숫자만 입력 가능합니다.',
+		},
+		{
+			label: '주기타입',
+			type: 'select',
+			name: 'durationType',
+			options: [
+				{ value: 'd', text: '일 ' },
+				{ value: 'w', text: '주' },
+				{ value: 'm', text: '달' },
+				{ value: 'y', text: '년' },
+			],
+		},
+	)
 
 	useEffect(() => {
 		dispatch(
@@ -77,6 +179,7 @@ function AccountBookDetail() {
 		)
 	}, [startDate, endDate])
 
+	// Child Component Props Settings
 	const defaultColumns = [
 		{
 			dataField: 'accountId',
@@ -115,7 +218,7 @@ function AccountBookDetail() {
 	fixedColumns.push(
 		{
 			dataField: 'date',
-			text: '날짜',
+			text: '시작날짜',
 			headerClasses: 'border-0',
 		},
 		{
@@ -124,16 +227,6 @@ function AccountBookDetail() {
 			headerClasses: 'border-0',
 		},
 	)
-
-	const onClickTableUpdate = accountInfo => {
-		const result = dispatch(updateAccountBook(accountInfo))
-		return result
-	}
-
-	const onClickTableDelete = async accountId => {
-		const result = dispatch(deleteAccountBook({ userId: userInfo.userId, accountId }))
-		return result
-	}
 
 	return (
 		<>
@@ -172,8 +265,6 @@ function AccountBookDetail() {
 						description="고치거나 삭제할 내역이 있다면 해당 부분을 클릭하세요!"
 						tableData={notFixedList}
 						columns={notFixedColumns}
-						onClickUpdate={onClickTableUpdate}
-						onClickDelete={onClickTableDelete}
 						modalProps={notFixedModalProps}
 					></TableBox>
 				</Col>
@@ -186,9 +277,7 @@ function AccountBookDetail() {
 						description="고치거나 삭제할 내역이 있다면 해당 부분을 클릭하세요!"
 						tableData={fixedList}
 						columns={fixedColumns}
-						onClickUpdate={onClickTableUpdate}
-						onClickDelete={onClickTableDelete}
-						modalProps={modalprops}
+						modalProps={fixedModalProps}
 					></TableBox>
 				</Col>
 			</Row>
@@ -196,63 +285,4 @@ function AccountBookDetail() {
 	)
 }
 
-const notFixedModalProps = {
-	title: '비고정지출 내역 수정',
-	fields: [
-		{
-			label: '내용',
-			placeholder: '내용',
-			value: '',
-			type: 'text',
-			name: 'content',
-		},
-		{
-			label: '금액',
-			placeholder: '금액',
-			value: '',
-			type: 'text',
-			name: 'amount',
-			required: true,
-			pattern: /^[-]?[0-9]+$/,
-			errormessage: '숫자만 입력 가능합니다.',
-		},
-		{
-			label: '카테고리',
-			placeholder: '카테고리',
-			value: '',
-			type: 'text',
-			name: 'category',
-		},
-		{
-			label: '날짜',
-			placeholder: '날짜',
-			value: '',
-			type: 'date',
-			name: 'date',
-		},
-	],
-	hiddenFields: [{ type: 'hidden', value: '', name: 'accountId' }],
-	buttons: {
-		customs: [
-			{
-				text: '삭제',
-				handleClick: (event, formData) => {
-					console.log(formData)
-
-					// 삭제 로직 구현
-
-					return true
-				},
-			},
-		],
-		submit: {
-			use: true,
-			text: '수정',
-		},
-		reset: {
-			use: true,
-			text: '초기화',
-		},
-	},
-}
 export default AccountBookDetail

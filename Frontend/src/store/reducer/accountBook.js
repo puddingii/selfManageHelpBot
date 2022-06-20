@@ -143,12 +143,13 @@ export const accountBookSlice = createSlice({
 		/** getAccountBookList */
 		builder
 			.addCase(getAccountBookList.fulfilled, (state, action) => {
-				const {
-					payload,
-					meta: {
-						arg: { startDate, endDate },
-					},
-				} = action
+				const { payload } = action
+				payload.forEach(account => {
+					if (account.fixedDuration) {
+						account.durationType = account.fixedDuration.slice(-1)
+						account.durationCnt = parseInt(account.fixedDuration.slice(0, -1), 10)
+					}
+				})
 				state.accountList = payload
 			})
 			.addCase(getAccountBookList.rejected, (state, action) => {
