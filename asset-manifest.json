@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/selfManageHelpBot/static/css/main.9cfc6720.chunk.css",
-    "main.js": "/selfManageHelpBot/static/js/main.196a82a5.chunk.js",
-    "main.js.map": "/selfManageHelpBot/static/js/main.196a82a5.chunk.js.map",
+    "main.js": "/selfManageHelpBot/static/js/main.e3b4e05c.chunk.js",
+    "main.js.map": "/selfManageHelpBot/static/js/main.e3b4e05c.chunk.js.map",
     "runtime-main.js": "/selfManageHelpBot/static/js/runtime-main.9a616253.js",
     "runtime-main.js.map": "/selfManageHelpBot/static/js/runtime-main.9a616253.js.map",
     "static/css/2.8af530c0.chunk.css": "/selfManageHelpBot/static/css/2.8af530c0.chunk.css",
@@ -12,7 +12,7 @@
     "static/css/2.8af530c0.chunk.css.map": "/selfManageHelpBot/static/css/2.8af530c0.chunk.css.map",
     "static/css/main.9cfc6720.chunk.css.map": "/selfManageHelpBot/static/css/main.9cfc6720.chunk.css.map",
     "static/js/2.86a7cf50.chunk.js.LICENSE.txt": "/selfManageHelpBot/static/js/2.86a7cf50.chunk.js.LICENSE.txt",
-    "static/js/main.196a82a5.chunk.js.LICENSE.txt": "/selfManageHelpBot/static/js/main.196a82a5.chunk.js.LICENSE.txt",
+    "static/js/main.e3b4e05c.chunk.js.LICENSE.txt": "/selfManageHelpBot/static/js/main.e3b4e05c.chunk.js.LICENSE.txt",
     "static/media/all.min.css": "/selfManageHelpBot/static/media/fa-solid-900.f4f93856.woff",
     "static/media/face-3.jpg": "/selfManageHelpBot/static/media/face-3.62232de2.jpg",
     "static/media/light-bootstrap-dashboard-react.scss?v=2.0.0": "/selfManageHelpBot/static/media/nucleo-icons.e8827b8a.svg",
@@ -28,6 +28,6 @@
     "static/css/2.8af530c0.chunk.css",
     "static/js/2.86a7cf50.chunk.js",
     "static/css/main.9cfc6720.chunk.css",
-    "static/js/main.196a82a5.chunk.js"
+    "static/js/main.e3b4e05c.chunk.js"
   ]
 }
