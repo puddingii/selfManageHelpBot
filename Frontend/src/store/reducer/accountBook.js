@@ -53,17 +53,16 @@ export const getAccountBookList = createAsyncThunk(
 	 * @returns {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]}
 	 */
 	async params => {
+		console.log(`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`)
 		const { data: notFixedList } = await axios({
 			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
 			method: 'get',
-			crossDomain: true,
 			params,
 		})
 
 		const { data: fixedList } = await axios({
 			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/fixedList`,
 			method: 'get',
-			crossDomain: true,
 			params: { userId: params.userId },
 		})
 
