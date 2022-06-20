@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - feature-CICD
 
 jobs:
   deployment:
@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '14'
-        
+
       - name: Build
         env:
           REACT_APP_BACKEND_DOMAIN: ${{ secrets.REACT_APP_BACKEND_DOMAIN }}
