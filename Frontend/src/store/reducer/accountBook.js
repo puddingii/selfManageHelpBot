@@ -56,12 +56,14 @@ export const getAccountBookList = createAsyncThunk(
 		const { data: notFixedList } = await axios({
 			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
 			method: 'get',
+			crossDomain: true,
 			params,
 		})
 
 		const { data: fixedList } = await axios({
 			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/fixedList`,
 			method: 'get',
+			crossDomain: true,
 			params: { userId: params.userId },
 		})
 
@@ -157,11 +159,7 @@ export const accountBookSlice = createSlice({
 			.addCase(getAccountBookList.rejected, (state, action) => {
 				state.isAjaxSucceed = false
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
-				console.log(
-					'실패함',
-					action.error,
-					`${process.env.REACT_APP_BACKEND_DOMAIN}/account-book/list`,
-				)
+				console.log('실패함', action.error)
 			})
 		/** insertAccountBook */
 		builder
