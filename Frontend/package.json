@@ -4,6 +4,9 @@
 	"homepage": "https://gun4930.github.io/selfManageHelpBot",
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "5.15.2",
+		"@fortawesome/fontawesome-svg-core": "^6.1.1",
+		"@fortawesome/free-solid-svg-icons": "^6.1.1",
+		"@fortawesome/react-fontawesome": "^0.1.18",
 		"@reduxjs/toolkit": "^1.8.1",
 		"@types/lodash": "^4.14.182",
 		"apexcharts": "^3.35.0",

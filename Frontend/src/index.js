@@ -38,6 +38,7 @@ import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.m
 
 import AdminLayout from 'layouts/Admin.js'
 import Layout from 'layouts/Layout'
+import LoginLayout from 'layouts/LoginLayout'
 import configureAppStore from 'configureStore'
 
 const store = configureAppStore()
@@ -48,8 +49,8 @@ ReactDOM.render(
 			<Switch>
 				<Route path="/admin" render={props => <AdminLayout {...props} />} />
 				<Route path="/study" render={props => <Layout {...props} />} />
+				<Route path="/account" render={props => <LoginLayout {...props} />} />
 				{/* <Redirect from="/" to="/admin/dashboard" /> */}
-				<Route />
 			</Switch>
 		</BrowserRouter>
 	</Provider>,
