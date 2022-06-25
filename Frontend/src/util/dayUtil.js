@@ -64,8 +64,8 @@ export const getRepeatCnt = (
 	const today = dayjs(endDate).date()
 	const convertedDuration = convertDurationToDay(duration)
 	if (diff <= today) return 1
-	if (diff - today < convertedDuration) {
-		return 0
-	}
+	// if (diff - today < convertedDuration) {
+	// 	return 0
+	// }
 	return Math.floor((((diff - today) % convertedDuration) + today) / convertedDuration)
 }
