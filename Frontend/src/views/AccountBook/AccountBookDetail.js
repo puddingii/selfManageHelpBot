@@ -51,9 +51,9 @@ function AccountBookDetail() {
 					acc.notFixedList.push(curData)
 				}
 
-				curData.fixedDuration = `${curData.durationCnt}${formatDurationType(
-					curData.durationType,
-				)}`
+				if (curData.fixedDuration) {
+					curData.fixedDuration = formatDurationType(curData.fixedDuration)
+				}
 				return acc
 			},
 			{ fixedList: [], notFixedList: [] },
@@ -161,10 +161,11 @@ function AccountBookDetail() {
 			type: 'select',
 			name: 'durationType',
 			options: [
-				{ value: 'd', text: '일 ' },
-				{ value: 'w', text: '주' },
-				{ value: 'm', text: '달' },
-				{ value: 'y', text: '년' },
+				{ value: 'md', text: '특정날짜(ex-매달23일에)' },
+				{ value: 'd', text: '일' },
+				{ value: 'w', text: '주(7일)' },
+				{ value: 'm', text: '달(30일)' },
+				{ value: 'y', text: '년(365일)' },
 			],
 		},
 	)

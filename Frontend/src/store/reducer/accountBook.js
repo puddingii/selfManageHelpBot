@@ -16,13 +16,14 @@ export const calcSummary = (accountList, dateInfo) => {
 		notFixedOutcome: 0,
 	}
 	accountList.forEach(accountInfo => {
+		/** 고정 금액 */
 		if (accountInfo.isFixed) {
-			/** 고정 금액 */
-			const repeatCnt = getRepeatCnt(
-				accountInfo.date,
-				dateInfo.endDate,
-				accountInfo.fixedDuration,
-			)
+			const repeatCnt = getRepeatCnt({
+				curDate: accountInfo.date,
+				startDate: dateInfo.startDate,
+				endDate: dateInfo.endDate,
+				duration: accountInfo.fixedDuration,
+			})
 			if (accountInfo.amount > 0) {
 				/** 수입 */
 				summary.fixedIncome += accountInfo.amount * repeatCnt
@@ -146,8 +147,9 @@ export const accountBookSlice = createSlice({
 				const { payload } = action
 				payload.forEach(account => {
 					if (account.fixedDuration) {
-						account.durationType = account.fixedDuration.slice(-1)
-						account.durationCnt = parseInt(account.fixedDuration.slice(0, -1), 10)
+						const sliceCnt = account.fixedDuration.slice(-2) === 'md' ? -2 : -1
+						account.durationType = account.fixedDuration.slice(sliceCnt)
+						account.durationCnt = parseInt(account.fixedDuration.slice(0, sliceCnt), 10)
 					}
 				})
 				state.accountList = payload

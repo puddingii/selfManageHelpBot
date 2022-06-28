@@ -1,17 +1,9 @@
 import dayjs from 'dayjs'
 
-export const formatDurationType = type => {
-	switch (type) {
-		case 'd':
-			return '일'
-		case 'w':
-			return '주'
-		case 'm':
-			return '달'
-		case 'y':
-			return '년'
-		default:
-	}
+export const formatDurationType = duration => {
+	return duration.slice(-2) === 'md'
+		? `매달 ${parseInt(duration.slice(0, -2), 10)}일`
+		: `${convertDurationToDay(duration)}일 마다`
 }
 
 /**
@@ -27,8 +19,7 @@ export const convertDurationToDay = duration => {
 	const type = duration.slice(-1)
 	const cnt = parseInt(duration.slice(0, -1), 10)
 
-	if (typeof cnt !== 'number') return -1
-
+	if (typeof cnt !== 'number' || duration.slice(-2) === 'md') return -1
 	switch (type) {
 		case 'w':
 			return cnt * 7
@@ -45,27 +36,43 @@ export const convertDurationToDay = duration => {
 
 /**
  * 해당 기간동안 몇번이나 반복하는지?
- * (현재 날짜 - 등록 날짜) = 경과한 전체 일수
- * (((경과한 전체 일수 - 현재 날짜의 일(ex - 11일)) % 주기 + 현재 날짜의 일) / 주기 * 액수
- * @param {string} startDate 시작 날짜
- * @param {string} endDate 끝 날짜
- * @param {string} duration 반복 날짜
+ * (((시작날짜 - 등록된 날짜) % 주기 + (끝 날짜 - 시작 날짜의 일)) / 주기
+ * @param {{ startDate: string, endDate: string, curDate: string, duration: string }} dateInfo
  * @returns {number} startDate기준으로 해당 기간동안 몇번인지
  * @example
  * getRepeatCnt('2022-03-01', '2022-03-05', '1w') // 1
  * getRepeatCnt('2022-03-01', '2022-03-11', '1w') // 2
  */
-export const getRepeatCnt = (
-	startDate,
-	endDate = dayjs().format('YYYY-MM-DD'),
-	duration,
-) => {
-	const diff = Math.abs(dayjs(endDate).diff(startDate, 'd'))
-	const today = dayjs(endDate).date()
+export const getRepeatCnt = ({ startDate, endDate, curDate, duration }) => {
+	if (dayjs(endDate).diff(curDate) < 0) return 0
+	curDate = dayjs(curDate)
 	const convertedDuration = convertDurationToDay(duration)
-	if (diff <= today) return 1
-	// if (diff - today < convertedDuration) {
-	// 	return 0
-	// }
-	return Math.floor((((diff - today) % convertedDuration) + today) / convertedDuration)
+	let cnt = 0
+
+	// 매달마다 특정날짜인 경우
+	if (convertedDuration === -1) {
+		let chkDate = dayjs(curDate).set('date', parseInt(duration.slice(0, -2), 10))
+		if (chkDate.diff(startDate, 'd') < 0) {
+			chkDate = chkDate.set('M', dayjs(startDate).month())
+		}
+
+		while (chkDate.diff(dayjs(endDate), 'd') <= 0) {
+			cnt++
+			chkDate = chkDate.add(1, 'M')
+		}
+
+		return cnt
+	}
+
+	let diff = dayjs(startDate).diff(curDate, 'd')
+	if (diff <= 0 && dayjs(endDate).diff(curDate, 'd') >= 0) {
+		cnt = 1
+		startDate = curDate
+	}
+	let diff2 = dayjs(endDate).diff(startDate, 'd') + 1
+
+	diff = diff < 0 ? 0 : diff
+	diff2 = diff2 < 0 ? 0 : diff2
+
+	return Math.floor(((diff % convertedDuration) + diff2) / convertedDuration) + cnt
 }
