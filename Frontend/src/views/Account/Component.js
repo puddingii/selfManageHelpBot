@@ -128,6 +128,7 @@ LoginModal.Control = ({
 	error,
 	register,
 	type = 'text',
+	onFocus,
 }) => {
 	return (
 		<FormGroup>
@@ -143,6 +144,7 @@ LoginModal.Control = ({
 					isInvalid={isInvalid}
 					placeholder={placeholder}
 					type={type}
+					onFocus={onFocus}
 					{...register}
 				/>
 				<Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>

@@ -1,22 +1,56 @@
-import React, { Children, Component } from 'react'
+import React, { Children, Component, useEffect, useState } from 'react'
 import { faAddressCard, faLock, faUser } from '@fortawesome/free-solid-svg-icons'
 import { LoginModal } from './Component'
 import { faDiscord } from '@fortawesome/free-brands-svg-icons'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
+import { login, loginInit, userIdCheck } from 'store/reducer/user'
+import { useDispatch } from 'react-redux'
+import Swal from 'sweetalert2'
+import _ from 'lodash'
 
 const USER_ID_ERROR = '아이디는 6자 이상 12자 이하의 영어 및 숫자만 가능합니다.'
+const USER_ID_DUPLICATED_ERROR = '중복된 아이디입니다.'
 const PASSWORD_ERROR = '비밀번호는 6자 이상 30자 이하의 A-z0-9!@^()&*-_=+만 가능합니다.'
 const NICKNAME_ERROR = '닉네임은 2자 이상 10자 이하의 한글,숫자,영어만 가능합니다.'
 const DISCORD_ID_ERROR = '디스코드 ID는 18자의 숫자만 가능합니다.'
 
 export const LoginBox = () => {
+	const dispatch = useDispatch()
+	const history = useHistory()
 	const {
 		register,
 		formState: { errors },
 		handleSubmit,
 	} = useForm()
-	console.log(location.pathname)
+
+	const handleClick = async data => {
+		try {
+			const [res, _] = await Promise.all([
+				dispatch(login(data)).unwrap(),
+				Swal.fire({
+					title: 'Login..',
+					didOpen: () => {
+						Swal.showLoading()
+					},
+					timer: 1000,
+					allowOutsideClick: false,
+				}),
+			])
+
+			Swal.close()
+			if (res.status === 200) {
+				localStorage.setItem('userId', res.data.userId)
+				history.push('/selfManageHelpBot/study')
+			}
+		} catch (e) {
+			Swal.fire({
+				icon: 'error',
+				title: e.message == 401 ? 'Login is failed.' : 'System error.',
+			})
+			dispatch(loginInit())
+		}
+	}
 	return (
 		<LoginModal.Frame isShow={true}>
 			<LoginModal.Header title={'Sign In'} />
@@ -41,9 +75,7 @@ export const LoginBox = () => {
 				/>
 				<LoginModal.Button
 					text="Sign In"
-					handleClick={handleSubmit(data => {
-						console.log(data)
-					})}
+					handleClick={_.debounce(handleSubmit(handleClick), 500)}
 				/>
 				<p
 					style={{
@@ -68,11 +100,27 @@ export const LoginBox = () => {
 }
 
 export const SignUpBox = () => {
+	const dispatch = useDispatch()
 	const {
 		register,
 		formState: { errors },
 		handleSubmit,
+		setError,
+		clearErrors,
+		getFieldState,
 	} = useForm()
+	const [userIdErrMsg, setUserIdErrMsg] = useState(USER_ID_ERROR)
+	const submitData = async data => {
+		try {
+			let res = await dispatch(userIdCheck({ userId: data.userId })).unwrap()
+			if (res.data.code == 1) {
+				clearErrors()
+			} else {
+				setUserIdErrMsg(USER_ID_DUPLICATED_ERROR)
+				setError('userId', { type: 'duplicated' })
+			}
+		} catch (e) {}
+	}
 	return (
 		<LoginModal.Frame isShow={true}>
 			<LoginModal.Header title={'Sign Up'} />
@@ -81,7 +129,14 @@ export const SignUpBox = () => {
 					icon={faUser}
 					isInvalid={errors.userId}
 					placeholder={'UserID'}
-					error={USER_ID_ERROR}
+					error={userIdErrMsg}
+					onFocus={() => {
+						const { error } = getFieldState('userId')
+						if (error?.type === 'duplicated') {
+							clearErrors()
+							setUserIdErrMsg(USER_ID_ERROR)
+						}
+					}}
 					register={register('userId', { required: true, pattern: /^[A-z0-9]{6,12}$/ })}
 				/>
 				<LoginModal.Control
@@ -116,9 +171,8 @@ export const SignUpBox = () => {
 				/>
 				<LoginModal.Button
 					text="Sign Up"
-					handleClick={handleSubmit(data => {
-						console.log(data)
-					})}
+					handleClick={_.debounce(handleSubmit(submitData), 500)}
+					// handleClick={}
 				/>
 			</LoginModal.Body>
 			<LoginModal.Footer>
