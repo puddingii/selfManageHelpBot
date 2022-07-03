@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import ChartistGraph from 'react-chartist'
+import Chart from 'react-apexcharts'
 import { useDispatch, useSelector } from 'react-redux'
 import dayjs from 'dayjs'
 
@@ -17,17 +17,16 @@ function AccountBook() {
 	const [isFixedOutcome, setIsFixedOutcome] = useState(true)
 
 	const durationInfo = {
-		// FIXME 위에 부분이랑 아래부분 cnt 다르게 할것
 		d: {
 			cnt: 30,
 			name: '일간',
 		},
 		w: {
-			cnt: 12 * 7,
+			cnt: 12,
 			name: '주간',
 		},
-		m: {
-			cnt: 12 * 30,
+		M: {
+			cnt: 12,
 			name: '월간',
 		},
 		y: {
@@ -35,10 +34,18 @@ function AccountBook() {
 			name: '년간',
 		},
 	}
+
+	const getStartDate = () => {
+		const initStartDate = dayjs().subtract(durationInfo[durationType].cnt, durationType)
+		return (durationType === 'M' ? initStartDate.set('date', 1) : initStartDate).format(
+			'YYYY-MM-DD',
+		)
+	}
+	const [startDate, setStartDate] = useState(getStartDate())
 	useEffect(() => {
-		const startDate = dayjs()
-			.subtract(durationInfo[durationType].cnt, durationType)
-			.format('YYYY-MM-DD')
+		setStartDate(getStartDate())
+	}, [durationType])
+	useEffect(() => {
 		dispatch(
 			getAccountBookList({
 				userId: userInfo.userId,
@@ -48,6 +55,7 @@ function AccountBook() {
 		)
 	}, [])
 
+	/** 이번달 요약본 */
 	const { fixedOutcome, fixedIncome, notFixedIncome, notFixedOutcome } = useSelector(
 		state => {
 			const firstDay = dayjs().set('date', 1)
@@ -55,7 +63,8 @@ function AccountBook() {
 			list = list.filter(account => {
 				return (
 					account.isFixed ||
-					(dayjs(account.date).diff(firstDay) >= 0 && dayjs().diff(account.date) >= 0)
+					(dayjs(account.date).diff(firstDay, 'd') >= 0 &&
+						dayjs().diff(account.date, 'd') >= 0)
 				)
 			})
 			return calcSummary(list, {
@@ -119,6 +128,140 @@ function AccountBook() {
 			},
 		},
 	]
+
+	/** 차트 */
+	const { incomeList, outcomeList, sumList, labelList } = useSelector(state => {
+		const list = _.cloneDeep(state.accountBook.accountList)
+		const incomeList = []
+		const outcomeList = []
+		const sumList = []
+		const labelList = []
+
+		let stDate = _.cloneDeep(startDate)
+		let stackSum = 0
+		for (let i = 0; i < durationInfo[durationType].cnt; i++) {
+			let endDate = dayjs(stDate)
+				.add(1, durationType)
+				.subtract(1, 'd')
+				.format('YYYY-MM-DD')
+			const filteredList = list.filter(account => {
+				return (
+					account.isFixed ||
+					(dayjs(account.date).diff(stDate, 'd') >= 0 &&
+						dayjs(endDate).diff(account.date, 'd') >= 0)
+				)
+			})
+			const result = calcSummary(filteredList, {
+				startDate: stDate,
+				endDate,
+			})
+
+			incomeList.push(result.fixedIncome + result.notFixedIncome)
+			outcomeList.push(Math.abs(result.fixedOutcome + result.notFixedOutcome))
+			stackSum +=
+				result.fixedIncome +
+				result.notFixedIncome +
+				result.fixedOutcome +
+				result.notFixedOutcome
+			sumList.push(stackSum)
+			const labelDate = durationType === 'd' ? stDate : endDate
+			labelList.push(dayjs(labelDate).format('YYYY.MM.DD'))
+			stDate = dayjs(stDate).add(1, durationType).format('YYYY-MM-DD')
+		}
+		return { incomeList, outcomeList, sumList, labelList }
+	})
+
+	/** @type {import('react-apexcharts').Props} */
+	const state = {
+		series: [
+			{
+				name: '수입',
+				type: 'column',
+				data: incomeList,
+			},
+			{
+				name: '지출',
+				type: 'column',
+				data: outcomeList,
+			},
+			{
+				name: '누적합계',
+				type: 'line',
+				data: sumList,
+			},
+		],
+		options: {
+			chart: {
+				toolbar: {
+					tools: {
+						zoom: false,
+						zoomin: false,
+						zoomout: false,
+						selection: false,
+						reset: true,
+						pan: false,
+						download: true,
+					},
+				},
+				zoom: false,
+			},
+			dataLabels: {
+				enabled: false,
+			},
+			stroke: {
+				width: [4, 4, 2],
+			},
+			labels: labelList,
+			xaxis: {
+				type: 'datetime',
+				labels: {
+					formatter: value => {
+						const formattedValue = dayjs(value).format('YYYY.MM.DD')
+						return durationType === 'd' ? formattedValue : `~${formattedValue}`
+					},
+				},
+			},
+			yaxis: [
+				{
+					showAlways: false,
+					seriesName: '수입',
+					title: {
+						text: '수입/지출',
+					},
+					labels: {
+						formatter: value => setComma(value),
+					},
+				},
+				{
+					showAlways: false,
+					seriesName: '수입',
+					show: false,
+				},
+				{
+					showAlways: false,
+					opposite: true,
+					title: {
+						text: '누적합계',
+					},
+					labels: {
+						formatter: value => setComma(value),
+					},
+				},
+			],
+			tooltip: {
+				y: {
+					formatter: value => setComma(value),
+				},
+				shared: true,
+				intersect: false,
+			},
+			legend: {
+				horizontalAlign: 'left',
+				offsetX: 40,
+			},
+		},
+	}
+
 	return (
 		<>
 			<Container fluid>
@@ -139,7 +282,7 @@ function AccountBook() {
 						)
 					})}
 				</Row>
-				<Dropdown as={Nav.Item}>
+				<Dropdown as={Nav.Item} onSelect={mode => setDurationType(mode)}>
 					<Dropdown.Toggle
 						as={Nav.Link}
 						data-toggle="dropdown"
@@ -148,87 +291,36 @@ function AccountBook() {
 						className="m-0"
 					>
 						<i className="nc-icon nc-planet"></i>
-						<span className="notification">월간</span>
+						<span className="notification">{durationInfo[durationType].name}</span>
 						<span className="d-lg-none ml-1">Notification</span>
 					</Dropdown.Toggle>
 					<Dropdown.Menu>
-						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
-							일간
-						</Dropdown.Item>
-						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
-							주간
-						</Dropdown.Item>
-						<Dropdown.Item href="#pablo" onClick={e => e.preventDefault()}>
-							월간
-						</Dropdown.Item>
+						{Object.keys(durationInfo).map(type => {
+							return (
+								<Dropdown.Item key={type} eventKey={type}>
+									{durationInfo[type].name}
+								</Dropdown.Item>
+							)
+						})}
 					</Dropdown.Menu>
 				</Dropdown>
 				<Row>
-					<Col md="8">
-						<Card>
+					<Col>
+						<Card className="strpied-tabled-with-hover">
 							<Card.Header>
 								<Card.Title as="h4">Users Behavior</Card.Title>
-								<p className="card-category">24 Hours performance</p>
 							</Card.Header>
-							<Card.Body>
+							<Card.Body className="table-full-width table-responsive px-1">
 								<div className="ct-chart" id="chartHours">
-									<ChartistGraph
-										data={{
-											labels: [
-												'9:00AM',
-												'12:00AM',
-												'3:00PM',
-												'6:00PM',
-												'9:00PM',
-												'12:00PM',
-												'3:00AM',
-												'6:00AM',
-											],
-											series: [
-												[287, 385, 490, 492, 554, 586, 698, 695],
-												[67, 152, 143, 240, 287, 335, 435, 437],
-												[23, 113, 67, 108, 190, 239, 307, 308],
-											],
-										}}
-										type="Line"
-										options={{
-											low: 0,
-											high: 800,
-											showArea: false,
-											height: '245px',
-											axisX: {
-												showGrid: false,
-											},
-											lineSmooth: true,
-											showLine: true,
-											showPoint: true,
-											fullWidth: true,
-											chartPadding: {
-												right: 50,
-											},
-										}}
-										responsiveOptions={[
-											[
-												'screen and (max-width: 640px)',
-												{
-													axisX: {
-														labelInterpolationFnc: function (value) {
-															return value[0]
-														},
-													},
-												},
-											],
-										]}
+									<Chart
+										options={state.options}
+										series={state.series}
+										type="bar"
+										height={280}
 									/>
 								</div>
 							</Card.Body>
 							<Card.Footer>
-								<div className="legend">
-									<i className="fas fa-circle text-info"></i>
-									Open <i className="fas fa-circle text-danger"></i>
-									Click <i className="fas fa-circle text-warning"></i>
-									Click Second Time
-								</div>
 								<hr></hr>
 								<div className="stats">
 									<i className="fas fa-history"></i>
@@ -237,6 +329,8 @@ function AccountBook() {
 							</Card.Footer>
 						</Card>
 					</Col>
+				</Row>
+				<Row>
 					<Col md="4">
 						<Card>
 							<Card.Header>
@@ -245,13 +339,13 @@ function AccountBook() {
 							</Card.Header>
 							<Card.Body>
 								<div className="ct-chart ct-perfect-fourth" id="chartPreferences">
-									<ChartistGraph
+									{/* <Chart
 										data={{
 											labels: ['40%', '20%', '40%'],
 											series: [40, 20, 40],
 										}}
 										type="Pie"
-									/>
+									/> */}
 								</div>
 								<div className="legend">
 									<i className="fas fa-circle text-info"></i>
