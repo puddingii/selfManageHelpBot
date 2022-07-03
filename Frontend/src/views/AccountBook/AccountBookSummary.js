@@ -6,7 +6,11 @@ import dayjs from 'dayjs'
 // react-bootstrap components
 import { Card, Dropdown, Nav, Container, Row, Col } from 'react-bootstrap'
 import SummaryMiniBox from 'components/Box/SummaryMiniBox'
-import { calcSummary, getAccountBookList } from 'store/reducer/accountBook'
+import {
+	calcSummary,
+	calcSummaryType,
+	getAccountBookList,
+} from 'store/reducer/accountBook'
 import { setComma } from 'util/common'
 
 function AccountBook() {
@@ -130,49 +134,93 @@ function AccountBook() {
 	]
 
 	/** 차트 */
-	const { incomeList, outcomeList, sumList, labelList } = useSelector(state => {
-		const list = _.cloneDeep(state.accountBook.accountList)
-		const incomeList = []
-		const outcomeList = []
-		const sumList = []
-		const labelList = []
+	const { incomeList, outcomeList, sumList, labelList, summaryTypeList } = useSelector(
+		state => {
+			const list = _.cloneDeep(state.accountBook.accountList)
+			const incomeList = []
+			const outcomeList = []
+			const sumList = []
+			const labelList = []
 
-		let stDate = _.cloneDeep(startDate)
-		let stackSum = 0
-		for (let i = 0; i < durationInfo[durationType].cnt; i++) {
-			let endDate = dayjs(stDate)
-				.add(1, durationType)
-				.subtract(1, 'd')
-				.format('YYYY-MM-DD')
-			const filteredList = list.filter(account => {
-				return (
-					account.isFixed ||
-					(dayjs(account.date).diff(stDate, 'd') >= 0 &&
-						dayjs(endDate).diff(account.date, 'd') >= 0)
+			let stDate =
+				durationType !== 'M'
+					? dayjs(_.cloneDeep(startDate)).add(1, 'd').format('YYYY-MM-DD')
+					: _.cloneDeep(startDate)
+			let stackSum = 0
+			for (let i = 0; i < durationInfo[durationType].cnt; i++) {
+				let endDate = dayjs(stDate)
+					.add(1, durationType)
+					.subtract(1, 'd')
+					.format('YYYY-MM-DD')
+				const filteredList = list.filter(account => {
+					return (
+						account.isFixed ||
+						(dayjs(account.date).diff(stDate, 'd') >= 0 &&
+							dayjs(endDate).diff(account.date, 'd') >= 0)
+					)
+				})
+				const result = calcSummary(filteredList, {
+					startDate: stDate,
+					endDate,
+				})
+
+				incomeList.push(result.fixedIncome + result.notFixedIncome)
+				outcomeList.push(Math.abs(result.fixedOutcome + result.notFixedOutcome))
+				stackSum +=
+					result.fixedIncome +
+					result.notFixedIncome +
+					result.fixedOutcome +
+					result.notFixedOutcome
+				sumList.push(stackSum)
+				labelList.push(
+					dayjs(durationType === 'd' ? stDate : endDate).format('YYYY.MM.DD'),
 				)
+				stDate = dayjs(stDate).add(1, durationType).format('YYYY-MM-DD')
+			}
+			const summaryTypeList = calcSummaryType(list, {
+				startDate: _.cloneDeep(startDate),
+				endDate: dayjs().format('YYYY-MM-DD'),
 			})
-			const result = calcSummary(filteredList, {
-				startDate: stDate,
-				endDate,
-			})
+			return { incomeList, outcomeList, sumList, labelList, summaryTypeList }
+		},
+	)
 
-			incomeList.push(result.fixedIncome + result.notFixedIncome)
-			outcomeList.push(Math.abs(result.fixedOutcome + result.notFixedOutcome))
-			stackSum +=
-				result.fixedIncome +
-				result.notFixedIncome +
-				result.fixedOutcome +
-				result.notFixedOutcome
-			sumList.push(stackSum)
-			const labelDate = durationType === 'd' ? stDate : endDate
-			labelList.push(dayjs(labelDate).format('YYYY.MM.DD'))
-			stDate = dayjs(stDate).add(1, durationType).format('YYYY-MM-DD')
-		}
-		return { incomeList, outcomeList, sumList, labelList }
-	})
+	/**
+	 * 파이차트 Options
+	 * @type {import('react-apexcharts').Props}
+	 */
+	const pieChartState = {
+		options: {
+			chart: {
+				width: 380,
+				type: 'pie',
+			},
+			responsive: [
+				{
+					breakpoint: 480,
+					options: {
+						chart: {
+							width: 200,
+						},
+						legend: {
+							position: 'bottom',
+						},
+					},
+				},
+			],
+			tooltip: {
+				y: {
+					formatter: value => setComma(value),
+				},
+			},
+		},
+	}
 
-	/** @type {import('react-apexcharts').Props} */
-	const state = {
+	/**
+	 * 라인/컬럼 복합 차트 Options
+	 * @type {import('react-apexcharts').Props}
+	 */
+	const complexChartState = {
 		series: [
 			{
 				name: '수입',
@@ -308,55 +356,55 @@ function AccountBook() {
 					<Col>
 						<Card className="strpied-tabled-with-hover">
 							<Card.Header>
-								<Card.Title as="h4">Users Behavior</Card.Title>
+								<Card.Title as="h4">종합 내역 그래프</Card.Title>
 							</Card.Header>
 							<Card.Body className="table-full-width table-responsive px-1">
 								<div className="ct-chart" id="chartHours">
 									<Chart
-										options={state.options}
-										series={state.series}
-										type="bar"
+										options={complexChartState.options}
+										series={complexChartState.series}
 										height={280}
 									/>
 								</div>
 							</Card.Body>
-							<Card.Footer>
-								<hr></hr>
-								<div className="stats">
-									<i className="fas fa-history"></i>
-									Updated 3 minutes ago
-								</div>
-							</Card.Footer>
 						</Card>
 					</Col>
 				</Row>
 				<Row>
-					<Col md="4">
+					<Col md="6">
 						<Card>
 							<Card.Header>
-								<Card.Title as="h4">Email Statistics</Card.Title>
-								<p className="card-category">Last Campaign Performance</p>
+								<Card.Title as="h4">수입</Card.Title>
+								<p className="card-category">위의 그래프에 대한 수입 분포도</p>
 							</Card.Header>
 							<Card.Body>
 								<div className="ct-chart ct-perfect-fourth" id="chartPreferences">
-									{/* <Chart
-										data={{
-											labels: ['40%', '20%', '40%'],
-											series: [40, 20, 40],
-										}}
-										type="Pie"
-									/> */}
+									<Chart
+										options={Object.assign(_.cloneDeep(pieChartState.options), {
+											labels: Object.keys(summaryTypeList.income),
+										})}
+										series={Object.values(summaryTypeList.income)}
+										type="pie"
+									></Chart>
 								</div>
-								<div className="legend">
-									<i className="fas fa-circle text-info"></i>
-									Open <i className="fas fa-circle text-danger"></i>
-									Bounce <i className="fas fa-circle text-warning"></i>
-									Unsubscribe
-								</div>
-								<hr></hr>
-								<div className="stats">
-									<i className="far fa-clock"></i>
-									Campaign sent 2 days ago
+							</Card.Body>
+						</Card>
+					</Col>
+					<Col md="6">
+						<Card>
+							<Card.Header>
+								<Card.Title as="h4">지출</Card.Title>
+								<p className="card-category">위의 그래프에 대한 지출 분포도</p>
+							</Card.Header>
+							<Card.Body>
+								<div className="ct-chart ct-perfect-fourth" id="chartPreferences">
+									<Chart
+										options={Object.assign(_.cloneDeep(pieChartState.options), {
+											labels: Object.keys(summaryTypeList.outcome),
+										})}
+										series={Object.values(summaryTypeList.outcome)}
+										type="pie"
+									></Chart>
 								</div>
 							</Card.Body>
 						</Card>

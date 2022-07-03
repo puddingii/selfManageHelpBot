@@ -8,6 +8,33 @@ import _ from 'lodash'
  * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} accountList 가계부 리스트
  * @param {{startDate: string, endDate: string}} dateInfo
  */
+export const calcSummaryType = (accountList, dateInfo) => {
+	const summary = {
+		income: {},
+		outcome: {},
+	}
+	accountList.forEach(accountInfo => {
+		const repeatCnt = accountInfo.isFixed
+			? getRepeatCnt({
+					curDate: accountInfo.date,
+					startDate: dateInfo.startDate,
+					endDate: dateInfo.endDate,
+					duration: accountInfo.fixedDuration,
+			  })
+			: 1
+		const comeType = accountInfo.amount > 0 ? 'income' : 'outcome'
+		summary[comeType][accountInfo.category] = summary[comeType][accountInfo.category]
+			? summary[comeType][accountInfo.category] + repeatCnt * Math.abs(accountInfo.amount)
+			: repeatCnt * Math.abs(accountInfo.amount)
+	})
+	return summary
+}
+
+/**
+ * accountList를 참고하여 summary 반환
+ * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} accountList 가계부 리스트
+ * @param {{startDate: string, endDate: string}} dateInfo
+ */
 export const calcSummary = (accountList, dateInfo) => {
 	const summary = {
 		fixedIncome: 0,
