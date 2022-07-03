@@ -35,7 +35,7 @@ export const join = createAsyncThunk('user/JOIN', async (param, thunkAPI) => {
 	let response = null
 	try {
 		response = await axios.post(
-			`${process.env.REACT_APP_BACKEND_DOMAIN}/user/login`,
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/user/signup`,
 			param,
 		)
 	} catch (e) {

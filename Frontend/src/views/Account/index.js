@@ -4,7 +4,7 @@ import { LoginModal } from './Component'
 import { faDiscord } from '@fortawesome/free-brands-svg-icons'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { Link, useHistory } from 'react-router-dom'
-import { login, loginInit, userIdCheck } from 'store/reducer/user'
+import { login, loginInit, userIdCheck, join } from 'store/reducer/user'
 import { useDispatch } from 'react-redux'
 import Swal from 'sweetalert2'
 import _ from 'lodash'
@@ -41,7 +41,7 @@ export const LoginBox = () => {
 			Swal.close()
 			if (res.status === 200) {
 				localStorage.setItem('userId', res.data.userId)
-				history.push('/selfManageHelpBot/study')
+				history.push('/study')
 			}
 		} catch (e) {
 			Swal.fire({
@@ -100,6 +100,7 @@ export const LoginBox = () => {
 }
 
 export const SignUpBox = () => {
+	const history = useHistory()
 	const dispatch = useDispatch()
 	const {
 		register,
@@ -112,14 +113,49 @@ export const SignUpBox = () => {
 	const [userIdErrMsg, setUserIdErrMsg] = useState(USER_ID_ERROR)
 	const submitData = async data => {
 		try {
-			let res = await dispatch(userIdCheck({ userId: data.userId })).unwrap()
-			if (res.data.code == 1) {
+			let checkRes = await dispatch(userIdCheck({ userId: data.userId })).unwrap()
+			if (checkRes.data.code == 1) {
 				clearErrors()
 			} else {
 				setUserIdErrMsg(USER_ID_DUPLICATED_ERROR)
 				setError('userId', { type: 'duplicated' })
+				return false
 			}
-		} catch (e) {}
+
+			const [joinRes, _] = await Promise.all([
+				dispatch(join(data)).unwrap(),
+				Swal.fire({
+					title: 'Join..',
+					didOpen: () => {
+						Swal.showLoading()
+					},
+					timer: 1000,
+					allowOutsideClick: false,
+				}),
+			])
+
+			Swal.close()
+			if (joinRes.data.code == 1) {
+				await Swal.fire({
+					icon: 'success',
+					title: 'Membership registration was successful.',
+					showConfirmButton: false,
+					allowOutsideClick: false,
+					timer: 1500,
+				})
+
+				history.push('/account/login')
+			} else {
+				throw Error('false')
+			}
+		} catch (e) {
+			console.log(e)
+			Swal.fire({
+				icon: 'error',
+				title: e.message === 'false' ? 'Join is failed.' : 'System error.',
+			})
+			dispatch(loginInit())
+		}
 	}
 	return (
 		<LoginModal.Frame isShow={true}>
