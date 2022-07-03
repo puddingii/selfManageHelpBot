@@ -5,7 +5,7 @@ import _ from 'lodash'
 
 /**
  * accountList를 참고하여 summary 반환
- * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} accountList 가계부 리스트
+ * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} accountList 가계부 리스트
  * @param {{startDate: string, endDate: string}} dateInfo
  */
 export const calcSummary = (accountList, dateInfo) => {

@@ -44,19 +44,24 @@ export const convertDurationToDay = duration => {
  * getRepeatCnt('2022-03-01', '2022-03-11', '1w') // 2
  */
 export const getRepeatCnt = ({ startDate, endDate, curDate, duration }) => {
-	if (dayjs(endDate).diff(curDate) < 0) return 0
-	curDate = dayjs(curDate)
+	const currDate = dayjs(curDate).format('YYYY-MM-DD')
+	if (dayjs(endDate).diff(currDate, 'd') < 0) return 0
 	const convertedDuration = convertDurationToDay(duration)
 	let cnt = 0
 
 	// 매달마다 특정날짜인 경우
 	if (convertedDuration === -1) {
-		let chkDate = dayjs(curDate).set('date', parseInt(duration.slice(0, -2), 10))
+		let chkDate = dayjs(currDate).set('date', parseInt(duration.slice(0, -2), 10))
 		if (chkDate.diff(startDate, 'd') < 0) {
-			chkDate = chkDate.set('M', dayjs(startDate).month())
+			chkDate = chkDate
+				.set('M', dayjs(startDate).month())
+				.set('y', dayjs(startDate).year())
 		}
 
-		while (chkDate.diff(dayjs(endDate), 'd') <= 0) {
+		while (
+			chkDate.diff(dayjs(endDate), 'd') <= 0 &&
+			chkDate.diff(dayjs(startDate), 'd') >= 0
+		) {
 			cnt++
 			chkDate = chkDate.add(1, 'M')
 		}
@@ -64,10 +69,10 @@ export const getRepeatCnt = ({ startDate, endDate, curDate, duration }) => {
 		return cnt
 	}
 
-	let diff = dayjs(startDate).diff(curDate, 'd')
-	if (diff <= 0 && dayjs(endDate).diff(curDate, 'd') >= 0) {
+	let diff = dayjs(startDate).diff(currDate, 'd')
+	if (diff <= 0 && dayjs(endDate).diff(currDate, 'd') >= 0) {
 		cnt = 1
-		startDate = curDate
+		startDate = dayjs(currDate).add(1, 'd')
 	}
 	let diff2 = dayjs(endDate).diff(startDate, 'd') + 1
 
