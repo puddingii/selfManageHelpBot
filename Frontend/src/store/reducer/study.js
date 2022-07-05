@@ -7,26 +7,57 @@ import axios from 'axios'
 const initialState = {
 	week: {},
 	month: {},
+	recentWeek: {},
 }
 
 //@ts-check
 
-/**
- * @param {import('../../interface/store/study').StudyFetchParam} param
- * @returns {import('../../interface/store/study').WeekData}
- */
 const studyTimeByDate = async (param, thunkAPI) => {
-	const res = await axios.post('http://localhost:8080/api/study/time', param, {
-		headers: {
-			'Referrer-Policy': 'no-referrer-when-downgrade',
+	const res = await axios.post(
+		`${process.env.REACT_APP_BACKEND_DOMAIN}/api/study/time`,
+		param,
+		{
+			headers: {
+				'Referrer-Policy': 'no-referrer-when-downgrade',
+			},
 		},
-	})
+	)
 	return res.data
 }
 
 export const fetchStudyWeekTimeByDate = createAsyncThunk(
 	'study/fetchStudyWeekTimeByDate',
-	studyTimeByDate,
+	/**
+	 * @param {import('../../interface/store/study').StudyFetchParam} param
+	 * @returns {import('../../interface/store/study').WeekData}
+	 */
+	async (param, thunkAPI) => {
+		const res = await axios.post(
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/study/time`,
+			param,
+			{
+				headers: {
+					'Referrer-Policy': 'no-referrer-when-downgrade',
+				},
+			},
+		)
+		return res.data
+	},
+)
+
+export const fetchStudyWeekTime = createAsyncThunk(
+	'study/STUDY_WEEK_TIME',
+	/**
+	 * @param {{week:number}} param
+	 * @returns {import('../../interface/store/study').StudyRecentWeekData}
+	 */
+	async (param, thunkAPI) => {
+		const res = await axios.post(
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/study/weeks/${param.week}`,
+			{ userId: 'gun4930' },
+		)
+		return res.data
+	},
 )
 
 export const studySlice = createSlice({
@@ -34,9 +65,13 @@ export const studySlice = createSlice({
 	initialState: initialState,
 	reducers: {},
 	extraReducers: builder => {
-		builder.addCase(fetchStudyWeekTimeByDate.fulfilled, (state, action) => {
-			state.week = action.payload
-		})
+		builder
+			.addCase(fetchStudyWeekTimeByDate.fulfilled, (state, action) => {
+				state.week = action.payload
+			})
+			.addCase(fetchStudyWeekTime.fulfilled, (state, action) => {
+				state.recentWeek = action.payload
+			})
 	},
 })
 

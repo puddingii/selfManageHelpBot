@@ -1,17 +1,18 @@
 import { CardView } from 'components/CardView'
-import React, { Component } from 'react'
+import React, { Component, useEffect, useState } from 'react'
 import { Col, Container, Row, Card, Table } from 'react-bootstrap'
 import ChartistGraph from 'react-chartist'
 import Chart from 'react-apexcharts'
 import { StudyWeekGraph } from '../components/Graph/LineGraph'
-import { fetchStudyWeekTimeByDate } from 'store/reducer/study'
+import { fetchStudyWeekTimeByDate, fetchStudyWeekTime } from 'store/reducer/study'
+import { useDispatch, useSelector } from 'react-redux'
 
 const Study = () => {
 	return (
 		<Container fluid>
 			<Row>
 				<Col>
-					<FrequencyGraph />
+					<FrequencyGraph title={'study time in recent weeks'} />
 				</Col>
 			</Row>
 			<Row>
@@ -24,11 +25,11 @@ const Study = () => {
 					<StudyWeekGraph
 						dateOptions={{ unitType: 'minutes', startDate: '2022-05-01' }}
 						action={fetchStudyWeekTimeByDate}
-						title={`Week's Study`}
+						title={`study time this week`}
 					/>
 				</Col>
 				<Col md="4">
-					<Graph2 />
+					<PieGraph title={'Average study time in last 4 weeks'} />
 				</Col>
 			</Row>
 		</Container>
@@ -162,7 +163,8 @@ const Graph1 = () => {
 	)
 }
 
-const Graph2 = () => {
+const PieGraph = () => {
+	// 일주일 공부 데이터를 월화수목금토일 나눠서 보여줌
 	return (
 		<CardView title="Email Statistics" subTitle="Last Campaign Performance">
 			<div className="ct-chart ct-perfect-fourth" id="chartPreferences">
@@ -189,113 +191,67 @@ const Graph2 = () => {
 	)
 }
 
-const FrequencyGraph = () => {
-	const generateData = () => [
-		{
-			x: 'W1',
-			y: 22,
-		},
-		{
-			x: 'W2',
-			y: 29,
-		},
-		{
-			x: 'W3',
-			y: 13,
-		},
-		{
-			x: 'W4',
-			y: 32,
-		},
-	]
+const FrequencyGraph = props => {
+	const { recentWeek: studyRecentWeek } = useSelector(state => state.study)
+	const [studyWeek, setStudyRecent] = useState(null)
+	const [date, setDate] = useState(null)
+	const dispatch = useDispatch()
+
+	useEffect(async () => {
+		await dispatch(fetchStudyWeekTime({ week: 8 })).unwrap()
+	}, [])
+
 	const options = {
 		chart: {
 			height: 350,
 			type: 'heatmap',
+			toolbar: false,
 		},
 		dataLabels: {
 			enabled: false,
 		},
-		colors: ['#008FFB'],
-		title: {
-			text: 'HeatMap Chart (Single color)',
+		colors: ['#F9C80E'],
+		tooltip: {
+			custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+				return `<div class="arrow_box p-2">
+						<span>
+							${date[seriesIndex][dataPointIndex]} : <b>${series[seriesIndex][dataPointIndex]}</b>
+						</span>
+					</div>`
+			},
 		},
 	}
-	const series = [
-		{
-			name: 'Metric1',
-			data: generateData(18, {
-				min: 0,
-				max: 90,
-			}),
-		},
-		{
-			name: 'Metric2',
-			data: generateData(18, {
-				min: 0,
-				max: 90,
-			}),
-		},
-		{
-			name: 'Metric3',
-			data: generateData(18, {
-				min: 0,
-				max: 90,
-			}),
-		},
-		{
-			name: 'Metric4',
-			data: generateData(18, {
-				min: 0,
-				max: 90,
-			}),
-		},
-		{
-			name: 'Metric5',
-			data: generateData(18, {
-				min: 0,
-				max: 90,
-			}),
-		},
-		{
-			name: 'Metric6',
-			data: generateData(18, {
-				min: 0,
-				max: 90,
-			}),
-		},
-		{
-			name: 'Metric7',
-			data: generateData(18, {
-				min: 0,
-				max: 90,
-			}),
-		},
-		{
-			name: 'Metric8',
-			data: generateData(18, {
-				min: 0,
-				max: 90,
-			}),
-		},
-		{
-			name: 'Metric9',
-			data: generateData(18, {
-				min: 0,
-				max: 90,
-			}),
-		},
-	]
+
+	useEffect(() => {
+		if (!_.isEmpty(studyRecentWeek)) {
+			const { dayLabel } = studyRecentWeek
+
+			setStudyRecent(
+				studyRecentWeek.data.map((week, i) => {
+					return {
+						name: `${i + 1}주 전`,
+						data: Object.keys(week).map((date, i) => ({
+							x: dayLabel[i],
+							y: week[date],
+						})),
+					}
+				}),
+			)
+			setDate(studyRecentWeek.data.map(week => Object.keys(week)).reverse())
+		}
+	}, [studyRecentWeek])
 
 	return (
-		<CardView>
-			<Chart
-				options={{ ...options, ...series }}
-				series={series}
-				type="heatmap"
-				height={350}
-			/>
-		</CardView>
+		studyWeek && (
+			<CardView title={props.title}>
+				<Chart
+					options={{ ...options, ...studyWeek }}
+					series={studyWeek}
+					type="heatmap"
+					height={350}
+				/>
+			</CardView>
+		)
 	)
 }
 
