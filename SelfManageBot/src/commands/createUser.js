@@ -23,6 +23,7 @@ module.exports = {
 			const userId = interaction.options.getString('userid');
 			const passwd = interaction.options.getString('passwd');
 			const nickname = interaction.options.getString('nickname');
+			const discordId = interaction.user.id.toString();
 
 			/** DB Info */
 			const userInfo = await UserModel.findByWeb({ userId, nickname });
@@ -30,7 +31,7 @@ module.exports = {
 
 			/** 유저정보가 없을 때 */
 			if (!userInfo) {
-				await UserModel.create({ userId, passwd, nickname });
+				await UserModel.create({ userId, passwd, nickname, discordId });
 			} else if (userInfo.nickname === nickname) {
 				content = 'Nickname is duplicated';
 			} else if (userInfo.userId === userId) {
