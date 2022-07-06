@@ -6,8 +6,13 @@ import Chart from 'react-apexcharts'
 import { StudyWeekGraph } from '../components/Graph/LineGraph'
 import { fetchStudyWeekTimeByDate, fetchStudyWeekTime } from 'store/reducer/study'
 import { useDispatch, useSelector } from 'react-redux'
+import _, { sum } from 'lodash'
 
 const Study = () => {
+	const dispatch = useDispatch()
+	useEffect(async () => {
+		await dispatch(fetchStudyWeekTime({ week: 8 })).unwrap()
+	}, [])
 	return (
 		<Container fluid>
 			<Row>
@@ -163,31 +168,75 @@ const Graph1 = () => {
 	)
 }
 
-const PieGraph = () => {
+const PieGraph = ({ title }) => {
 	// 일주일 공부 데이터를 월화수목금토일 나눠서 보여줌
+	const { recentWeek: studyRecentWeek } = useSelector(state => state.study)
+	const [studyWeek, setStudyRecent] = useState(null)
+
+	const getAverageData = () => {
+		const data = studyRecentWeek.data.slice(-4)
+		const len = data.length
+		const sumOfDay = data.reduce(
+			(prev, cur) => Object.values(cur).map((time, i) => Number(prev[i]) + Number(time)),
+			[0, 0, 0, 0, 0, 0, 0],
+		)
+		return sumOfDay.map(sum => sum / len)
+	}
+
+	const getStudyRecent = () => {
+		const { dayLabel } = studyRecentWeek
+		const averageTimes = getAverageData()
+		const mondayIndex = dayLabel.findIndex(el => el === '월')
+		return {
+			data: [...averageTimes.slice(mondayIndex), ...averageTimes.slice(0, mondayIndex)],
+			label: [...dayLabel.slice(mondayIndex), ...dayLabel.slice(0, mondayIndex)],
+		}
+	}
+
+	useEffect(() => {
+		if (!_.isEmpty(studyRecentWeek?.data)) {
+			setStudyRecent(getStudyRecent())
+		}
+	}, [studyRecentWeek])
+
+	useEffect(() => {
+		if (!_.isEmpty(studyRecentWeek?.data)) {
+			setStudyRecent(getStudyRecent())
+		}
+	}, [])
+
+	const options = {
+		chart: {
+			width: 380,
+			type: 'pie',
+		},
+		responsive: [
+			{
+				breakpoint: 480,
+				options: {
+					chart: {
+						width: 200,
+					},
+					legend: {
+						position: 'bottom',
+					},
+				},
+			},
+		],
+	}
+
+	console.log(studyWeek)
 	return (
-		<CardView title="Email Statistics" subTitle="Last Campaign Performance">
-			<div className="ct-chart ct-perfect-fourth" id="chartPreferences">
-				<ChartistGraph
-					data={{
-						labels: ['40%', '20%', '40%'],
-						series: [40, 20, 40],
-					}}
-					type="Pie"
+		studyWeek && (
+			<CardView title={title}>
+				<Chart
+					options={{ ...options, labels: studyWeek.label }}
+					series={studyWeek.data}
+					type="pie"
+					height={350}
 				/>
-			</div>
-			<div className="legend">
-				<i className="fas fa-circle text-info"></i>
-				Open <i className="fas fa-circle text-danger"></i>
-				Bounce <i className="fas fa-circle text-warning"></i>
-				Unsubscribe
-			</div>
-			<hr></hr>
-			<div className="stats">
-				<i className="far fa-clock"></i>
-				Campaign sent 2 days ago
-			</div>
-		</CardView>
+			</CardView>
+		)
 	)
 }
 
@@ -197,15 +246,11 @@ const FrequencyGraph = props => {
 	const [date, setDate] = useState(null)
 	const dispatch = useDispatch()
 
-	useEffect(async () => {
-		await dispatch(fetchStudyWeekTime({ week: 8 })).unwrap()
-	}, [])
-
 	const options = {
 		chart: {
 			height: 350,
 			type: 'heatmap',
-			toolbar: false,
+			toolbar: { enabled: false },
 		},
 		dataLabels: {
 			enabled: false,
@@ -244,12 +289,7 @@ const FrequencyGraph = props => {
 	return (
 		studyWeek && (
 			<CardView title={props.title}>
-				<Chart
-					options={{ ...options, ...studyWeek }}
-					series={studyWeek}
-					type="heatmap"
-					height={350}
-				/>
+				<Chart options={{ ...options }} series={studyWeek} type="heatmap" height={350} />
 			</CardView>
 		)
 	)
