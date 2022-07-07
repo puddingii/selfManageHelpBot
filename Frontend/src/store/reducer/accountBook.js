@@ -4,8 +4,14 @@ import { getRepeatCnt } from '../../util/dayUtil'
 import _ from 'lodash'
 
 /**
+ * 가계부 데이터 정보
+ * @typedef {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} AccountDataType
+ * @typedef {import('../../interface/Store').ifStore.AccountBookAjax.CreateNewAccountInfo} CreateNewAccountInfo
+ */
+
+/**
  * accountList를 참고하여 summary 반환
- * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} accountList 가계부 리스트
+ * @param {AccountDataType[]} accountList 가계부 리스트
  * @param {{startDate: string, endDate: string}} dateInfo
  */
 export const calcSummaryType = (accountList, dateInfo) => {
@@ -32,7 +38,7 @@ export const calcSummaryType = (accountList, dateInfo) => {
 
 /**
  * accountList를 참고하여 summary 반환
- * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} accountList 가계부 리스트
+ * @param {AccountDataType[]} accountList 가계부 리스트
  * @param {{startDate: string, endDate: string}} dateInfo
  */
 export const calcSummary = (accountList, dateInfo) => {
@@ -78,7 +84,7 @@ export const getAccountBookList = createAsyncThunk(
 	'accountBook/getAccountBookList',
 	/**
 	 * @param {{userId: string, startDate: string, endDate: string}} params
-	 * @returns {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]}
+	 * @returns {AccountDataType[]}
 	 */
 	async params => {
 		const { data: notFixedList } = await axios({
@@ -104,16 +110,17 @@ export const getAccountBookList = createAsyncThunk(
 export const insertAccountBook = createAsyncThunk(
 	'accountBook/insertAccountBook',
 	/**
-	 * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} data
-	 * @returns {{ msg: string, code: string }}
+	 * @param {CreateNewAccountInfo} data
+	 * @returns {{ msg: string, code: string, accountId: number, accountInfo: CreateNewAccountInfo }}
 	 */
 	async data => {
+		console.log(data)
 		const response = await axios({
 			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
 			method: 'post',
 			data,
 		})
-		return response.data
+		return { ...response.data, accountInfo: data }
 	},
 )
 
@@ -139,8 +146,8 @@ export const deleteAccountBook = createAsyncThunk(
 export const updateAccountBook = createAsyncThunk(
 	'accountBook/updateAccountBook',
 	/**
-	 * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} data
-	 * @returns {{ msg: string, code: string, updatedData: import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo }}
+	 * @param {AccountDataType} data
+	 * @returns {{ msg: string, code: string, updatedData: AccountDataType }}
 	 */
 	async data => {
 		const response = await axios({
@@ -157,7 +164,7 @@ export const accountBookSlice = createSlice({
 	name: 'accountBook',
 	initialState: {
 		value: 0,
-		/** @type {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} 가계부 리스트 */
+		/** @type {AccountDataType[]} 가계부 리스트 */
 		accountList: [],
 		isAjaxSucceed: true,
 		ajaxMsg: '',
@@ -188,9 +195,12 @@ export const accountBookSlice = createSlice({
 		/** insertAccountBook */
 		builder
 			.addCase(insertAccountBook.fulfilled, (state, action) => {
-				const { code, msg } = action.payload
-
-				state.isAjaxSucceed = code !== 1
+				const { code, msg, accountId, accountInfo } = action.payload
+				if (code === 1) {
+					if (accountInfo.userId) delete accountInfo.userId
+					state.accountList.push({ accountId, ...accountInfo })
+				}
+				state.isAjaxSucceed = code === 1
 				state.ajaxMsg = msg
 			})
 			.addCase(insertAccountBook.rejected, (state, action) => {
