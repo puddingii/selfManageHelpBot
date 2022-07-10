@@ -97,7 +97,7 @@ const TableBox = ({ columnId, title, description, columns, tableData, modalProps
 					selectRow={{
 						mode: 'checkbox',
 						onSelect: (row, isSelected, rowIndex) => {
-							console.log(row, isSelected, rowIndex)
+							// console.log(row, isSelected, rowIndex)
 						},
 					}}
 				/>

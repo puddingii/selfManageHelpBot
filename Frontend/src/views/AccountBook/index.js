@@ -15,7 +15,7 @@ import { useDispatch } from 'react-redux'
 
 const CreateAccountButton = styled(Button)`
 	position: fixed;
-	bottom: 30px;
+	bottom: 80px;
 	right: 30px;
 	z-index: 999;
 
@@ -142,7 +142,6 @@ const AccountBook = () => {
 					}
 					setModalShow(false)
 
-					console.log(param)
 					const res = await dispatch(insertAccountBook(param)).unwrap()
 					if (!!res.code)
 						Swal.fire({

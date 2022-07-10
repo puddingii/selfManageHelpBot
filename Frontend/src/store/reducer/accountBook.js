@@ -114,7 +114,6 @@ export const insertAccountBook = createAsyncThunk(
 	 * @returns {{ msg: string, code: string, accountId: number, accountInfo: CreateNewAccountInfo }}
 	 */
 	async data => {
-		console.log(data)
 		const response = await axios({
 			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/account-book`,
 			method: 'post',
@@ -166,7 +165,7 @@ export const accountBookSlice = createSlice({
 		value: 0,
 		/** @type {AccountDataType[]} 가계부 리스트 */
 		accountList: [],
-		isAjaxSucceed: true,
+		isAjaxSucceed: 'fulfilled',
 		ajaxMsg: '',
 	},
 	reducers: {
@@ -177,6 +176,9 @@ export const accountBookSlice = createSlice({
 	extraReducers: builder => {
 		/** getAccountBookList */
 		builder
+			.addCase(getAccountBookList.pending, state => {
+				state.isAjaxSucceed = 'pending'
+			})
 			.addCase(getAccountBookList.fulfilled, (state, action) => {
 				const { payload } = action
 				payload.forEach(account => {
@@ -187,9 +189,10 @@ export const accountBookSlice = createSlice({
 					}
 				})
 				state.accountList = payload
+				state.isAjaxSucceed = 'fulfilled'
 			})
 			.addCase(getAccountBookList.rejected, (state, action) => {
-				state.isAjaxSucceed = false
+				state.isAjaxSucceed = 'reject'
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})
 		/** insertAccountBook */
@@ -204,7 +207,7 @@ export const accountBookSlice = createSlice({
 				state.ajaxMsg = msg
 			})
 			.addCase(insertAccountBook.rejected, (state, action) => {
-				state.isAjaxSucceed = false
+				state.isAjaxSucceed = 'reject'
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})
 		/** deleteAccountBook */
