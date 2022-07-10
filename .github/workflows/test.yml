@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+
+    # 해당 Job의 이름을 아래와 같이 설정하여 Actions 탭에서 확인할 수 있게 설정합니다.
+    name: Deploying
+
+    steps:
+      # 해당 레포지토리로 check-out하는 Action을 불러왔습니다.
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Node 환경을 설정하여 npm 커맨드를 사용할 수 있도록 하는 Action을 불러옵니다.
+      # 여기에서는 14 버전을 사용하고 있습니다
+      - name: Node Setting
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+        
+      - name: Build
+        env:
+          REACT_APP_BACKEND_DOMAIN: ${{ secrets.REACT_APP_BACKEND_DOMAIN }}
+        run: |
+          cd Frontend/
+          npm install
+          npm run-script build
+
+      # React 프로젝트를 빌드합니다.
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: build

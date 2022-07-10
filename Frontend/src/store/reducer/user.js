@@ -1,58 +1,67 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 
-/**
- * 비동기 작업 예제코드
- */
-export const fetchUserById = createAsyncThunk(
-	'user/fetchByIdStatus',
-	async (userId, thunkAPI) => {
-		const response = await axios('https://api.bithumb.com/public/ticker/ALL')
-		return response.data
+export const login = createAsyncThunk('user/login', async (param, thunkAPI) => {
+	let response = null
+	try {
+		response = await axios.post(
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/user/login`,
+			param,
+		)
+	} catch (e) {
+		return Promise.reject(e.response.status)
+	}
+	return response
+})
+
+export const userIdCheck = createAsyncThunk(
+	'user/USER_ID_CHECK',
+	async (param, thunkAPI) => {
+		let response = null
+		try {
+			const url = new URL(`${process.env.REACT_APP_BACKEND_DOMAIN}/user/checkUserId`)
+			for (const [key, value] of Object.entries(param)) {
+				url.searchParams.set(key, value)
+			}
+			response = await axios.get(url.href, param)
+		} catch (e) {
+			return Promise.reject(e.response.status)
+		}
+		return response
 	},
 )
+
+export const join = createAsyncThunk('user/JOIN', async (param, thunkAPI) => {
+	let response = null
+	try {
+		response = await axios.post(
+			`${process.env.REACT_APP_BACKEND_DOMAIN}/user/signup`,
+			param,
+		)
+	} catch (e) {
+		return Promise.reject(e.response.status)
+	}
+	return response
+})
 
 export const userSlice = createSlice({
 	name: 'user',
 	initialState: {
-		value: 0,
-		temp: {},
-		userId: 'gun4930',
-		nickname: '무야호',
+		login: {
+			success: false,
+			msg: '',
+		},
+		join: {},
 	},
 	reducers: {
-		increment: state => {
-			state.value += 1
+		loginInit: state => {
+			state.login = {}
 		},
 	},
 	extraReducers: builder => {
-		builder
-			.addCase(fetchUserById.pending, (state, action) => {
-				console.log('Data pending')
-				state.temp = action.payload
-			})
-			.addCase(fetchUserById.fulfilled, (state, action) => {
-				console.log('Data fulfilled')
-				state.temp = action.payload
-			})
-			.addCase(fetchUserById.rejected, (state, action) => {
-				console.log('Data rejected')
-				state.temp = action.payload
-			})
-		// .addMatcher(
-		// 	action => {
-		// 		console.log(action)
-		// 		return true
-		// 	},
-		// 	(state, action) => {
-		// 		console.log('Matcher')
-		// 	},
-		// )
-		// .addDefaultCase((state, action) => {
-		// 	console.log('DefaultCase')
-		// })
+		builder.addDefaultCase((state, action) => {})
 	},
 })
 
-export const { increment } = userSlice.actions
+export const { loginInit } = userSlice.actions
 export default userSlice.reducer

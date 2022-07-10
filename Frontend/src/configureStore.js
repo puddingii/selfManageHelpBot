@@ -12,6 +12,10 @@ export default function configureAppStore(preloadedState = {}) {
 		},
 		devTools: process.env.NODE_ENV !== 'production',
 		preloadedState,
+		middleware: getDefaultMiddleware =>
+			getDefaultMiddleware({
+				serializableCheck: false,
+			}),
 	})
 
 	return store
