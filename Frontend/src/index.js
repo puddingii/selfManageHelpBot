@@ -17,10 +17,8 @@
 */
 import dotenv from 'dotenv'
 import path from 'path'
-console.log(process.env.REACT_APP_ENV)
 const envPath = process.env.REACT_APP_ENV === 'local' ? '../.env-local' : '../.env'
 dotenv.config({ path: path.resolve(__dirname, envPath) })
-console.log(process.env.REACT_APP_BACKEND_DOMAIN)
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -52,6 +50,7 @@ ReactDOM.render(
 				<Route path="/admin" render={props => <AdminLayout {...props} />} />
 				<NonLoginRequiredRoute path="/account" component={LoginLayout} />
 				<LoginRequiredRoute path="/study" component={Layout} />
+				<LoginRequiredRoute path="/accountBook" component={Layout} />
 			</Switch>
 		</BrowserRouter>
 	</Provider>,

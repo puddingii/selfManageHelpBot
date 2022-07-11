@@ -100,6 +100,13 @@ const smbRoutes = [
 		component: Notifications,
 		layout: '/todo',
 	},
+	{
+		path: '/',
+		name: 'AccountBook',
+		icon: 'nc-icon nc-bell-55',
+		component: AccountBook,
+		layout: '/accountBook',
+	},
 ]
 
 export { smbRoutes }

@@ -12,9 +12,10 @@ import {
 	getAccountBookList,
 } from 'store/reducer/accountBook'
 import { setComma } from 'util/common'
+import { getLoginId } from 'util/authenticate'
 
 function AccountBook() {
-	const userInfo = useSelector(state => state.user)
+	const [userId] = useState(getLoginId())
 	const dispatch = useDispatch()
 	const [durationType, setDurationType] = useState('d')
 	const [isFixedIncome, setIsFixedIncome] = useState(true)
@@ -52,7 +53,7 @@ function AccountBook() {
 	useEffect(() => {
 		dispatch(
 			getAccountBookList({
-				userId: userInfo.userId,
+				userId,
 				startDate,
 				endDate: dayjs().format('YYYY-MM-DD'),
 			}),
