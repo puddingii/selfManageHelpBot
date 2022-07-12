@@ -1,0 +1,7 @@
+.custom-date-picker-wrapper {
+	width: 190px !important;
+}
+
+.react-datepicker__tab-loop {
+	display: inline-block;
+}

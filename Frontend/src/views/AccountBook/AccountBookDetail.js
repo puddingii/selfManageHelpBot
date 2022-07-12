@@ -1,13 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, {
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+	forwardRef,
+} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
 import { ko } from 'date-fns/esm/locale'
-import styled from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
 import _ from 'lodash'
 
 // react-bootstrap components
-import { Row, Col } from 'react-bootstrap'
+import { Row, Col, InputGroup, Form } from 'react-bootstrap'
 import TableBox from 'components/Box/TableBox'
 import {
 	getAccountBookList,
@@ -20,10 +27,34 @@ import 'react-date-range/dist/theme/default.css'
 import 'react-datepicker/dist/react-datepicker.css'
 import { setComma } from 'util/common'
 import { formatDurationType } from 'util/dayUtil'
+import '../../assets/css/custom.css'
 
-// style
-const CustomDatePicker = styled(DatePicker)`
-	width: 190px;
+// const FormControlDatePicker = forwardRef((props, ref) => {
+// 	return <input {...props} className="form-control d-inline" ref={ref} />
+// })
+
+// FormControlDatePicker.displayName = 'FormControlDatePicker'
+
+// // style
+// const CustomDatePicker = styled(DatePicker)`
+// 	width: 190px;
+// `
+
+const CustomDatePickerWrapper = createGlobalStyle`
+	display:inline;
+	width:190px;
+`
+styled.div.attrs({
+	className: 'SignupForm',
+})`
+	.customDatePickerWrapper {
+		display: inline;
+		width: 190px;
+	}
+
+	.button {
+		/* Custom Styles */
+	}
 `
 
 const CenterCol = styled(Col)`
@@ -35,6 +66,8 @@ const CenterCol = styled(Col)`
 function AccountBookDetail() {
 	const [startDate, setStartDate] = useState(dayjs().subtract(7, 'day').toDate())
 	const [endDate, setEndDate] = useState(dayjs().toDate())
+
+	const [pickerRef1, pickerRef2] = [useRef(), useRef()]
 
 	// Redux Init
 	const accountInfo = useSelector(state => state.accountBook)
@@ -180,6 +213,11 @@ function AccountBookDetail() {
 		)
 	}, [startDate, endDate])
 
+	useLayoutEffect(() => {
+		console.log(pickerRef1)
+		console.log(pickerRef2)
+	})
+
 	// Child Component Props Settings
 	const defaultColumns = [
 		{
@@ -232,8 +270,8 @@ function AccountBookDetail() {
 	return (
 		<>
 			<Row>
-				<CenterCol md="3">
-					<CustomDatePicker
+				<CenterCol className="text-center mb-3">
+					<DatePicker
 						dateFormat="yyyy-MM-dd"
 						locale={ko}
 						selected={startDate}
@@ -243,8 +281,15 @@ function AccountBookDetail() {
 							setStartDate(update)
 						}}
 						selectsStart
+						wrapperClassName={'custom-date-picker-wrapper'}
+						className="form-control"
+						popperStrategy="fixed"
+						// customInput={<FormControlDatePicker />}
 					/>
-					<CustomDatePicker
+					<h4 className="d-inline-block my-0 mx-1" style={{ lineHeight: 0 }}>
+						~
+					</h4>
+					<DatePicker
 						dateFormat="yyyy-MM-dd"
 						locale={ko}
 						selected={endDate}
@@ -255,6 +300,8 @@ function AccountBookDetail() {
 							setEndDate(update)
 						}}
 						selectsEnd
+						wrapperClassName={'custom-date-picker-wrapper'}
+						className="form-control"
 					/>
 				</CenterCol>
 			</Row>

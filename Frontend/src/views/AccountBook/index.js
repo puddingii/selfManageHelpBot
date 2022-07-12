@@ -12,6 +12,7 @@ import { CommonModal } from 'components/Modal/Modal'
 import dayjs from 'dayjs'
 import Swal from 'sweetalert2'
 import { useDispatch } from 'react-redux'
+import FloatingButton from 'components/FloatingButton'
 
 const CreateAccountButton = styled(Button)`
 	position: fixed;
@@ -163,9 +164,10 @@ const AccountBook = () => {
 	return (
 		<>
 			<Container fluid>
-				<CreateAccountButton variant="success" onClick={() => setModalShow(true)}>
+				{/* <CreateAccountButton variant="success" onClick={() => setModalShow(true)}>
 					가계부 작성
-				</CreateAccountButton>
+				</CreateAccountButton> */}
+				<FloatingButton />
 				<Tabs
 					defaultActiveKey={tabType}
 					onSelect={type => setTabType(type)}
