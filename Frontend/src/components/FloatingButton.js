@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { Component, useEffect, useRef, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 const ButtonWrapper = styled.div`

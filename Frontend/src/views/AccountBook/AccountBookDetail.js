@@ -1,11 +1,4 @@
-import React, {
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-	useState,
-	forwardRef,
-} from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
@@ -14,7 +7,7 @@ import styled, { createGlobalStyle } from 'styled-components'
 import _ from 'lodash'
 
 // react-bootstrap components
-import { Row, Col, InputGroup, Form } from 'react-bootstrap'
+import { Row, Col } from 'react-bootstrap'
 import TableBox from 'components/Box/TableBox'
 import {
 	getAccountBookList,
@@ -30,46 +23,11 @@ import { formatDurationType } from 'util/dayUtil'
 import '../../assets/css/custom.css'
 import { getLoginId } from 'util/authenticate'
 
-// const FormControlDatePicker = forwardRef((props, ref) => {
-// 	return <input {...props} className="form-control d-inline" ref={ref} />
-// })
-
-// FormControlDatePicker.displayName = 'FormControlDatePicker'
-
-// // style
-// const CustomDatePicker = styled(DatePicker)`
-// 	width: 190px;
-// `
-
-const CustomDatePickerWrapper = createGlobalStyle`
-	display:inline;
-	width:190px;
-`
-styled.div.attrs({
-	className: 'SignupForm',
-})`
-	.customDatePickerWrapper {
-		display: inline;
-		width: 190px;
-	}
-
-	.button {
-		/* Custom Styles */
-	}
-`
-
-const CenterCol = styled(Col)`
-	float: none;
-	margin: 0 auto;
-`
-
 // component
 function AccountBookDetail() {
 	const [startDate, setStartDate] = useState(dayjs().subtract(7, 'day').toDate())
 	const [endDate, setEndDate] = useState(dayjs().toDate())
 	const [userId] = useState(getLoginId())
-
-	const [pickerRef1, pickerRef2] = [useRef(), useRef()]
 
 	// Redux Init
 	const accountInfo = useSelector(state => state.accountBook)
@@ -214,11 +172,6 @@ function AccountBookDetail() {
 		)
 	}, [startDate, endDate])
 
-	useLayoutEffect(() => {
-		console.log(pickerRef1)
-		console.log(pickerRef2)
-	})
-
 	// Child Component Props Settings
 	const defaultColumns = [
 		{
@@ -271,7 +224,7 @@ function AccountBookDetail() {
 	return (
 		<>
 			<Row>
-				<CenterCol className="text-center mb-3">
+				<Col className="text-center mb-3">
 					<DatePicker
 						dateFormat="yyyy-MM-dd"
 						locale={ko}
@@ -284,8 +237,6 @@ function AccountBookDetail() {
 						selectsStart
 						wrapperClassName={'custom-date-picker-wrapper'}
 						className="form-control"
-						popperStrategy="fixed"
-						// customInput={<FormControlDatePicker />}
 					/>
 					<h4 className="d-inline-block my-0 mx-1" style={{ lineHeight: 0 }}>
 						~
@@ -304,7 +255,7 @@ function AccountBookDetail() {
 						wrapperClassName={'custom-date-picker-wrapper'}
 						className="form-control"
 					/>
-				</CenterCol>
+				</Col>
 			</Row>
 			<Row>
 				<Col>
