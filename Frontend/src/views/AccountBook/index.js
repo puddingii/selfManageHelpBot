@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 
 // react-bootstrap components
-import { Button, Dropdown, Nav, Container, Tabs, Tab } from 'react-bootstrap'
+import { Button, Container, Tabs, Tab } from 'react-bootstrap'
 import { insertAccountBook } from 'store/reducer/accountBook'
 
 import Summary from 'views/AccountBook/AccountBookSummary'
@@ -13,6 +13,7 @@ import dayjs from 'dayjs'
 import Swal from 'sweetalert2'
 import { useDispatch } from 'react-redux'
 import FloatingButton from 'components/FloatingButton'
+import { getLoginId } from 'util/authenticate'
 
 const CreateAccountButton = styled(Button)`
 	position: fixed;
@@ -30,6 +31,7 @@ const AccountBook = () => {
 	const dispatch = useDispatch()
 	const [tabType, setTabType] = useState('summary')
 	const [isModalShow, setModalShow] = useState(false)
+	const [userId] = useState(getLoginId())
 	const getDynamicComponent = tab => {
 		if (tab === tabType) {
 			switch (tabType) {
@@ -125,7 +127,7 @@ const AccountBook = () => {
 					const { amount, category, content, isFixed, durationCnt, durationType, date } =
 						data
 					const param = {
-						userId: 'gun4930',
+						userId,
 						amount: parseInt(amount, 10),
 						category,
 						content,

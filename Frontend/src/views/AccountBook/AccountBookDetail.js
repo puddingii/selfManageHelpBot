@@ -28,6 +28,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { setComma } from 'util/common'
 import { formatDurationType } from 'util/dayUtil'
 import '../../assets/css/custom.css'
+import { getLoginId } from 'util/authenticate'
 
 // const FormControlDatePicker = forwardRef((props, ref) => {
 // 	return <input {...props} className="form-control d-inline" ref={ref} />
@@ -66,6 +67,7 @@ const CenterCol = styled(Col)`
 function AccountBookDetail() {
 	const [startDate, setStartDate] = useState(dayjs().subtract(7, 'day').toDate())
 	const [endDate, setEndDate] = useState(dayjs().toDate())
+	const [userId] = useState(getLoginId())
 
 	const [pickerRef1, pickerRef2] = [useRef(), useRef()]
 
@@ -92,7 +94,6 @@ function AccountBookDetail() {
 			{ fixedList: [], notFixedList: [] },
 		)
 	})
-	const userInfo = useSelector(state => state.user)
 	const dispatch = useDispatch()
 
 	// Modal Props
@@ -134,7 +135,7 @@ function AccountBookDetail() {
 					text: '삭제',
 					handleClick: async (event, formData) => {
 						const res = await dispatch(
-							deleteAccountBook({ userId: 'gun4930', accountId: formData.accountId }),
+							deleteAccountBook({ userId, accountId: formData.accountId }),
 						).unwrap()
 						return !!res.code
 					},
@@ -145,7 +146,7 @@ function AccountBookDetail() {
 				text: '수정',
 				callback: async data => {
 					const param = {
-						userId: 'gun4930',
+						userId,
 						...data,
 					}
 					if (data.durationType) {
@@ -206,7 +207,7 @@ function AccountBookDetail() {
 	useEffect(() => {
 		dispatch(
 			getAccountBookList({
-				userId: userInfo.userId,
+				userId,
 				startDate: dayjs(startDate).format('YYYY-MM-DD'),
 				endDate: dayjs(endDate).format('YYYY-MM-DD'),
 			}),

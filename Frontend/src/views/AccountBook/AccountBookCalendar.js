@@ -10,6 +10,7 @@ import styled from 'styled-components'
 
 import { calcSummary, getAccountBookList } from 'store/reducer/accountBook'
 import { setComma } from 'util/common'
+import { getLoginId } from 'util/authenticate'
 
 const TitleDiv = styled.div`
 	display: flex;
@@ -21,14 +22,14 @@ const CustomSpinner = styled(Spinner)`
 
 const AccountBookCalendar = () => {
 	dayjs.locale('ko')
+	const [userId] = useState(getLoginId())
 	const [startDate, setStartDate] = useState(dayjs().startOf('month'))
-	const userInfo = useSelector(state => state.user)
 	const isAjaxSucceed = useSelector(state => state.accountBook.isAjaxSucceed)
 	const dispatch = useDispatch()
 	useEffect(() => {
 		dispatch(
 			getAccountBookList({
-				userId: userInfo.userId,
+				userId,
 				startDate: startDate.format('YYYY-MM-DD'),
 				endDate: startDate.endOf('month').format('YYYY-MM-DD'),
 			}),
