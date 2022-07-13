@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 // react-bootstrap components
-import { Button, Col, Dropdown, Form, Modal, Row, Card, Nav } from 'react-bootstrap'
+import { Dropdown, Card, Nav, Spinner } from 'react-bootstrap'
 import BSTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import Swal from 'sweetalert2'
@@ -66,7 +66,15 @@ const paginationOption = {
 }
 
 /** @param {import('../../interface/Component').ComponentOptions.TableBox} */
-const TableBox = ({ columnId, title, description, columns, tableData, modalProps }) => {
+const TableBox = ({
+	columnId,
+	title,
+	description,
+	columns,
+	tableData,
+	modalProps,
+	isAjaxSucceed,
+}) => {
 	const [isModalShow, setModalShow] = useState(false)
 	const [currentRow, setCurrentRow] = useState({})
 
@@ -82,7 +90,12 @@ const TableBox = ({ columnId, title, description, columns, tableData, modalProps
 	return (
 		<Card className="strpied-tabled-with-hover">
 			<Card.Header>
-				<Card.Title as="h4">{title}</Card.Title>
+				<Card.Title as="h4">
+					{title}
+					{isAjaxSucceed === 'pending' ? (
+						<Spinner animation="border" variant="secondary" />
+					) : null}
+				</Card.Title>
 				<p className="card-category">{description}</p>
 			</Card.Header>
 			<Card.Body className="table-full-width table-responsive px-0">
@@ -120,6 +133,7 @@ TableBox.propTypes = {
 	description: PropTypes.string,
 	columns: PropTypes.array.isRequired,
 	tableData: PropTypes.array.isRequired,
+	isAjaxSucceed: PropTypes.string,
 }
 
 export default React.memo(TableBox)
