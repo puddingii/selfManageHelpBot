@@ -36,12 +36,6 @@ const InnerButton = styled.button`
 
 const ButtonMark = styled.span`
 	transition: all 0.4s ease;
-
-	${props =>
-		props.toggle &&
-		css`
-			transform: rotate(225deg);
-		`}
 	${props =>
 		props.toggle &&
 		css`
