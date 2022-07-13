@@ -48,18 +48,10 @@ const ButtonMark = styled.span`
 			transform: rotate(135deg);
 		`}
 `
-const Toggle = styled.input`
-	display: 'none';
-`
 
-const FloatingButton = () => {
+const FloatingButton = ({ onCallback = () => {}, offCallback = () => {}, refState }) => {
 	const [toggled, setToggled] = useState(false)
 	const wrapperRef = useRef()
-
-	// 디버깅용
-	useEffect(() => {
-		console.log(toggled)
-	}, [toggled])
 
 	useEffect(() => {
 		const scrollWidth =
@@ -68,6 +60,20 @@ const FloatingButton = () => {
 		wrapperRef.current.style.bottom = '30px'
 		wrapperRef.current.style.right = `${30 + scrollWidth}px`
 	}, [])
+
+	useEffect(() => {
+		if (toggled) {
+			onCallback()
+		} else {
+			offCallback()
+		}
+	}, [toggled])
+
+	useEffect(() => {
+		if (refState !== undefined) {
+			setToggled(refState)
+		}
+	}, [refState])
 
 	return (
 		<ButtonWrapper ref={wrapperRef}>

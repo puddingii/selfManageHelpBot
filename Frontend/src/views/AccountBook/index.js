@@ -169,7 +169,15 @@ const AccountBook = () => {
 				{/* <CreateAccountButton variant="success" onClick={() => setModalShow(true)}>
 					가계부 작성
 				</CreateAccountButton> */}
-				<FloatingButton />
+				<FloatingButton
+					onCallback={() => {
+						setModalShow(true)
+					}}
+					offCallback={() => {
+						setModalShow(false)
+					}}
+					refState={isModalShow}
+				/>
 				<Tabs
 					defaultActiveKey={tabType}
 					onSelect={type => setTabType(type)}
