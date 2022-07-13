@@ -33,6 +33,7 @@ import './assets/css/demo.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css'
+import './assets/css/custom.css'
 
 import AdminLayout from 'layouts/Admin.js'
 import Layout from 'layouts/Layout'

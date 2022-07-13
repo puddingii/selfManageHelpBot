@@ -20,7 +20,6 @@ import 'react-date-range/dist/theme/default.css'
 import 'react-datepicker/dist/react-datepicker.css'
 import { setComma } from 'util/common'
 import { formatDurationType } from 'util/dayUtil'
-import '../../assets/css/custom.css'
 import { getLoginId } from 'util/authenticate'
 
 // component
