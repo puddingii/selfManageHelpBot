@@ -148,7 +148,6 @@ const AccountBook = () => {
 					const res = await dispatch(insertAccountBook(param)).unwrap()
 					if (!!res.code)
 						Swal.fire({
-							position: 'top-end',
 							icon: 'success',
 							title: '가계부 기록완료!',
 							showConfirmButton: false,
