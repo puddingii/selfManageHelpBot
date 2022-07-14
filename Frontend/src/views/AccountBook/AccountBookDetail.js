@@ -27,9 +27,8 @@ function AccountBookDetail() {
 	const [startDate, setStartDate] = useState(dayjs().subtract(7, 'day').toDate())
 	const [endDate, setEndDate] = useState(dayjs().toDate())
 	const [userId] = useState(getLoginId())
+	const isAjaxSucceed = useSelector(state => state.accountBook.isAjaxSucceed)
 
-	// Redux Init
-	const accountInfo = useSelector(state => state.accountBook)
 	// computed 속성
 	const { fixedList, notFixedList } = useSelector(state => {
 		const list = _.cloneDeep(state.accountBook.accountList)
@@ -265,6 +264,7 @@ function AccountBookDetail() {
 						tableData={notFixedList}
 						columns={notFixedColumns}
 						modalProps={notFixedModalProps}
+						isAjaxSucceed={isAjaxSucceed}
 					></TableBox>
 				</Col>
 			</Row>
