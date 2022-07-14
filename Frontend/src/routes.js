@@ -24,6 +24,7 @@ import Notifications from 'views/Notifications.js'
 import Upgrade from 'views/Upgrade.js'
 import { Study } from 'views/Study'
 import AccountBook from 'views/AccountBook/index.js'
+import Todo from 'views/Todo/index.js'
 
 const dashboardRoutes = [
 	{
@@ -97,7 +98,7 @@ const smbRoutes = [
 		path: '/',
 		name: 'Todo',
 		icon: 'nc-icon nc-bell-55',
-		component: Notifications,
+		component: Todo,
 		layout: '/todo',
 	},
 	{

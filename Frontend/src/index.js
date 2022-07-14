@@ -51,6 +51,7 @@ ReactDOM.render(
 				<Route path="/admin" render={props => <AdminLayout {...props} />} />
 				<NonLoginRequiredRoute path="/account" component={LoginLayout} />
 				<LoginRequiredRoute path="/study" component={Layout} />
+				<LoginRequiredRoute path="/todo" component={Layout} />
 				<LoginRequiredRoute path="/accountBook" component={Layout} />
 			</Switch>
 		</BrowserRouter>

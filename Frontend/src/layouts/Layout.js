@@ -37,6 +37,7 @@ function Admin() {
 		return routes.map((prop, key) => {
 			switch (prop.layout) {
 				case '/accountBook':
+				case '/todo':
 				case '/study': {
 					return (
 						<Route
