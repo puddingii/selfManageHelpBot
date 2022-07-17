@@ -1,26 +1,44 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 // react-bootstrap components
-import {
-	Button,
-	Card,
-	Container,
-	Form,
-	InputGroup,
-	Row,
-	Col,
-	FormCheck,
-} from 'react-bootstrap'
+import { Button, Card, Container, Form, InputGroup, Row, Col } from 'react-bootstrap'
+import { useSelector, useDispatch } from 'react-redux'
+import { getTodoList } from 'store/reducer/todo'
+import { getLoginId } from 'util/authenticate'
 
 const CustomCard = styled(Card)`
 	margin-bottom: 10px;
 `
 
+const TodoControlBtn = styled('i')`
+	cursor: pointer;
+`
+
 const Todo = () => {
 	const [list, setList] = useState([])
+	const [userId] = useState(getLoginId())
 	const [completeList, setCompleteList] = useState([])
 	const inputRef = useRef()
+	const dispatch = useDispatch()
+
+	useEffect(() => {
+		// dispatch(getTodoList({ userId }))
+	}, [])
+	/** 이번달 요약본 */
+	const { doingList, completedList } = useSelector(state => {
+		return state.todo.todoList.reduce(
+			(acc, cur) => {
+				if (cur.isCompleted) {
+					acc.compList.push(cur)
+				} else {
+					acc.doingList.push(cur)
+				}
+				return acc
+			},
+			{ doingList: [], compList: [] },
+		)
+	})
 
 	const swapTodo = (type, idx) => {
 		if (type === 'complete') {
@@ -43,8 +61,7 @@ const Todo = () => {
 							<Form.Control
 								ref={inputRef}
 								onKeyDown={e => {
-									console.log(e)
-									if (e.key === 'Enter') {
+									if (e.key === 'Enter' && inputRef.current.value) {
 										setList([...list, inputRef.current.value])
 										inputRef.current.value = ''
 									}
@@ -55,6 +72,7 @@ const Todo = () => {
 							/>
 							<Button
 								onClick={() => {
+									if (!inputRef.current.value) return
 									setList([...list, inputRef.current.value])
 									inputRef.current.value = ''
 								}}
@@ -72,20 +90,22 @@ const Todo = () => {
 						{list.map((text, idx) => (
 							<CustomCard key={idx}>
 								<Card.Body>
-									<Form.Check.Input
-										onChange={e => {
-											e.preventDefault()
-											swapTodo('', idx)
-										}}
-									></Form.Check.Input>
-									{text}&nbsp;
-									<i
-										onClick={() => {
-											list.splice(idx, 1)
-											setList([...list])
-										}}
-										className="fas fa-trash fa-xs"
-									></i>
+									<div className="row justify-content-between">
+										<div className="col-10">{text}</div>
+										<div style={{ paddingRight: '0px' }} className="col-2">
+											<TodoControlBtn
+												className="fas fa-check"
+												onClick={() => swapTodo('', idx)}
+											></TodoControlBtn>
+											<TodoControlBtn
+												className="fas fa-times"
+												onClick={() => {
+													list.splice(idx, 1)
+													setList([...list])
+												}}
+											></TodoControlBtn>
+										</div>
+									</div>
 								</Card.Body>
 							</CustomCard>
 						))}
@@ -93,23 +113,24 @@ const Todo = () => {
 					<Col md="6">
 						<h3>완료</h3>
 						{completeList.map((text, idx) => (
-							<CustomCard key={idx} border="info" backgroundcolor="grey">
+							<CustomCard key={idx} border="info">
 								<Card.Body>
-									<Form.Check.Input
-										defaultChecked={true}
-										onClick={e => {
-											e.preventDefault()
-											swapTodo('complete', idx)
-										}}
-									></Form.Check.Input>
-									{text}&nbsp;
-									<i
-										onClick={() => {
-											completeList.splice(idx, 1)
-											setList([...completeList])
-										}}
-										className="fas fa-trash fa-xs"
-									></i>
+									<div className="row justify-content-between">
+										<div className="col-10">{text}</div>
+										<div style={{ paddingRight: '0px' }} className="col-2">
+											<TodoControlBtn
+												className="fas fa-minus"
+												onClick={() => swapTodo('complete', idx)}
+											></TodoControlBtn>
+											<TodoControlBtn
+												className="fas fa-times"
+												onClick={() => {
+													completeList.splice(idx, 1)
+													setCompleteList([...completeList])
+												}}
+											></TodoControlBtn>
+										</div>
+									</div>
 								</Card.Body>
 							</CustomCard>
 						))}
