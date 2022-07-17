@@ -8,7 +8,11 @@ const Todo = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	date: {
+	insDate: {
+		type: Date,
+		default: () => dayjs().subtract(9, 'hour').toDate(),
+	},
+	updDate: {
 		type: Date,
 		default: () => dayjs().subtract(9, 'hour').toDate(),
 	},
@@ -65,6 +69,7 @@ Todo.statics.updateComplete = async function (userInfo, todoId) {
 	}
 	todo.isCompleted = true;
 	todo.proceed = 100;
+	todo.updDate = dayjs().subtract(9, 'hour').toDate();
 
 	await todo.save();
 
