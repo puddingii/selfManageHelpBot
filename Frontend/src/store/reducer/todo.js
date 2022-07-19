@@ -6,7 +6,7 @@ import _ from 'lodash'
 export const getTodoList = createAsyncThunk(
 	'todo/getTodoList',
 	/**
-	 * @param {userId: string} params
+	 * @param {{userId: string}} params
 	 */
 	async params => {
 		const response = await axios({
@@ -15,7 +15,7 @@ export const getTodoList = createAsyncThunk(
 			params,
 		})
 
-		return response
+		return response.data
 	},
 )
 
@@ -23,7 +23,7 @@ export const getTodoList = createAsyncThunk(
 export const insertTodo = createAsyncThunk(
 	'todo/insertTodo',
 	/**
-	 * @param {{title: string, content: string, userId: string}} data
+	 * @param {{content: string, userId: string}} data
 	 */
 	async data => {
 		const response = await axios({
@@ -31,7 +31,7 @@ export const insertTodo = createAsyncThunk(
 			method: 'post',
 			data,
 		})
-		return response
+		return response.data
 	},
 )
 
@@ -39,16 +39,16 @@ export const insertTodo = createAsyncThunk(
 export const deleteTodo = createAsyncThunk(
 	'todo/deleteTodo',
 	/**
-	 * @param {{ userId: string, todoId: string }} data
+	 * @param {{ userId: string, todoId: string }} params
 	 */
-	async data => {
+	async params => {
 		const response = await axios({
 			url: `${process.env.REACT_APP_BACKEND_DOMAIN}/todo`,
 			method: 'delete',
-			data,
+			params,
 		})
 
-		return response
+		return { ...response.data, todoId: params.todoId }
 	},
 )
 
@@ -65,7 +65,7 @@ export const updateTodo = createAsyncThunk(
 			params,
 		})
 
-		return response
+		return { ...response.data, todoId: params.todoId }
 	},
 )
 
@@ -95,13 +95,13 @@ export const todoSlice = createSlice({
 		/** insertTodo */
 		builder
 			.addCase(insertTodo.fulfilled, (state, action) => {
-				const { code, msg, todoId, todoInfo } = action.payload
-				if (code === 1) {
-					if (todoInfo.userId) delete todoInfo.userId
-					state.todoList.push({ todoId, ...todoInfo })
+				const {
+					payload: { todoId },
+				} = action
+				if (todoId) {
+					state.todoList.push(action.payload)
 				}
-				state.isAjaxSucceed = code === 1
-				state.ajaxMsg = msg
+				state.isAjaxSucceed = !!todoId
 			})
 			.addCase(insertTodo.rejected, (state, action) => {
 				state.isAjaxSucceed = 'reject'
@@ -128,14 +128,12 @@ export const todoSlice = createSlice({
 		/** updateTodo */
 		builder
 			.addCase(updateTodo.fulfilled, (state, action) => {
-				const { code, msg, updatedData } = action.payload
+				const { code, msg, todoId } = action.payload
 
 				if (code === 1) {
-					const todoIdx = state.todoList.findIndex(
-						todo => updatedData.todoId === todo.todoId,
-					)
+					const todoIdx = state.todoList.findIndex(todo => todoId === todo.todoId)
 					if (todoIdx !== -1) {
-						state.todoList[todoIdx] = updatedData
+						state.todoList[todoIdx].isCompleted = !state.todoList[todoIdx].isCompleted
 					}
 				}
 

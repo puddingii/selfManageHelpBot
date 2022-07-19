@@ -4,7 +4,7 @@ import styled from 'styled-components'
 // react-bootstrap components
 import { Button, Card, Container, Form, InputGroup, Row, Col } from 'react-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
-import { getTodoList } from 'store/reducer/todo'
+import { deleteTodo, getTodoList, insertTodo, updateTodo } from 'store/reducer/todo'
 import { getLoginId } from 'util/authenticate'
 
 const CustomCard = styled(Card)`
@@ -23,20 +23,20 @@ const Todo = () => {
 	const dispatch = useDispatch()
 
 	useEffect(() => {
-		// dispatch(getTodoList({ userId }))
+		dispatch(getTodoList({ userId }))
 	}, [])
 	/** 이번달 요약본 */
 	const { doingList, completedList } = useSelector(state => {
 		return state.todo.todoList.reduce(
 			(acc, cur) => {
 				if (cur.isCompleted) {
-					acc.compList.push(cur)
+					acc.completedList.push(cur)
 				} else {
 					acc.doingList.push(cur)
 				}
 				return acc
 			},
-			{ doingList: [], compList: [] },
+			{ doingList: [], completedList: [] },
 		)
 	})
 
@@ -73,8 +73,7 @@ const Todo = () => {
 							<Button
 								onClick={() => {
 									if (!inputRef.current.value) return
-									setList([...list, inputRef.current.value])
-									inputRef.current.value = ''
+									dispatch(insertTodo({ userId, content: inputRef.current.value }))
 								}}
 								variant="outline-secondary"
 								id="button-addon2"
@@ -87,22 +86,23 @@ const Todo = () => {
 				<Row>
 					<Col md="6">
 						<h3>해야하는 일</h3>
-						{list.map((text, idx) => (
+						{doingList.map((todo, idx) => (
 							<CustomCard key={idx}>
 								<Card.Body>
 									<div className="row justify-content-between">
-										<div className="col-10">{text}</div>
+										<div className="col-10">{todo.content}</div>
 										<div style={{ paddingRight: '0px' }} className="col-2">
 											<TodoControlBtn
 												className="fas fa-check"
-												onClick={() => swapTodo('', idx)}
+												onClick={() =>
+													dispatch(updateTodo({ userId, todoId: todo.todoId }))
+												}
 											></TodoControlBtn>
 											<TodoControlBtn
 												className="fas fa-times"
-												onClick={() => {
-													list.splice(idx, 1)
-													setList([...list])
-												}}
+												onClick={() =>
+													dispatch(deleteTodo({ userId, todoId: todo.todoId }))
+												}
 											></TodoControlBtn>
 										</div>
 									</div>
@@ -112,22 +112,23 @@ const Todo = () => {
 					</Col>
 					<Col md="6">
 						<h3>완료</h3>
-						{completeList.map((text, idx) => (
+						{completedList.map((todo, idx) => (
 							<CustomCard key={idx} border="info">
 								<Card.Body>
 									<div className="row justify-content-between">
-										<div className="col-10">{text}</div>
+										<div className="col-10">{todo.content}</div>
 										<div style={{ paddingRight: '0px' }} className="col-2">
 											<TodoControlBtn
 												className="fas fa-minus"
-												onClick={() => swapTodo('complete', idx)}
+												onClick={() =>
+													dispatch(updateTodo({ userId, todoId: todo.todoId }))
+												}
 											></TodoControlBtn>
 											<TodoControlBtn
 												className="fas fa-times"
-												onClick={() => {
-													completeList.splice(idx, 1)
-													setCompleteList([...completeList])
-												}}
+												onClick={() =>
+													dispatch(deleteTodo({ userId, todoId: todo.todoId }))
+												}
 											></TodoControlBtn>
 										</div>
 									</div>
