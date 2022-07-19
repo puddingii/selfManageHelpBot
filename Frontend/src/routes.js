@@ -96,14 +96,14 @@ const smbRoutes = [
 	},
 	{
 		path: '/',
-		name: 'Todo',
+		name: '할 일',
 		icon: 'nc-icon nc-notes',
 		component: Todo,
 		layout: '/todo',
 	},
 	{
 		path: '/',
-		name: 'AccountBook',
+		name: '가계부',
 		icon: 'nc-icon nc-money-coins',
 		component: AccountBook,
 		layout: '/accountBook',

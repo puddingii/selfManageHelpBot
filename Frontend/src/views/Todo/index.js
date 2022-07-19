@@ -16,10 +16,9 @@ const TodoControlBtn = styled('i')`
 `
 
 const Todo = () => {
-	const [list, setList] = useState([])
 	const [userId] = useState(getLoginId())
-	const [completeList, setCompleteList] = useState([])
 	const inputRef = useRef()
+	const [isInvalid, setIsInvalid] = useState(false)
 	const dispatch = useDispatch()
 
 	useEffect(() => {
@@ -39,17 +38,14 @@ const Todo = () => {
 			{ doingList: [], completedList: [] },
 		)
 	})
-
-	const swapTodo = (type, idx) => {
-		if (type === 'complete') {
-			const text = completeList.splice(idx, 1)
-			setCompleteList([...completeList])
-			setList([...list, text])
-		} else {
-			const text = list.splice(idx, 1)
-			setList([...list])
-			setCompleteList([...completeList, text])
+	const onSubmitTodo = () => {
+		if (!inputRef.current.value || inputRef.current.value.length < 5) {
+			setIsInvalid(true)
+			return
 		}
+		dispatch(insertTodo({ userId, content: inputRef.current.value }))
+		inputRef.current.value = ''
+		setIsInvalid(false)
 	}
 
 	return (
@@ -57,29 +53,29 @@ const Todo = () => {
 			<Container fluid>
 				<Row>
 					<Col>
-						<InputGroup size="lg" className="mb-3">
+						<InputGroup hasValidation size="lg" className="mb-3">
 							<Form.Control
 								ref={inputRef}
-								onKeyDown={e => {
-									if (e.key === 'Enter' && inputRef.current.value) {
-										setList([...list, inputRef.current.value])
-										inputRef.current.value = ''
+								isInvalid={isInvalid}
+								onKeyPress={e => {
+									if (e.key === 'Enter') {
+										onSubmitTodo()
 									}
 								}}
-								placeholder="Todo List"
+								placeholder="Todo"
 								aria-label="Todo List"
 								aria-describedby="basic-addon2"
 							/>
 							<Button
-								onClick={() => {
-									if (!inputRef.current.value) return
-									dispatch(insertTodo({ userId, content: inputRef.current.value }))
-								}}
+								onClick={() => onSubmitTodo()}
 								variant="outline-secondary"
 								id="button-addon2"
 							>
 								추가하기!
 							</Button>
+							<Form.Control.Feedback type="invalid">
+								5글자 이상 입력해주세요!
+							</Form.Control.Feedback>
 						</InputGroup>
 					</Col>
 				</Row>
