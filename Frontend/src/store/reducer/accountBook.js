@@ -203,7 +203,7 @@ export const accountBookSlice = createSlice({
 					if (accountInfo.userId) delete accountInfo.userId
 					state.accountList.push({ accountId, ...accountInfo })
 				}
-				state.isAjaxSucceed = code === 1
+				state.isAjaxSucceed = 'fulfilled'
 				state.ajaxMsg = msg
 			})
 			.addCase(insertAccountBook.rejected, (state, action) => {
@@ -221,11 +221,11 @@ export const accountBookSlice = createSlice({
 					})
 				}
 
-				state.isAjaxSucceed = code !== 1
+				state.isAjaxSucceed = 'fulfilled'
 				state.ajaxMsg = msg
 			})
 			.addCase(deleteAccountBook.rejected, (state, action) => {
-				state.isAjaxSucceed = false
+				state.isAjaxSucceed = 'reject'
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})
 		/** updateAccountBook */
@@ -242,15 +242,15 @@ export const accountBookSlice = createSlice({
 					}
 				}
 
-				state.isAjaxSucceed = code !== 1
+				state.isAjaxSucceed = 'fulfilled'
 				state.ajaxMsg = msg
 			})
 			.addCase(updateAccountBook.rejected, (state, action) => {
-				state.isAjaxSucceed = false
+				state.isAjaxSucceed = 'reject'
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})
 			.addDefaultCase((state, action) => {
-				state.isAjaxSucceed = true
+				state.isAjaxSucceed = 'pending'
 			})
 	},
 })
