@@ -2,7 +2,16 @@ import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 // react-bootstrap components
-import { Button, Card, Container, Form, InputGroup, Row, Col } from 'react-bootstrap'
+import {
+	Button,
+	Card,
+	Container,
+	Form,
+	InputGroup,
+	Row,
+	Col,
+	Pagination,
+} from 'react-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
 import { deleteTodo, getTodoList, insertTodo, updateTodo } from 'store/reducer/todo'
 import { getLoginId } from 'util/authenticate'
@@ -15,10 +24,44 @@ const TodoControlBtn = styled('i')`
 	cursor: pointer;
 `
 
+const CustomPagination = (list, page, setPage) => {
+	let pageLength =
+		Math.floor((list.length - Math.floor((page - 1) / 5) * 50 - 1) / 10) + 1
+	pageLength = pageLength > 5 ? 5 : pageLength
+	return (
+		<Pagination>
+			<Pagination.Prev
+				disabled={(page - 1) / 5 < 1}
+				onClick={() => {
+					setPage((Math.floor((page - 1) / 5) - 1) * 5 + 1)
+				}}
+			/>
+			{Array.from({ length: pageLength }, (v, idx) => {
+				return Math.floor((page - 1) / 5) * 5 + idx + 1
+			}).map(num => {
+				return (
+					<Pagination.Item key={num} active={num === page} onClick={() => setPage(num)}>
+						{num}
+					</Pagination.Item>
+				)
+			})}
+			<Pagination.Next
+				disabled={(Math.floor((page - 1) / 5) + 1) * 50 + 1 > list.length}
+				onClick={() => {
+					setPage((Math.floor((page - 1) / 5) + 1) * 5 + 1)
+				}}
+			/>
+		</Pagination>
+	)
+}
+
 const Todo = () => {
 	const [userId] = useState(getLoginId())
 	const inputRef = useRef()
 	const [isInvalid, setIsInvalid] = useState(false)
+	const [doingPage, setDoingPage] = useState(1)
+	const [completedPage, setCompletedPage] = useState(1)
+
 	const dispatch = useDispatch()
 
 	useEffect(() => {
@@ -38,6 +81,7 @@ const Todo = () => {
 			{ doingList: [], completedList: [] },
 		)
 	})
+
 	const onSubmitTodo = () => {
 		if (!inputRef.current.value || inputRef.current.value.length < 5) {
 			setIsInvalid(true)
@@ -46,6 +90,28 @@ const Todo = () => {
 		dispatch(insertTodo({ userId, content: inputRef.current.value }))
 		inputRef.current.value = ''
 		setIsInvalid(false)
+	}
+
+	const TodoListBox = (type, list, page) => {
+		return list.slice((page - 1) * 10, (page - 1) * 10 + 10).map((todo, idx) => (
+			<CustomCard key={idx}>
+				<Card.Body>
+					<div className="row justify-content-between">
+						<div className="col-10">{todo.content}</div>
+						<div style={{ paddingRight: '0px' }} className="col-2">
+							<TodoControlBtn
+								className={`fas ${type === 'doing' ? 'fa-check' : 'fa-minus'}`}
+								onClick={() => dispatch(updateTodo({ userId, todoId: todo.todoId }))}
+							></TodoControlBtn>
+							<TodoControlBtn
+								className="fas fa-times"
+								onClick={() => dispatch(deleteTodo({ userId, todoId: todo.todoId }))}
+							></TodoControlBtn>
+						</div>
+					</div>
+				</Card.Body>
+			</CustomCard>
+		))
 	}
 
 	return (
@@ -82,55 +148,13 @@ const Todo = () => {
 				<Row>
 					<Col md="6">
 						<h3>해야하는 일</h3>
-						{doingList.map((todo, idx) => (
-							<CustomCard key={idx}>
-								<Card.Body>
-									<div className="row justify-content-between">
-										<div className="col-10">{todo.content}</div>
-										<div style={{ paddingRight: '0px' }} className="col-2">
-											<TodoControlBtn
-												className="fas fa-check"
-												onClick={() =>
-													dispatch(updateTodo({ userId, todoId: todo.todoId }))
-												}
-											></TodoControlBtn>
-											<TodoControlBtn
-												className="fas fa-times"
-												onClick={() =>
-													dispatch(deleteTodo({ userId, todoId: todo.todoId }))
-												}
-											></TodoControlBtn>
-										</div>
-									</div>
-								</Card.Body>
-							</CustomCard>
-						))}
+						{TodoListBox('doing', doingList, doingPage)}
+						{CustomPagination(doingList, doingPage, setDoingPage)}
 					</Col>
 					<Col md="6">
 						<h3>완료</h3>
-						{completedList.map((todo, idx) => (
-							<CustomCard key={idx} border="info">
-								<Card.Body>
-									<div className="row justify-content-between">
-										<div className="col-10">{todo.content}</div>
-										<div style={{ paddingRight: '0px' }} className="col-2">
-											<TodoControlBtn
-												className="fas fa-minus"
-												onClick={() =>
-													dispatch(updateTodo({ userId, todoId: todo.todoId }))
-												}
-											></TodoControlBtn>
-											<TodoControlBtn
-												className="fas fa-times"
-												onClick={() =>
-													dispatch(deleteTodo({ userId, todoId: todo.todoId }))
-												}
-											></TodoControlBtn>
-										</div>
-									</div>
-								</Card.Body>
-							</CustomCard>
-						))}
+						{TodoListBox('completed', completedList, completedPage)}
+						{CustomPagination(completedList, completedPage, setCompletedPage)}
 					</Col>
 				</Row>
 			</Container>
