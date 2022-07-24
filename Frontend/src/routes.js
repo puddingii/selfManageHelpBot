@@ -24,6 +24,7 @@ import Notifications from 'views/Notifications.js'
 import Upgrade from 'views/Upgrade.js'
 import { Study } from 'views/Study'
 import AccountBook from 'views/AccountBook/index.js'
+import Todo from 'views/Todo/index.js'
 
 const dashboardRoutes = [
 	{
@@ -95,15 +96,15 @@ const smbRoutes = [
 	},
 	{
 		path: '/',
-		name: 'Todo',
-		icon: 'nc-icon nc-bell-55',
-		component: Notifications,
+		name: '할 일',
+		icon: 'nc-icon nc-notes',
+		component: Todo,
 		layout: '/todo',
 	},
 	{
 		path: '/',
-		name: 'AccountBook',
-		icon: 'nc-icon nc-bell-55',
+		name: '가계부',
+		icon: 'nc-icon nc-money-coins',
 		component: AccountBook,
 		layout: '/accountBook',
 	},
