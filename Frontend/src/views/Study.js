@@ -28,7 +28,7 @@ const Study = () => {
 			<Row>
 				<Col md="8">
 					<StudyWeekGraph
-						dateOptions={{ unitType: 'minutes', startDate: '2022-05-01' }}
+						dateOptions={{ unitType: 'minutes', startDate: '2022-05-25' }}
 						action={fetchStudyWeekTimeByDate}
 						title={`study time this week`}
 					/>

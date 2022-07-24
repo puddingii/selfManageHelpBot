@@ -53,7 +53,8 @@ const LineGraph = ({ data, dateOptions, action, title, subTitle = null }) => {
 
 	useEffect(() => {
 		if (data && Object.keys(data).length > 0) {
-			const [date, time] = [data.list.map(e => e.date), data.list.map(e => e.time)]
+			const time = Object.values(data.list)
+			// const [date, time] = [data.list.map(e => e.date), data.list.map(e => e.time)]
 			setState({
 				series: [
 					{
