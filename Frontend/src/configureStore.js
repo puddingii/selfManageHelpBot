@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import user from './store/reducer/user'
 import accountBook from './store/reducer/accountBook'
 import study from './store/reducer/study'
+import todo from './store/reducer/todo'
 
 export default function configureAppStore(preloadedState = {}) {
 	const store = configureStore({
@@ -9,6 +10,7 @@ export default function configureAppStore(preloadedState = {}) {
 			user,
 			accountBook,
 			study,
+			todo,
 		},
 		devTools: process.env.NODE_ENV !== 'production',
 		preloadedState,

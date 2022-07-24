@@ -4,8 +4,41 @@ import { getRepeatCnt } from '../../util/dayUtil'
 import _ from 'lodash'
 
 /**
+ * 가계부 데이터 정보
+ * @typedef {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} AccountDataType
+ * @typedef {import('../../interface/Store').ifStore.AccountBookAjax.CreateNewAccountInfo} CreateNewAccountInfo
+ */
+
+/**
  * accountList를 참고하여 summary 반환
- * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} accountList 가계부 리스트
+ * @param {AccountDataType[]} accountList 가계부 리스트
+ * @param {{startDate: string, endDate: string}} dateInfo
+ */
+export const calcSummaryType = (accountList, dateInfo) => {
+	const summary = {
+		income: {},
+		outcome: {},
+	}
+	accountList.forEach(accountInfo => {
+		const repeatCnt = accountInfo.isFixed
+			? getRepeatCnt({
+					curDate: accountInfo.date,
+					startDate: dateInfo.startDate,
+					endDate: dateInfo.endDate,
+					duration: accountInfo.fixedDuration,
+			  })
+			: 1
+		const comeType = accountInfo.amount > 0 ? 'income' : 'outcome'
+		summary[comeType][accountInfo.category] = summary[comeType][accountInfo.category]
+			? summary[comeType][accountInfo.category] + repeatCnt * Math.abs(accountInfo.amount)
+			: repeatCnt * Math.abs(accountInfo.amount)
+	})
+	return summary
+}
+
+/**
+ * accountList를 참고하여 summary 반환
+ * @param {AccountDataType[]} accountList 가계부 리스트
  * @param {{startDate: string, endDate: string}} dateInfo
  */
 export const calcSummary = (accountList, dateInfo) => {
@@ -16,13 +49,14 @@ export const calcSummary = (accountList, dateInfo) => {
 		notFixedOutcome: 0,
 	}
 	accountList.forEach(accountInfo => {
+		/** 고정 금액 */
 		if (accountInfo.isFixed) {
-			/** 고정 금액 */
-			const repeatCnt = getRepeatCnt(
-				accountInfo.date,
-				dateInfo.endDate,
-				accountInfo.fixedDuration,
-			)
+			const repeatCnt = getRepeatCnt({
+				curDate: accountInfo.date,
+				startDate: dateInfo.startDate,
+				endDate: dateInfo.endDate,
+				duration: accountInfo.fixedDuration,
+			})
 			if (accountInfo.amount > 0) {
 				/** 수입 */
 				summary.fixedIncome += accountInfo.amount * repeatCnt
@@ -50,7 +84,7 @@ export const getAccountBookList = createAsyncThunk(
 	'accountBook/getAccountBookList',
 	/**
 	 * @param {{userId: string, startDate: string, endDate: string}} params
-	 * @returns {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]}
+	 * @returns {AccountDataType[]}
 	 */
 	async params => {
 		const { data: notFixedList } = await axios({
@@ -76,8 +110,8 @@ export const getAccountBookList = createAsyncThunk(
 export const insertAccountBook = createAsyncThunk(
 	'accountBook/insertAccountBook',
 	/**
-	 * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} data
-	 * @returns {{ msg: string, code: string }}
+	 * @param {CreateNewAccountInfo} data
+	 * @returns {{ msg: string, code: string, accountId: number, accountInfo: CreateNewAccountInfo }}
 	 */
 	async data => {
 		const response = await axios({
@@ -85,7 +119,7 @@ export const insertAccountBook = createAsyncThunk(
 			method: 'post',
 			data,
 		})
-		return response.data
+		return { ...response.data, accountInfo: data }
 	},
 )
 
@@ -111,8 +145,8 @@ export const deleteAccountBook = createAsyncThunk(
 export const updateAccountBook = createAsyncThunk(
 	'accountBook/updateAccountBook',
 	/**
-	 * @param {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo} data
-	 * @returns {{ msg: string, code: string, updatedData: import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo }}
+	 * @param {AccountDataType} data
+	 * @returns {{ msg: string, code: string, updatedData: AccountDataType }}
 	 */
 	async data => {
 		const response = await axios({
@@ -129,9 +163,9 @@ export const accountBookSlice = createSlice({
 	name: 'accountBook',
 	initialState: {
 		value: 0,
-		/** @type {import('../../interface/Store').ifStore.AccountBookAjax.AccountInfo[]} 가계부 리스트 */
+		/** @type {AccountDataType[]} 가계부 리스트 */
 		accountList: [],
-		isAjaxSucceed: true,
+		isAjaxSucceed: 'fulfilled',
 		ajaxMsg: '',
 	},
 	reducers: {
@@ -142,29 +176,38 @@ export const accountBookSlice = createSlice({
 	extraReducers: builder => {
 		/** getAccountBookList */
 		builder
+			.addCase(getAccountBookList.pending, state => {
+				state.isAjaxSucceed = 'pending'
+			})
 			.addCase(getAccountBookList.fulfilled, (state, action) => {
-				const {
-					payload,
-					meta: {
-						arg: { startDate, endDate },
-					},
-				} = action
+				const { payload } = action
+				payload.forEach(account => {
+					if (account.fixedDuration) {
+						const sliceCnt = account.fixedDuration.slice(-2) === 'md' ? -2 : -1
+						account.durationType = account.fixedDuration.slice(sliceCnt)
+						account.durationCnt = parseInt(account.fixedDuration.slice(0, sliceCnt), 10)
+					}
+				})
 				state.accountList = payload
+				state.isAjaxSucceed = 'fulfilled'
 			})
 			.addCase(getAccountBookList.rejected, (state, action) => {
-				state.isAjaxSucceed = false
+				state.isAjaxSucceed = 'reject'
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})
 		/** insertAccountBook */
 		builder
 			.addCase(insertAccountBook.fulfilled, (state, action) => {
-				const { code, msg } = action.payload
-
-				state.isAjaxSucceed = code !== 1
+				const { code, msg, accountId, accountInfo } = action.payload
+				if (code === 1) {
+					if (accountInfo.userId) delete accountInfo.userId
+					state.accountList.push({ accountId, ...accountInfo })
+				}
+				state.isAjaxSucceed = 'fulfilled'
 				state.ajaxMsg = msg
 			})
 			.addCase(insertAccountBook.rejected, (state, action) => {
-				state.isAjaxSucceed = false
+				state.isAjaxSucceed = 'reject'
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})
 		/** deleteAccountBook */
@@ -178,11 +221,11 @@ export const accountBookSlice = createSlice({
 					})
 				}
 
-				state.isAjaxSucceed = code !== 1
+				state.isAjaxSucceed = 'fulfilled'
 				state.ajaxMsg = msg
 			})
 			.addCase(deleteAccountBook.rejected, (state, action) => {
-				state.isAjaxSucceed = false
+				state.isAjaxSucceed = 'reject'
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})
 		/** updateAccountBook */
@@ -199,15 +242,15 @@ export const accountBookSlice = createSlice({
 					}
 				}
 
-				state.isAjaxSucceed = code !== 1
+				state.isAjaxSucceed = 'fulfilled'
 				state.ajaxMsg = msg
 			})
 			.addCase(updateAccountBook.rejected, (state, action) => {
-				state.isAjaxSucceed = false
+				state.isAjaxSucceed = 'reject'
 				state.ajaxMsg = '인터넷이나 서버가 불안정합니다...'
 			})
 			.addDefaultCase((state, action) => {
-				state.isAjaxSucceed = true
+				state.isAjaxSucceed = 'pending'
 			})
 	},
 })

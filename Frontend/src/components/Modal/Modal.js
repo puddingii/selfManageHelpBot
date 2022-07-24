@@ -137,7 +137,7 @@ const Field = props => {
 					{props.required && <RequiredSpan />}
 				</Form.Label>
 			</Col>
-			<Col className="col-9">
+			<Col className="col-9 text-center">
 				<FieldInput {...props} ref={inputRef} />
 			</Col>
 		</Row>
@@ -185,6 +185,7 @@ const FieldInput = forwardRef((props, inputRef) => {
 					isInvalid={errors[props.name]}
 					{...inputReg}
 					ref={ref}
+					className="mx-0"
 				></Form.Check.Input>
 			)
 			break

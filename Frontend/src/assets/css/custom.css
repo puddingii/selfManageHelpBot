@@ -1,0 +1,12 @@
+.custom-date-picker-wrapper {
+	width: 190px !important;
+}
+
+.react-datepicker__tab-loop {
+	display: inline-block;
+}
+
+.nav-item.nav-link.active {
+	background-color: transparent;
+	border-color: #dee2e6 #dee2e6 #f8f9fa;
+}

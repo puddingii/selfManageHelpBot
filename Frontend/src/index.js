@@ -17,10 +17,8 @@
 */
 import dotenv from 'dotenv'
 import path from 'path'
-console.log(process.env.REACT_APP_ENV)
 const envPath = process.env.REACT_APP_ENV === 'local' ? '../.env-local' : '../.env'
 dotenv.config({ path: path.resolve(__dirname, envPath) })
-console.log(process.env.REACT_APP_BACKEND_DOMAIN)
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -35,11 +33,13 @@ import './assets/css/demo.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css'
+import './assets/css/custom.css'
 
 import AdminLayout from 'layouts/Admin.js'
 import Layout from 'layouts/Layout'
 import LoginLayout from 'layouts/LoginLayout'
 import configureAppStore from 'configureStore'
+import { LoginRequiredRoute, NonLoginRequiredRoute } from 'layouts/routes'
 
 const store = configureAppStore()
 
@@ -47,10 +47,12 @@ ReactDOM.render(
 	<Provider store={store}>
 		<BrowserRouter basename={process.env.PUBLIC_URL}>
 			<Switch>
+				<Route exact path="/" render={props => <Redirect push to="/study" />} />
 				<Route path="/admin" render={props => <AdminLayout {...props} />} />
-				<Route path="/study" render={props => <Layout {...props} />} />
-				<Route path="/account" render={props => <LoginLayout {...props} />} />
-				{/* <Redirect from="/" to="/admin/dashboard" /> */}
+				<NonLoginRequiredRoute path="/account" component={LoginLayout} />
+				<LoginRequiredRoute path="/study" component={Layout} />
+				<LoginRequiredRoute path="/todo" component={Layout} />
+				<LoginRequiredRoute path="/accountBook" component={Layout} />
 			</Switch>
 		</BrowserRouter>
 	</Provider>,
