@@ -10,3 +10,8 @@
 	background-color: transparent;
 	border-color: #dee2e6 #dee2e6 #f8f9fa;
 }
+
+.react-bootstrap-table-pagination {
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
