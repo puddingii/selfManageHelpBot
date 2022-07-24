@@ -20,6 +20,7 @@ import { useLocation } from 'react-router-dom'
 import { Navbar, Container, Nav, Dropdown, Button } from 'react-bootstrap'
 
 import routes from 'routes.js'
+import { logout } from 'util/authenticate'
 
 function Header() {
 	const location = useLocation()
@@ -151,7 +152,7 @@ function Header() {
 							</Dropdown.Menu>
 						</Dropdown>
 						<Nav.Item>
-							<Nav.Link className="m-0" href="#pablo" onClick={e => e.preventDefault()}>
+							<Nav.Link className="m-0" href="#pablo" onClick={e => logout()}>
 								<span className="no-icon">Log out</span>
 							</Nav.Link>
 						</Nav.Item>
