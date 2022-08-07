@@ -89,8 +89,8 @@ const dashboardRoutes = [
 const smbRoutes = [
 	{
 		path: '/',
-		name: 'Study',
-		icon: 'nc-icon nc-bell-55',
+		name: '공부',
+		icon: 'nc-icon nc-ruler-pencil',
 		component: Study,
 		layout: '/study',
 	},

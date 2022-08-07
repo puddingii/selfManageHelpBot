@@ -8,6 +8,7 @@ const initialState = {
 	week: {},
 	month: {},
 	recentWeek: {},
+	list: [],
 }
 
 //@ts-check
@@ -60,6 +61,23 @@ export const fetchStudyWeekTime = createAsyncThunk(
 	},
 )
 
+export const fetchStudyDetailList = createAsyncThunk(
+	'study/STUDY_DETAIL_LIST',
+	/**
+	 * @param {{startDate:Date, endDate:Date}} param
+	 * @returns {import('../../interface/store/study').StudyDetail}
+	 */
+	async (param, thunkAPI) => {
+		const host = 'http://localhost:8080/api/study/list'
+		const url = new URL(host)
+		url.searchParams.set('userId', 'test123456')
+		url.searchParams.set('startDate', param.startDate)
+		url.searchParams.set('endDate', param.endDate)
+		const res = await axios.get(url.href)
+		return res.data
+	},
+)
+
 export const studySlice = createSlice({
 	name: 'study',
 	initialState: initialState,
@@ -71,6 +89,9 @@ export const studySlice = createSlice({
 			})
 			.addCase(fetchStudyWeekTime.fulfilled, (state, action) => {
 				state.recentWeek = action.payload
+			})
+			.addCase(fetchStudyDetailList.fulfilled, (state, action) => {
+				state.list = action.payload
 			})
 	},
 })

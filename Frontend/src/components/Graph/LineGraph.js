@@ -70,6 +70,7 @@ const LineGraph = ({ data, dateOptions, action, title, subTitle = null }) => {
 						zoom: {
 							enabled: false,
 						},
+						toolbar: { show: false },
 					},
 					annotations: {
 						yaxis: [

@@ -74,6 +74,7 @@ const TableBox = ({
 	tableData,
 	modalProps,
 	isAjaxSucceed,
+	datepicker,
 }) => {
 	const [isModalShow, setModalShow] = useState(false)
 	const [currentRow, setCurrentRow] = useState({})
@@ -99,6 +100,7 @@ const TableBox = ({
 				<p className="card-category">{description}</p>
 			</Card.Header>
 			<Card.Body className="table-full-width table-responsive px-0">
+				{datepicker && datepicker}
 				<BSTable
 					classes="table-hover table-striped"
 					keyField={columnId}
@@ -134,6 +136,70 @@ TableBox.propTypes = {
 	columns: PropTypes.array.isRequired,
 	tableData: PropTypes.array.isRequired,
 	isAjaxSucceed: PropTypes.string,
+	datepicker: PropTypes.any,
+}
+
+const TableModalTableBox = ({
+	columnId,
+	title,
+	description,
+	columns,
+	tableData,
+	modalProps,
+	isAjaxSucceed,
+	datepicker,
+}) => {
+	const [isModalShow, setModalShow] = useState(false)
+	const [currentRow, setCurrentRow] = useState({})
+
+	const handleShow = () => {
+		setModalShow(true)
+	}
+	const rowEvents = {
+		onClick: (e, row, rowIndex) => {
+			setCurrentRow(row)
+			handleShow()
+		},
+	}
+	return (
+		<Card className="strpied-tabled-with-hover">
+			<Card.Header>
+				<Card.Title as="h4">
+					{title}
+					{isAjaxSucceed === 'pending' ? (
+						<Spinner animation="border" variant="secondary" />
+					) : null}
+				</Card.Title>
+				<p className="card-category">{description}</p>
+			</Card.Header>
+			<Card.Body className="table-full-width table-responsive px-0">
+				{datepicker && datepicker}
+				<BSTable
+					classes={`table-hover table-striped`}
+					keyField={columnId}
+					data={tableData}
+					columns={columns}
+					bordered={false}
+					pagination={paginationFactory(paginationOption)}
+					rowEvents={rowEvents}
+					selectRow={{
+						mode: 'checkbox',
+						onSelect: (row, isSelected, rowIndex) => {
+							// console.log(row, isSelected, rowIndex)
+						},
+					}}
+				/>
+				<CommonModal
+					{...modalProps}
+					fieldValues={currentRow}
+					isShow={isModalShow}
+					handleClose={() => {
+						setModalShow(false)
+					}}
+				/>
+			</Card.Body>
+		</Card>
+	)
 }
 
 export default React.memo(TableBox)

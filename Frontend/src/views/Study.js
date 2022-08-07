@@ -1,14 +1,23 @@
 import { CardView } from 'components/CardView'
 import React, { Component, useEffect, useState } from 'react'
 import { Col, Container, Row, Card, Table } from 'react-bootstrap'
-import ChartistGraph from 'react-chartist'
 import Chart from 'react-apexcharts'
 import { StudyWeekGraph } from '../components/Graph/LineGraph'
-import { fetchStudyWeekTimeByDate, fetchStudyWeekTime } from 'store/reducer/study'
+import study, {
+	fetchStudyWeekTimeByDate,
+	fetchStudyWeekTime,
+	fetchStudyDetailList,
+} from 'store/reducer/study'
 import { useDispatch, useSelector } from 'react-redux'
 import _, { sum } from 'lodash'
+import TableBox from 'components/Box/TableBox'
+import DatePicker from 'react-datepicker'
+import { ko } from 'date-fns/esm/locale'
+import dayjs from 'dayjs'
+import { TableModal } from 'components/Modal/TableModal'
 
 const Study = () => {
+	const [modalFlag, setModalFlag] = useState(true)
 	const dispatch = useDispatch()
 	useEffect(async () => {
 		await dispatch(fetchStudyWeekTime({ week: 8 })).unwrap()
@@ -17,12 +26,12 @@ const Study = () => {
 		<Container fluid>
 			<Row>
 				<Col>
-					<FrequencyGraph title={'study time in recent weeks'} />
+					<FrequencyGraph title={'최근 2달간 공부 시간'} />
 				</Col>
 			</Row>
 			<Row>
 				<Col>
-					<StudyTable />
+					<StudyTable title="공부 상세 내역" />
 				</Col>
 			</Row>
 			<Row>
@@ -30,141 +39,122 @@ const Study = () => {
 					<StudyWeekGraph
 						dateOptions={{ unitType: 'minutes', startDate: '2022-05-25' }}
 						action={fetchStudyWeekTimeByDate}
-						title={`study time this week`}
+						title={`이번주 공부 시간(분)`}
 					/>
 				</Col>
 				<Col md="4">
-					<PieGraph title={'Average study time in last 4 weeks'} />
+					<PieGraph title={'최근 4주간 일 평균 공부시간'} />
 				</Col>
 			</Row>
+			<TableModal
+				title="공부 상세 내역"
+				isShow={modalFlag}
+				handleClose={() => setModalFlag(false)}
+			></TableModal>
 		</Container>
 	)
 }
 
-const StudyTable = () => {
+const StudyTable = props => {
+	const columns = [
+		{
+			dataField: 'title',
+			text: '제목',
+			headerClasses: 'border-0',
+		},
+		{
+			dataField: 'startDate',
+			text: '시작시간',
+			headerClasses: 'border-0',
+			formatter: date => {
+				return <span>{`${dayjs(date).format('YYYY년MM월DD일 H시m분')}`}</span>
+			},
+			headerStyle: { width: '250px' },
+			classes: 'text-center',
+		},
+		{
+			dataField: 'endDate',
+			text: '끝시간',
+			headerClasses: 'border-0',
+			formatter: date => {
+				return <span>{`${dayjs(date).format('YYYY년MM월DD일 H시m분')}`}</span>
+			},
+			headerStyle: { width: '250px' },
+			classes: 'text-center',
+		},
+		{
+			dataField: 'commentList',
+			text: '메모',
+			headerClasses: 'border-0',
+			formatter: list => {
+				return <span>{`${list.length ?? 0}개`}</span>
+			},
+			headerStyle: { width: '100px' },
+			classes: 'text-center',
+		},
+	]
+
+	const tableData = useSelector(({ study }) => study.list)
+
 	return (
-		<CardView
-			title="Striped Table with Hover"
-			subtitle="Here is a subtitle for this table"
-		>
-			<Table className="table-hover table-striped">
-				<thead>
-					<tr>
-						<th className="border-0">ID</th>
-						<th className="border-0">Name</th>
-						<th className="border-0">Salary</th>
-						<th className="border-0">Country</th>
-						<th className="border-0">City</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>1</td>
-						<td>Dakota Rice</td>
-						<td>$36,738</td>
-						<td>Niger</td>
-						<td>Oud-Turnhout</td>
-					</tr>
-					<tr>
-						<td>2</td>
-						<td>Minerva Hooper</td>
-						<td>$23,789</td>
-						<td>Curaçao</td>
-						<td>Sinaai-Waas</td>
-					</tr>
-					<tr>
-						<td>3</td>
-						<td>Sage Rodriguez</td>
-						<td>$56,142</td>
-						<td>Netherlands</td>
-						<td>Baileux</td>
-					</tr>
-					<tr>
-						<td>4</td>
-						<td>Philip Chaney</td>
-						<td>$38,735</td>
-						<td>Korea, South</td>
-						<td>Overland Park</td>
-					</tr>
-					<tr>
-						<td>5</td>
-						<td>Doris Greene</td>
-						<td>$63,542</td>
-						<td>Malawi</td>
-						<td>Feldkirchen in Kärnten</td>
-					</tr>
-					<tr>
-						<td>6</td>
-						<td>Mason Porter</td>
-						<td>$78,615</td>
-						<td>Chile</td>
-						<td>Gloucester</td>
-					</tr>
-				</tbody>
-			</Table>
-		</CardView>
+		<TableBox
+			columnId="endDate"
+			title={props.title}
+			tableData={tableData}
+			columns={columns}
+			modalProps={{}}
+			isAjaxSucceed=""
+			datepicker={<TableDatePicker />}
+		></TableBox>
 	)
 }
 
-const Graph1 = () => {
+const TableDatePicker = () => {
+	const dispatch = useDispatch()
+	const [startDate, setStartDate] = useState(dayjs().add(-7, 'day').toDate())
+	const [endDate, setEndDate] = useState(dayjs().toDate())
+	const [nowDate, setNowdate] = useState(dayjs().add(1, 'day').date())
+
+	useEffect(() => {
+		dispatch(
+			fetchStudyDetailList({
+				startDate: dayjs(startDate).format('YYYY-MM-DD'),
+				endDate: dayjs(endDate).format('YYYY-MM-DD'),
+			}),
+		).unwrap()
+	}, [startDate, endDate])
+
 	return (
-		<CardView title="Users Behavior" subTitle="24 Hours performance">
-			<div className="ct-chart" id="chartHours">
-				<ChartistGraph
-					data={{
-						labels: [
-							'9:00AM',
-							'12:00AM',
-							'3:00PM',
-							'6:00PM',
-							'',
-							'12:00PM',
-							'3:00AM',
-							'6:00AM',
-						],
-						series: [
-							[287, 385, 490, 492, 554, 586, 698, 695],
-							[67, 152, 143, 240, 287, 335, 435, 437],
-							[23, 113, 67, 108, 190, 239, 307, 308],
-						],
-					}}
-					type="Line"
-					options={{
-						low: 0,
-						high: 800,
-						showArea: false,
-						height: '245px',
-						axisX: {
-							showGrid: false,
-						},
-						lineSmooth: true,
-						showLine: true,
-						showPoint: true,
-						fullWidth: true,
-						chartPadding: {
-							right: 50,
-						},
-						plugins: [
-							ChartistGraph.plugins.ctAverageLine({
-								value: 6,
-							}),
-						],
-					}}
-					responsiveOptions={[
-						[
-							'screen and (max-width: 640px)',
-							{
-								axisX: {
-									labelInterpolationFnc: function (value) {
-										return value[0]
-									},
-								},
-							},
-						],
-					]}
-				/>
-			</div>
-		</CardView>
+		<div className="d-flex justify-content-center">
+			<DatePicker
+				dateFormat="yyyy-MM-dd"
+				locale={ko}
+				selected={startDate}
+				startDate={startDate}
+				endDate={endDate}
+				onChange={update => {
+					setStartDate(update)
+				}}
+				selectsStart
+				wrapperClassName={'custom-date-picker-wrapper'}
+				className="form-control"
+			/>
+			<h4 className="d-inline-block my-0 mx-1">~</h4>
+			<DatePicker
+				dateFormat="yyyy-MM-dd"
+				locale={ko}
+				selected={endDate}
+				startDate={startDate}
+				endDate={endDate}
+				minDate={startDate}
+				onChange={update => {
+					setEndDate(update)
+				}}
+				selectsEnd
+				wrapperClassName={'custom-date-picker-wrapper'}
+				className="form-control"
+			/>
+		</div>
 	)
 }
 
@@ -225,7 +215,6 @@ const PieGraph = ({ title }) => {
 		],
 	}
 
-	console.log(studyWeek)
 	return (
 		studyWeek && (
 			<CardView title={title}>
@@ -250,7 +239,7 @@ const FrequencyGraph = props => {
 		chart: {
 			height: 350,
 			type: 'heatmap',
-			toolbar: { enabled: false },
+			toolbar: { show: false },
 		},
 		dataLabels: {
 			enabled: false,
