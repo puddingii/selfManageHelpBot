@@ -19,3 +19,10 @@
 .text-center {
 	text-align: center !important;
 }
+
+.extand-row {
+	word-wrap: break-word;
+	word-break: break-all;
+	max-height: 200px !important;
+	overflow-y: auto;
+}

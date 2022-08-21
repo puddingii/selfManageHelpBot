@@ -35,7 +35,7 @@ export const fetchStudyWeekTimeByDate = createAsyncThunk(
 	async (param, thunkAPI) => {
 		const res = await axios.post(
 			`${process.env.REACT_APP_BACKEND_DOMAIN}/study/time`,
-			{ ...param, userId: 'gun4930' },
+			{ ...param, userId: 'test123456' },
 			{
 				headers: {
 					'Referrer-Policy': 'no-referrer-when-downgrade',
@@ -55,7 +55,7 @@ export const fetchStudyWeekTime = createAsyncThunk(
 	async (param, thunkAPI) => {
 		const res = await axios.post(
 			`${process.env.REACT_APP_BACKEND_DOMAIN}/study/weeks/${param.week}`,
-			{ userId: 'gun4930' },
+			{ userId: 'test123456' },
 		)
 		return res.data
 	},

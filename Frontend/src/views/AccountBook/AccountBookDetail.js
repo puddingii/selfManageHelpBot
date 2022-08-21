@@ -8,7 +8,7 @@ import _ from 'lodash'
 
 // react-bootstrap components
 import { Row, Col } from 'react-bootstrap'
-import TableBox from 'components/Box/TableBox'
+import { CommonModalTableBox } from 'components/Box/TableBox'
 import {
 	getAccountBookList,
 	updateAccountBook,
@@ -257,7 +257,7 @@ function AccountBookDetail() {
 			</Row>
 			<Row>
 				<Col>
-					<TableBox
+					<CommonModalTableBox
 						columnId="accountId"
 						title="변동 수입/지출"
 						description="고치거나 삭제할 내역이 있다면 해당 부분을 클릭하세요!"
@@ -265,19 +265,19 @@ function AccountBookDetail() {
 						columns={notFixedColumns}
 						modalProps={notFixedModalProps}
 						isAjaxSucceed={isAjaxSucceed}
-					></TableBox>
+					></CommonModalTableBox>
 				</Col>
 			</Row>
 			<Row>
 				<Col>
-					<TableBox
+					<CommonModalTableBox
 						columnId="accountId"
 						title="고정 수입/지출"
 						description="고치거나 삭제할 내역이 있다면 해당 부분을 클릭하세요!"
 						tableData={fixedList}
 						columns={fixedColumns}
 						modalProps={fixedModalProps}
-					></TableBox>
+					></CommonModalTableBox>
 				</Col>
 			</Row>
 		</>

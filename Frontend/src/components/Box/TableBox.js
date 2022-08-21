@@ -1,12 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
 // react-bootstrap components
 import { Dropdown, Card, Nav, Spinner } from 'react-bootstrap'
 import BSTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
 import { CommonModal } from '../Modal/Modal'
 import _ from 'lodash'
 
@@ -72,22 +70,11 @@ const TableBox = ({
 	description,
 	columns,
 	tableData,
-	modalProps,
 	isAjaxSucceed,
 	datepicker,
+	rowEvents,
+	modalComponent,
 }) => {
-	const [isModalShow, setModalShow] = useState(false)
-	const [currentRow, setCurrentRow] = useState({})
-
-	const handleShow = () => {
-		setModalShow(true)
-	}
-	const rowEvents = {
-		onClick: (e, row, rowIndex) => {
-			setCurrentRow(row)
-			handleShow()
-		},
-	}
 	return (
 		<Card className="strpied-tabled-with-hover">
 			<Card.Header>
@@ -111,19 +98,10 @@ const TableBox = ({
 					rowEvents={rowEvents}
 					selectRow={{
 						mode: 'checkbox',
-						onSelect: (row, isSelected, rowIndex) => {
-							// console.log(row, isSelected, rowIndex)
-						},
+						onSelect: (row, isSelected, rowIndex) => {},
 					}}
 				/>
-				<CommonModal
-					{...modalProps}
-					fieldValues={currentRow}
-					isShow={isModalShow}
-					handleClose={() => {
-						setModalShow(false)
-					}}
-				/>
+				{modalComponent && modalComponent}
 			</Card.Body>
 		</Card>
 	)
@@ -137,18 +115,11 @@ TableBox.propTypes = {
 	tableData: PropTypes.array.isRequired,
 	isAjaxSucceed: PropTypes.string,
 	datepicker: PropTypes.any,
+	rowEvents: PropTypes.object,
+	modalComponent: PropTypes.any,
 }
 
-const TableModalTableBox = ({
-	columnId,
-	title,
-	description,
-	columns,
-	tableData,
-	modalProps,
-	isAjaxSucceed,
-	datepicker,
-}) => {
+const _CommonModalTableBox = props => {
 	const [isModalShow, setModalShow] = useState(false)
 	const [currentRow, setCurrentRow] = useState({})
 
@@ -161,45 +132,79 @@ const TableModalTableBox = ({
 			handleShow()
 		},
 	}
-	return (
-		<Card className="strpied-tabled-with-hover">
-			<Card.Header>
-				<Card.Title as="h4">
-					{title}
-					{isAjaxSucceed === 'pending' ? (
-						<Spinner animation="border" variant="secondary" />
-					) : null}
-				</Card.Title>
-				<p className="card-category">{description}</p>
-			</Card.Header>
-			<Card.Body className="table-full-width table-responsive px-0">
-				{datepicker && datepicker}
-				<BSTable
-					classes={`table-hover table-striped`}
-					keyField={columnId}
-					data={tableData}
-					columns={columns}
-					bordered={false}
-					pagination={paginationFactory(paginationOption)}
-					rowEvents={rowEvents}
-					selectRow={{
-						mode: 'checkbox',
-						onSelect: (row, isSelected, rowIndex) => {
-							// console.log(row, isSelected, rowIndex)
-						},
-					}}
-				/>
-				<CommonModal
-					{...modalProps}
-					fieldValues={currentRow}
-					isShow={isModalShow}
-					handleClose={() => {
-						setModalShow(false)
-					}}
-				/>
-			</Card.Body>
-		</Card>
+
+	const Modal = (
+		<CommonModal
+			{...props.modalProps}
+			fieldValues={currentRow}
+			isShow={isModalShow}
+			handleClose={() => {
+				setModalShow(false)
+			}}
+		/>
 	)
+	return <TableBox {...props} rowEvents={rowEvents} modalComponent={Modal} />
 }
 
-export default React.memo(TableBox)
+_CommonModalTableBox.propTypes = {
+	columnId: PropTypes.string.isRequired,
+	title: PropTypes.string.isRequired,
+	description: PropTypes.string,
+	columns: PropTypes.array.isRequired,
+	tableData: PropTypes.func.isRequired,
+	isAjaxSucceed: PropTypes.string,
+	datepicker: PropTypes.any,
+	modalProps: PropTypes.any,
+}
+
+const _CustomModalTableBox = ({
+	ModalComponent,
+	modalHandler,
+	rowToModalProp,
+	...props
+}) => {
+	const [isModalShow, setModalShow] = useState(false)
+	const [currentRow, setCurrentRow] = useState({})
+	const [modalProps, setModalProps] = useState(rowToModalProp())
+
+	const handleShow = row => {
+		setModalShow(modalHandler(row)) // 클릭한 row가 특정한 조건일때만 모달 열기
+	}
+	const rowEvents = {
+		onClick: (e, row, rowIndex) => {
+			setCurrentRow(row)
+			handleShow(row)
+		},
+	}
+
+	useEffect(() => {
+		setModalProps(rowToModalProp(currentRow))
+	}, [currentRow])
+
+	const Modal = (
+		<ModalComponent
+			{...modalProps}
+			isShow={isModalShow}
+			handleClose={() => {
+				setModalShow(false)
+			}}
+			data={currentRow}
+		/>
+	)
+	return <TableBox {...props} rowEvents={rowEvents} modalComponent={Modal} />
+}
+_CustomModalTableBox.propTypes = {
+	columnId: PropTypes.string.isRequired,
+	title: PropTypes.string.isRequired,
+	description: PropTypes.string,
+	columns: PropTypes.array.isRequired,
+	tableData: PropTypes.array.isRequired,
+	isAjaxSucceed: PropTypes.string,
+	datepicker: PropTypes.any,
+	ModalComponent: PropTypes.any.isRequired,
+	modalHandler: PropTypes.func.isRequired,
+	rowToModalProp: PropTypes.func.isRequired,
+}
+
+export const CommonModalTableBox = React.memo(_CommonModalTableBox)
+export const CustomModalTableBox = React.memo(_CustomModalTableBox)

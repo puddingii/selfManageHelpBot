@@ -9,19 +9,19 @@ import study, {
 	fetchStudyDetailList,
 } from 'store/reducer/study'
 import { useDispatch, useSelector } from 'react-redux'
-import _, { sum } from 'lodash'
-import TableBox from 'components/Box/TableBox'
+import _ from 'lodash'
+import { CustomModalTableBox } from 'components/Box/TableBox'
 import DatePicker from 'react-datepicker'
 import { ko } from 'date-fns/esm/locale'
 import dayjs from 'dayjs'
 import { TableModal } from 'components/Modal/TableModal'
 
 const Study = () => {
-	const [modalFlag, setModalFlag] = useState(true)
 	const dispatch = useDispatch()
 	useEffect(async () => {
 		await dispatch(fetchStudyWeekTime({ week: 8 })).unwrap()
 	}, [])
+
 	return (
 		<Container fluid>
 			<Row>
@@ -46,11 +46,6 @@ const Study = () => {
 					<PieGraph title={'최근 4주간 일 평균 공부시간'} />
 				</Col>
 			</Row>
-			<TableModal
-				title="공부 상세 내역"
-				isShow={modalFlag}
-				handleClose={() => setModalFlag(false)}
-			></TableModal>
 		</Container>
 	)
 }
@@ -90,28 +85,59 @@ const StudyTable = props => {
 				return <span>{`${list.length ?? 0}개`}</span>
 			},
 			headerStyle: { width: '100px' },
-			classes: 'text-center',
+			cllasses: 'text-center',
 		},
 	]
 
 	const tableData = useSelector(({ study }) => study.list)
+	const modalHandler = row => {
+		return !!(row.commentList?.length > 0)
+	}
+	const rowToModalProp = row => ({
+		keyField: 'date',
+		title: '공부 상세 내역',
+		columns: [
+			{
+				dataField: 'title',
+				text: '제목',
+			},
+			{
+				dataField: 'date',
+				text: '날짜',
+				formatter: date => (
+					<span>
+						{dayjs(date).format('YYYY년MM월DD일')}
+						<br />
+						{dayjs(date).format('HH시mm분ss초')}
+					</span>
+				),
+				headerStyle: { width: '150px' },
+			},
+		],
+		tableData: row => row?.commentList ?? [],
+		nonExpandable: row => row?.filter(data => !data.content).map(data => data.date) ?? [],
+		extandRowKey: 'content',
+		size: 'lg',
+	})
 
 	return (
-		<TableBox
+		<CustomModalTableBox
 			columnId="endDate"
 			title={props.title}
 			tableData={tableData}
 			columns={columns}
-			modalProps={{}}
 			isAjaxSucceed=""
 			datepicker={<TableDatePicker />}
-		></TableBox>
+			ModalComponent={TableModal}
+			modalHandler={modalHandler}
+			rowToModalProp={rowToModalProp}
+		/>
 	)
 }
 
 const TableDatePicker = () => {
 	const dispatch = useDispatch()
-	const [startDate, setStartDate] = useState(dayjs().add(-7, 'day').toDate())
+	const [startDate, setStartDate] = useState(dayjs().add(-14, 'day').toDate())
 	const [endDate, setEndDate] = useState(dayjs().toDate())
 	const [nowDate, setNowdate] = useState(dayjs().add(1, 'day').date())
 
@@ -233,7 +259,6 @@ const FrequencyGraph = props => {
 	const { recentWeek: studyRecentWeek } = useSelector(state => state.study)
 	const [studyWeek, setStudyRecent] = useState(null)
 	const [date, setDate] = useState(null)
-	const dispatch = useDispatch()
 
 	const options = {
 		chart: {
